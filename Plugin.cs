@@ -1,33 +1,24 @@
 ﻿using BepInEx;
-using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace BlackMossTemplate;
+namespace CustomFungamePack;
 
-[BepInPlugin(Guid, Name, "1.0.1")]
+[BepInPlugin(Guid, Name, "1.0.0")]
+[BepInDependency("blackmoss.mosslib")]
 public class Plugin : BaseUnityPlugin
 {
     internal new static ManualLogSource Logger;
-    internal const string Guid = "blackmoss.template";
-    internal const string Name = "Black_Moss Template";
+    internal const string Guid = "blackmoss.customfungamepack";
+    internal const string Name = "Custom Fungame Pack";
     private readonly Harmony _harmony = new(Guid);
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public static Plugin Instance { get; private set; } = null!;
-    private ConfigEntry<int> _testNumber;
 
     public void Awake()
     {
         Logger = base.Logger;
         Instance = this;
         _harmony.PatchAll();
-            
-        _testNumber = Config.Bind(
-            "General",                // 配置节名称
-            "TEST Number",         // 配置项名称
-            60,                   // 默认值
-            "Default 1 minute."    // 描述信息
-        );
-        Logger.LogInfo($"Here's Black Moss! {_testNumber.Value}");
     }
 }

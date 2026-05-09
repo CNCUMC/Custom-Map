@@ -22,7 +22,7 @@ $bepInExPath = [System.IO.Path]::Combine($GamePath, "BepInEx")
 # 各种文件
 $bepInExLog = [System.IO.Path]::Combine($bepInExPath, "LogOutput.log") # BepInEx 日志
 $GameExecutable = [System.IO.Path]::Combine($GamePath, "CasualtiesUnknown.exe") # 游戏文件
-$ModDll = [System.IO.Path]::Combine($PSScriptRoot, "bin/Debug/net472", "$ModNamespace.dll")
+$ModDll = [System.IO.Path]::Combine($PSScriptRoot, "bin/Debug/net48", "$ModNamespace.dll")
 
 # 统一使用 ModName 作为目标文件夹名称
 $targetModFolder = $ModName
