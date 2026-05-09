@@ -22,6 +22,6 @@ public class Plugin : BaseUnityPlugin
         Instance = this;
         _harmony.PatchAll();
         
-        FungameJson.Initialize();
+        FungameDirectory.Initialize();
     }
 }
