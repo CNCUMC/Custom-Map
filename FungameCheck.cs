@@ -109,7 +109,7 @@ public static class FungameCheck
         }
     }
 
-    private static bool ValidateAndLoadFungame(string filePath)
+private static bool ValidateAndLoadFungame(string filePath)
     {
         try
         {
@@ -148,6 +148,11 @@ public static class FungameCheck
                 }
             }
 
+            if (jsonObject.ContainsKey("map") && jsonObject["map"] != null)
+            {
+                ValidateMapData(jsonObject["map"] as JObject, errors);
+            }
+
             if (errors.Count > 0)
             {
                 Logger.LogWarning($"Fungame文件验证失败: {Path.GetFileName(filePath)}");
@@ -167,7 +172,20 @@ public static class FungameCheck
                 return false;
             }
 
-            Logger.LogInfo($"成功加载Fungame: {fungame.Name} (ID: {fungame.Id}, Version: {fungame.Version})");
+            if (fungame.Map != null)
+            {
+                if (!ValidateMapDataInObject(fungame.Map))
+                {
+                    Logger.LogWarning($"Fungame文件的地图数据无效: {Path.GetFileName(filePath)}");
+                    return false;
+                }
+                Logger.LogInfo($"成功加载Fungame: {fungame.Name} (ID: {fungame.Id}, Version: {fungame.Version}, 包含地图数据)");
+            }
+            else
+            {
+                Logger.LogInfo($"成功加载Fungame: {fungame.Name} (ID: {fungame.Id}, Version: {fungame.Version})");
+            }
+            
             return true;
         }
         catch (Exception ex) when (ex is JsonException or UnauthorizedAccessException or IOException)
@@ -177,6 +195,95 @@ public static class FungameCheck
         }
     }
 
+private static bool IsValidVersion(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+            return false;
+
+        var parts = version.Split('.');
+        return parts.Length is >= 2 and <= 4 && parts.All(part => int.TryParse(part, out _));
+    }
+
+    private static void ValidateMapData(JObject mapObject, List<string> errors)
+    {
+        if (mapObject == null)
+        {
+            errors.Add("map 字段格式不正确");
+            return;
+        }
+
+        if (!mapObject.ContainsKey("x"))
+        {
+            errors.Add("地图缺少必需字段: x");
+        }
+        else if (mapObject["x"] == null || mapObject["x"].Type != JTokenType.Integer)
+        {
+            errors.Add("地图 x 字段必须是整数");
+        }
+
+        if (!mapObject.ContainsKey("y"))
+        {
+            errors.Add("地图缺少必需字段: y");
+        }
+        else if (mapObject["y"] == null || mapObject["y"].Type != JTokenType.Integer)
+        {
+            errors.Add("地图 y 字段必须是整数");
+        }
+
+        if (!mapObject.ContainsKey("blocks"))
+        {
+            errors.Add("地图缺少必需字段: blocks");
+        }
+        else if (mapObject["blocks"] == null || mapObject["blocks"].Type != JTokenType.Array)
+        {
+            errors.Add("地图 blocks 字段必须是二维数组");
+        }
+        else
+        {
+            var blocksArray = mapObject["blocks"] as JArray;
+            if (blocksArray == null || blocksArray.Count == 0)
+            {
+                errors.Add("地图 blocks 数组不能为空");
+            }
+            else
+            {
+                for (int i = 0; i < blocksArray.Count; i++)
+                {
+                    if (blocksArray[i].Type != JTokenType.Array)
+                    {
+                        errors.Add($"地图 blocks 第 {i} 行必须是数组");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private static bool ValidateMapDataInObject(MapData mapData)
+    {
+        if (mapData.Blocks == null || mapData.Blocks.Length == 0)
+        {
+            Logger.LogWarning("地图中没有方块数据");
+            return false;
+        }
+
+        var rowCount = mapData.Blocks.Length;
+        var maxColCount = 0;
+        
+        foreach (var row in mapData.Blocks)
+        {
+            if (row != null && row.Length > maxColCount)
+            {
+                maxColCount = row.Length;
+            }
+        }
+
+        if (maxColCount != 0) return true;
+        Logger.LogWarning("地图行数据为空");
+        return false;
+
+    }
+    
     private static void ValidateRequiredField(JObject jsonObject, string fieldName, List<string> errors)
     {
         if (!jsonObject.ContainsKey(fieldName))
@@ -200,14 +307,5 @@ public static class FungameCheck
             return false;
 
         return id.All(c => char.IsLower(c) || char.IsDigit(c) || c == '_');
-    }
-
-    private static bool IsValidVersion(string version)
-    {
-        if (string.IsNullOrWhiteSpace(version))
-            return false;
-
-        var parts = version.Split('.');
-        return parts.Length is >= 2 and <= 4 && parts.All(part => int.TryParse(part, out _));
     }
 }
