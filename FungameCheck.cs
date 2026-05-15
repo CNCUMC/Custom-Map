@@ -27,10 +27,10 @@ public static class FungameCheck
     private static void LoadFungameDirectories()
     {
         var directories = Directory.GetDirectories(FungamesPath);
-        
+
         // 早期初始化，直接使用 Logger，不依赖本地化
         _logger.LogInfo($"已读取 {directories.Length} 个Fungame文件夹");
-        
+
         ValidDirectories.Clear();
         CheckFailDirectories.Clear();
         Fungames.Clear();
@@ -56,7 +56,7 @@ public static class FungameCheck
         if (ValidDirectories.Count != 0)
         {
             _logger.LogInfo($"有效目录: {ValidDirectories.Count} 个，正在加载中...");
-            
+
             var directoriesToValidate = ValidDirectories.ToList();
             foreach (var fungame in directoriesToValidate)
             {
@@ -78,7 +78,7 @@ public static class FungameCheck
             }
         }
     }
-    
+
     private static bool ValidateAndLoadFungame(string filePath)
     {
         try
@@ -122,7 +122,7 @@ public static class FungameCheck
                         authorArray[i].Remove();
                         i--;
                     }
-                    
+
                     if (authorArray.Count == 0)
                     {
                         warnings.Add(Locale("fungame_check.author_empty"));
@@ -131,16 +131,16 @@ public static class FungameCheck
                 }
             }
 
-            if (jsonObject.ContainsKey("map") && jsonObject["map"] != null)
+            if (jsonObject.ContainsKey("map_data") && jsonObject["map_data"] != null)
             {
-                ValidateMapData(jsonObject["map"] as JObject, errors, warnings);
+                ValidateMapData(jsonObject["map_data"] as JObject, errors, warnings);
             }
-            
+
             if (jsonObject.ContainsKey("features") && jsonObject["features"] != null)
             {
                 ValidateFeatures(jsonObject["features"] as JArray, errors, warnings);
             }
-            
+
             if (jsonObject.ContainsKey("spawn") && jsonObject["spawn"] != null)
             {
                 ValidateSpawn(jsonObject["spawn"] as JArray, errors, warnings);
@@ -175,10 +175,10 @@ public static class FungameCheck
                 fungame.Version = "1.0";
             }
 
-            var hasMap = fungame.Map != null;
+            var hasMap = fungame.MapData != null;
             if (hasMap)
             {
-                if (!ValidateMapDataInObject(fungame.Map))
+                if (!ValidateMapDataInObject(fungame.MapData))
                 {
                     _logger.LogWarning($"fungame.json 文件验证失败: {Path.GetFileName(filePath)}");
                     return false;
@@ -199,26 +199,27 @@ public static class FungameCheck
             {
                 _logger.LogInfo("请检查并修复上述警告");
             }
-            
+
             return true;
         }
-        catch (Exception ex) when (ex is JsonException or UnauthorizedAccessException or IOException or ArgumentException)
+        catch (Exception ex) when (ex is JsonException or UnauthorizedAccessException or IOException
+                                       or ArgumentException)
         {
             _logger.LogError($"fungame.json 文件处理失败: {Path.GetFileName(filePath)} ({ex.Message})");
             return false;
         }
     }
 
-private static bool IsValidVersion(string version)
-{
-    if (string.IsNullOrWhiteSpace(version))
+    private static bool IsValidVersion(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
             return false;
 
         var parts = version.Split('.');
         return parts.Length is >= 2 and <= 4 && parts.All(part => int.TryParse(part, out _));
-}
+    }
 
- private static void ValidateMapData(JObject mapObject, List<string> errors, List<string> _ = null)
+    private static void ValidateMapData(JObject mapObject, List<string> errors, List<string> _ = null)
     {
         if (mapObject == null)
         {
@@ -244,30 +245,38 @@ private static bool IsValidVersion(string version)
             errors.Add(Locale("validation.map_y_not_integer"));
         }
 
-        if (!mapObject.ContainsKey("blocks"))
+        if (!mapObject.ContainsKey("map"))
         {
-            errors.Add(Locale("validation.map_missing_blocks"));
+            errors.Add(Locale("validation.map_missing_map"));
         }
-        else if (mapObject["blocks"] == null || mapObject["blocks"].Type != JTokenType.Array)
+        else if (mapObject["map"] == null || mapObject["map"].Type != JTokenType.Array)
         {
-            errors.Add(Locale("validation.map_blocks_not_array"));
+            errors.Add(Locale("validation.map_map_not_array"));
         }
         else
         {
-            var blocksArray = mapObject["blocks"] as JArray;
-            if (blocksArray == null || blocksArray.Count == 0)
+            if (mapObject["map"] is not JArray mapArray || mapArray.Count == 0)
             {
-                errors.Add(Locale("validation.map_blocks_empty"));
+                errors.Add(Locale("validation.map_map_empty"));
             }
             else
             {
-                for (int i = 0; i < blocksArray.Count; i++)
+                for (int i = 0; i < mapArray.Count; i++)
                 {
-                    if (blocksArray[i].Type == JTokenType.Array) continue;
-                    errors.Add(Locale("validation.map_block_row_not_array", i));
+                    if (mapArray[i].Type == JTokenType.String) continue;
+                    errors.Add(Locale("validation.map_row_not_string", i));
                     break;
                 }
             }
+        }
+
+        if (!mapObject.ContainsKey("key"))
+        {
+            errors.Add(Locale("validation.map_missing_key"));
+        }
+        else if (mapObject["key"] == null || mapObject["key"].Type != JTokenType.Object)
+        {
+            errors.Add(Locale("validation.map_key_not_object"));
         }
 
         if (!mapObject.ContainsKey("items") || mapObject["items"] == null)
@@ -279,10 +288,9 @@ private static bool IsValidVersion(string version)
         }
         else
         {
-            var itemsArray = mapObject["items"] as JArray;
-            if (itemsArray == null || itemsArray.Count <= 0)
+            if (mapObject["items"] is not JArray { Count: > 0 } itemsArray)
                 return;
-                
+
             for (int i = 0; i < itemsArray.Count; i++)
             {
                 if (itemsArray[i].Type != JTokenType.Array)
@@ -293,7 +301,7 @@ private static bool IsValidVersion(string version)
 
                 var rowArray = itemsArray[i] as JArray;
                 if (rowArray == null) continue;
-                
+
                 for (int j = 0; j < rowArray.Count; j++)
                 {
                     if (rowArray[j].Type == JTokenType.String) continue;
@@ -320,7 +328,7 @@ private static bool IsValidVersion(string version)
 
         for (int i = 0; i < featuresArray.Count; i++)
         {
-            if (featuresArray[i].Type != JTokenType.String && 
+            if (featuresArray[i].Type != JTokenType.String &&
                 featuresArray[i].Type != JTokenType.Object &&
                 featuresArray[i].Type != JTokenType.Float &&
                 featuresArray[i].Type != JTokenType.Integer)
@@ -355,29 +363,31 @@ private static bool IsValidVersion(string version)
 
     private static bool ValidateMapDataInObject(MapData mapData)
     {
-        if (mapData.Blocks == null || mapData.Blocks.Length == 0)
+        if (mapData.Map == null || mapData.Map.Length == 0)
         {
-            _logger.LogWarning(Locale("validation.no_data", Locale("common.map"), Locale("common.block")));
+            _logger.LogWarning(Locale("validation.no_data", Locale("common.map"), "string map"));
             return false;
         }
 
-        var maxColCount = 0;
-        
-        foreach (var row in mapData.Blocks)
+        if (mapData.Key == null || mapData.Key.Count == 0)
         {
-            if (row != null && row.Length > maxColCount)
-            {
-                maxColCount = row.Length;
-            }
+            _logger.LogWarning(Locale("validation.map_missing_key"));
+            return false;
         }
 
-        if (maxColCount != 0) return true;
-        _logger.LogWarning(Locale("validation.row_data_empty", Locale("common.map")));
-        return false;
+        var maxColCount = mapData.Map.Max(row => row?.Length ?? 0);
 
+        if (maxColCount == 0)
+        {
+            _logger.LogWarning(Locale("validation.row_data_empty", Locale("common.map")));
+            return false;
+        }
+
+        return true;
     }
-    
-    private static void ValidateRequiredFieldWithDefault(JObject jsonObject, string fieldName, List<string> warnings, string defaultValue)
+
+    private static void ValidateRequiredFieldWithDefault(JObject jsonObject, string fieldName, List<string> warnings,
+        string defaultValue)
     {
         if (!jsonObject.ContainsKey(fieldName))
         {
@@ -397,7 +407,8 @@ private static bool IsValidVersion(string version)
         }
     }
 
-    private static void ValidateRequiredListFieldWithDefault(JObject jsonObject, string fieldName, List<string> warnings, string defaultItem)
+    private static void ValidateRequiredListFieldWithDefault(JObject jsonObject, string fieldName,
+        List<string> warnings, string defaultItem)
     {
         if (!jsonObject.ContainsKey(fieldName))
         {
@@ -417,12 +428,9 @@ private static bool IsValidVersion(string version)
         }
         else
         {
-            var array = jsonObject[fieldName] as JArray;
-            if (array == null || array.Count == 0)
-            {
-                warnings.Add(Locale("validation.array_empty_default", fieldName));
-                jsonObject[fieldName] = new JArray(new object[] { defaultItem });
-            }
+            if (jsonObject[fieldName] is JArray array && array.Count != 0) return;
+            warnings.Add(Locale("validation.array_empty_default", fieldName));
+            jsonObject[fieldName] = new JArray(new object[] { defaultItem });
         }
     }
 
@@ -453,7 +461,7 @@ private static bool IsValidVersion(string version)
     {
         if (string.IsNullOrWhiteSpace(id))
             return "unknown_fungame";
-        
+
         var sanitized = new System.Text.StringBuilder();
         foreach (var c in id.ToLower())
         {
@@ -464,12 +472,9 @@ private static bool IsValidVersion(string version)
             else
                 sanitized.Append('_');
         }
-        
+
         var result = sanitized.ToString();
-        if (string.IsNullOrWhiteSpace(result))
-            return "unknown_fungame";
-        
-        return result;
+        return string.IsNullOrWhiteSpace(result) ? "unknown_fungame" : result;
     }
 
     private static bool IsValidId(string id)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace CustomFungamePack;
@@ -13,8 +14,11 @@ public class Fungame
     public string Description { get; set; }
     public Dictionary<string, float> Feature { get; set; } = new();
     public List<string> Command { get; set; }
-    public Vector2 Spawn { get; set; } = new(0, 0);
-    public MapData Map { get; set; }
+    public float[] Spawn { get; set; } = [0, 0];
+    [JsonProperty("map_data")]
+    public MapData MapData { get; set; }
+    
+    public Vector2 SpawnPosition => new(Spawn is { Length: >= 2 } ? Spawn[0] : 0, Spawn != null && Spawn.Length >= 2 ? Spawn[1] : 0);
 }
 
 [UsedImplicitly]
@@ -28,4 +32,6 @@ public class MapData
     public bool SkipTerrain { get; set; } = true;
     public bool SkipStructures { get; set; } = true;
     public bool SkipBackground { get; set; } = true;
+    public string[] Map { get; set; } = [];
+    public Dictionary<string, object> Key { get; set; } = new();
 }

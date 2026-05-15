@@ -38,10 +38,10 @@ public static class WorldGenerationPatch
 
                 ApplyFeaturesEarly(fungame.Feature);
 
-                if (fungame.Map != null)
+                if (fungame.MapData != null)
                 {
-                    WorldGeneration.biomeOverride = fungame.Map.Type;
-                    Info("world_generation.scene_type_set", fungame.Map.Type);
+                    WorldGeneration.biomeOverride = fungame.MapData.Type;
+                    Info("world_generation.scene_type_set", fungame.MapData.Type);
                 }
                 else
                 {
@@ -95,7 +95,7 @@ public static class WorldGenerationPatch
     [HarmonyPostfix]
     private static void ForgivingLevel()
     {
-        if (IsFeatureEnabled("forgiving_level") && CurrentFungame?.Map != null)
+        if (IsFeatureEnabled("forgiving_level") && CurrentFungame?.MapData != null)
         {
             var mapBottom = -WorldGeneration.halfHeight + 10;
             var mapTop = WorldGeneration.halfHeight - 10;
@@ -137,7 +137,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldCreateBackground()
     {
-        if (CurrentFungame?.Map?.SkipBackground != true) return true;
+        if (CurrentFungame?.MapData?.SkipBackground != true) return true;
         Info("world_generation.skip_generation", ModLocale.GetFormat("log.common.background"));
         return false;
     }
@@ -146,7 +146,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateStructures()
     {
-        if (CurrentFungame?.Map?.SkipStructures != true) return true;
+        if (CurrentFungame?.MapData?.SkipStructures != true) return true;
         Info("world_generation.skip_generation", ModLocale.GetFormat("log.common.structure"));
         return false;
     }
@@ -155,7 +155,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateTerrain()
     {
-        if (CurrentFungame?.Map?.SkipTerrain != true) return true;
+        if (CurrentFungame?.MapData?.SkipTerrain != true) return true;
         Info("world_generation.skip_generation", ModLocale.GetFormat("log.common.terrain"));
         return false;
     }
@@ -176,13 +176,13 @@ public static class WorldGenerationPatch
                 var jsonContent = File.ReadAllText(fungameFilePath);
                 var fungame = Newtonsoft.Json.JsonConvert.DeserializeObject<Fungame>(jsonContent);
 
-                if (fungame?.Map != null)
+                if (fungame?.MapData != null)
                 {
                     Info("world_generation.loading_fungame_map", fungame.Name);
                     WorldGeneration.loadingText.text = Locale("world_generation.loading_fungame_map", fungame.Name);
                     MapLoader.LoadAndApplyMapFromFungame(fungame);
                     ExecuteCommands(fungame);
-                    Tools.Tp(fungame.Spawn);
+                    Tools.Tp(fungame.SpawnPosition);
 
                     string authors = fungame.Author is { Count: > 0 }
                         ? string.Join(", ", fungame.Author)
