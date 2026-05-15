@@ -73,10 +73,11 @@ public class WorldGenerationPatch
             switch (feature.Key.ToLower())
             {
                 case "fullbright":
+                    Info("已启用宽容关卡模式");
                     Tools.RunCommand("fullbright");
                     break;
-                case "forgivingLevel":
-                    Info("已启用宽容关卡模式");
+                case "forgiving_level":
+                    Info("已启用仁慈关卡模式");
                     break;
                 case "gravity":
                     Info($"已启用重力调整: {feature.Value}");
@@ -97,10 +98,11 @@ public class WorldGenerationPatch
             var mapBottom = -WorldGeneration.halfHeight + 10;
             var mapTop = WorldGeneration.halfHeight - 10;
 
-            if (PlayerCamera.main.body.transform.position.y <= mapBottom
-                || PlayerCamera.main.transform.position.y <= mapBottom)
+            var main = PlayerCamera.main;
+            if (main.body.transform.position.y <= mapBottom
+                || main.transform.position.y <= mapBottom)
             {
-                Tools.Tp(new Vector2(PlayerCamera.main.transform.position.x, mapTop));
+                Tools.Tp(new Vector2(main.transform.position.x, mapTop));
             }
         }
 
