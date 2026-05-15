@@ -22,7 +22,7 @@ public class ModLocale : ModLocaleBase
         {
             return $"[{key}]";
         }
-        
+
         try
         {
             var result = _instance.GetStringFormatted(key, args);

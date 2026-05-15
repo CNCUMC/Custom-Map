@@ -21,23 +21,24 @@ public static class MapLoader
             }
 
             var mapData = fungame.MapData;
-            
+
             if (mapData.Map == null || mapData.Map.Length == 0)
             {
                 Error("map_loader.invalid_format");
                 return;
             }
-            
+
             ParseAndApplyStringMap(fungame);
-            
-            Info("map_loader.load_success", mapData.X, mapData.Y, mapData.Map.Length, mapData.Map.Max(row => row?.Length ?? 0));
+
+            Info("map_loader.load_success", mapData.X, mapData.Y, mapData.Map.Length,
+                mapData.Map.Max(row => row?.Length ?? 0));
         }
         catch (Exception ex)
         {
             Error("map_loader.load_failed", ex.Message);
         }
     }
-    
+
     private static void ParseAndApplyStringMap(Fungame fungame)
     {
         var mapData = fungame.MapData;
@@ -55,7 +56,7 @@ public static class MapLoader
 
         var rowCount = mapData.Map.Length;
         var maxColCount = mapData.Map.Max(row => row?.Length ?? 0);
-        
+
         if (maxColCount == 0)
         {
             Warning("validation.row_data_empty", "string map");
@@ -77,7 +78,7 @@ public static class MapLoader
             }
 
             var worldX = mapData.X;
-            
+
             foreach (var charStr in mapRow.Select(t => t.ToString()))
             {
                 if (!mapData.Key.TryGetValue(charStr, out var value))
@@ -99,7 +100,8 @@ public static class MapLoader
                             }
                             catch (Exception ex)
                             {
-                                Error("map_loader.place_failed", worldX, worldY, ModLocale.GetFormat("log.common.block"), intValue, ex.Message);
+                                Error("map_loader.place_failed", worldX, worldY,
+                                    ModLocale.GetFormat("log.common.block"), intValue, ex.Message);
                                 failCount++;
                             }
                         }
@@ -117,7 +119,8 @@ public static class MapLoader
                             }
                             catch (Exception ex)
                             {
-                                Error("map_loader.place_failed", worldX, worldY, ModLocale.GetFormat("log.common.block"), doubleValue, ex.Message);
+                                Error("map_loader.place_failed", worldX, worldY,
+                                    ModLocale.GetFormat("log.common.block"), doubleValue, ex.Message);
                                 failCount++;
                             }
                         }
@@ -135,7 +138,8 @@ public static class MapLoader
                             }
                             catch (Exception ex)
                             {
-                                Error("map_loader.place_failed", worldX, worldY, ModLocale.GetFormat("log.common.item"), stringValue, ex.Message);
+                                Error("map_loader.place_failed", worldX, worldY, ModLocale.GetFormat("log.common.item"),
+                                    stringValue, ex.Message);
                                 failCount++;
                             }
                         }
@@ -143,10 +147,10 @@ public static class MapLoader
                         break;
                     }
                 }
-                
+
                 worldX++;
             }
-            
+
             worldY--;
         }
 

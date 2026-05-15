@@ -45,7 +45,8 @@ public static class FungameCheck
 
             if (missingFiles.Count > 0)
             {
-                _logger.LogWarning($"{Path.GetFileName(fungamesDirectory)} Missing files: {string.Join(", ", missingFiles)}");
+                _logger.LogWarning(
+                    $"{Path.GetFileName(fungamesDirectory)} Missing files: {string.Join(", ", missingFiles)}");
                 continue;
             }
 
@@ -56,7 +57,8 @@ public static class FungameCheck
         _logger.LogInfo($"Valid directories: {ValidDirectories.Count}, loading...");
 
         var directoriesToValidate = ValidDirectories.ToList();
-        foreach (var fungame in directoriesToValidate.Where(fungame => !ValidateAndLoadFungame(Path.Combine(fungame, "fungame.json"))))
+        foreach (var fungame in directoriesToValidate.Where(fungame =>
+                     !ValidateAndLoadFungame(Path.Combine(fungame, "fungame.json"))))
         {
             _logger.LogWarning($"{Path.GetFileName(fungame)} Validation failed!");
             CheckFailDirectories.Add(fungame);

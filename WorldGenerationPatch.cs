@@ -141,7 +141,7 @@ public static class WorldGenerationPatch
         Info("world_generation.skip_generation", ModLocale.GetFormat("log.common.background"));
         return false;
     }
-    
+
     [HarmonyPatch("WorldGenerateStructures")]
     [HarmonyPrefix]
     public static bool SkipWorldGenerateStructures()
@@ -150,7 +150,7 @@ public static class WorldGenerationPatch
         Info("world_generation.skip_generation", ModLocale.GetFormat("log.common.structure"));
         return false;
     }
-    
+
     [HarmonyPatch("WorldGenerateTerrain")]
     [HarmonyPrefix]
     public static bool SkipWorldGenerateTerrain()
@@ -187,7 +187,7 @@ public static class WorldGenerationPatch
                     string modInfo = $"{fungame.Name} v{fungame.Version}";
                     string authorInfo = $"by {fungame.Authors}";
                     string description = fungame.Description;
-                    
+
                     Tools.Alert($"{modInfo}\n{authorInfo}", true);
                     Tools.Alert(description, false, 6f);
                     Tools.LogInfo(modInfo, Logger);
