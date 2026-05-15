@@ -11,8 +11,8 @@ namespace CustomFungamePack;
 
 public static class FungameCheck
 {
-    private const string LogPrefix = "log.";
     private static ManualLogSource Logger;
+    private const string LogPrefix = "log.fungame_check.";
     public static readonly string FungamesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fungames");
     public static readonly List<string> ValidDirectories = [];
     public static readonly List<string> checkFailDirectories = [];
@@ -191,15 +191,10 @@ public static class FungameCheck
             var id = fungame.Id;
             var version = fungame.Version;
 
-            if (hasMap)
-            {
-                Logger.LogInfo($"成功加载Fungame: {name} (ID: {id}, Version: {version}, 包含地图数据)");
-            }
-            else
-            {
-                Logger.LogInfo($"成功加载Fungame: {name} (ID: {id}, Version: {version})");
-            }
-            
+            Logger.LogInfo(hasMap
+                ? $"成功加载Fungame: {name} (ID: {id}, Version: {version}, 包含地图数据)"
+                : $"成功加载Fungame: {name} (ID: {id}, Version: {version})");
+
             if (warnings.Count > 0)
             {
                 Logger.LogInfo("请检查并修复上述警告");
@@ -268,11 +263,9 @@ private static bool IsValidVersion(string version)
             {
                 for (int i = 0; i < blocksArray.Count; i++)
                 {
-                    if (blocksArray[i].Type != JTokenType.Array)
-                    {
-                        errors.Add(Locale("validation.map_block_row_not_array", i));
-                        break;
-                    }
+                    if (blocksArray[i].Type == JTokenType.Array) continue;
+                    errors.Add(Locale("validation.map_block_row_not_array", i));
+                    break;
                 }
             }
         }
@@ -303,11 +296,9 @@ private static bool IsValidVersion(string version)
                 
                 for (int j = 0; j < rowArray.Count; j++)
                 {
-                    if (rowArray[j].Type != JTokenType.String)
-                    {
-                        errors.Add(Locale("validation.map_item_not_string", i, j));
-                        break;
-                    }
+                    if (rowArray[j].Type == JTokenType.String) continue;
+                    errors.Add(Locale("validation.map_item_not_string", i, j));
+                    break;
                 }
             }
         }

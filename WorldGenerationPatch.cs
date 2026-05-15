@@ -182,6 +182,7 @@ public static class WorldGenerationPatch
                     WorldGeneration.loadingText.text = Locale("world_generation.loading_fungame_map", fungame.Name);
                     MapLoader.LoadAndApplyMapFromFungame(fungame);
                     ExecuteCommands(fungame);
+                    Tools.Tp(fungame.Spawn);
 
                     string authors = fungame.Author is { Count: > 0 }
                         ? string.Join(", ", fungame.Author)
