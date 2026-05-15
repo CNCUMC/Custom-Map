@@ -11,7 +11,8 @@ public class Fungame
     public string Version { get; set; }
     public List<string> Author { get; set; }
     public string Description { get; set; }
-    public List<Feature> Features { get; set; }
+    public Dictionary<string, float> Feature { get; set; } = new();
+    public List<string> Command { get; set; }
     public Vector2 Spawn { get; set; } = new(0, 0);
     public MapData Map { get; set; }
 }
@@ -23,4 +24,8 @@ public class MapData
     public int Y { get; set; }
     public int[][] Blocks { get; set; } = [];
     public string[][] Items { get; set; } = [];
+    public WorldGeneration.OverrideSceneType Type { get; set; } = WorldGeneration.OverrideSceneType.Debug;
+    public bool SkipTerrain { get; set; } = true;
+    public bool SkipStructures { get; set; } = true;
+    public bool SkipBackground { get; set; } = true;
 }
