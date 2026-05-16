@@ -51,13 +51,13 @@ public static class WorldGenerationPatch
             }
             else
             {
-                Error("error.no_fungame_file", fungameFilePath);
+                Error("no_fungame_file", fungameFilePath);
                 SetDefaultSceneType(WorldGeneration);
             }
         }
         else
         {
-            Error("error.no_valid_directories");
+            Error("no_valid_directories");
             SetDefaultSceneType(WorldGeneration);
         }
     }
@@ -202,12 +202,12 @@ public static class WorldGenerationPatch
             }
             else
             {
-                Error("error.no_fungame_file", fungameFilePath);
+                Error("no_fungame_file", fungameFilePath);
             }
         }
         else
         {
-            Error("error.no_valid_directories");
+            Error("no_valid_directories");
         }
     }
 
@@ -235,7 +235,7 @@ public static class WorldGenerationPatch
 
     private static void Error(string key, params object[] args)
     {
-        var message = Locale(key, args);
+        var message = ModLocale.GetFormat($"log.error.{key}", args);
         Log.Error(message, Logger);
     }
 

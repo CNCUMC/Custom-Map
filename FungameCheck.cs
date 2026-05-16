@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BepInEx.Logging;
 using MossLib;
+using MossLib.Tool;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -45,7 +46,7 @@ public static class FungameCheck
 
             if (missingFiles.Count > 0)
             {
-                _logger.LogWarning(
+                Warning(
                     $"{Path.GetFileName(fungamesDirectory)} Missing files: {string.Join(", ", missingFiles)}");
                 continue;
             }
@@ -60,18 +61,16 @@ public static class FungameCheck
         foreach (var fungame in directoriesToValidate.Where(fungame =>
                      !ValidateAndLoadFungame(Path.Combine(fungame, "fungame.json"))))
         {
-            _logger.LogWarning($"{Path.GetFileName(fungame)} Validation failed!");
+            Warning($"{Path.GetFileName(fungame)} Validation failed!");
             CheckFailDirectories.Add(fungame);
         }
 
-        if (CheckFailDirectories.Count != 0)
+        if (CheckFailDirectories.Count == 0) return;
+        _logger.LogInfo($"Directory validation failed: {CheckFailDirectories.Count}:");
+        foreach (var failDirectory in CheckFailDirectories)
         {
-            _logger.LogInfo($"Directory validation failed: {CheckFailDirectories.Count}:");
-            foreach (var failDirectory in CheckFailDirectories)
-            {
-                _logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
-                ValidDirectories.Remove(failDirectory);
-            }
+            _logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
+            ValidDirectories.Remove(failDirectory);
         }
     }
 
@@ -129,7 +128,7 @@ public static class FungameCheck
 
             if (jsonObject.ContainsKey("map_data") && jsonObject["map_data"] != null)
             {
-                ValidateMapData(jsonObject["map_data"] as JObject, errors, warnings);
+                ValidateMapData(jsonObject["map_data"] as JObject, errors);
             }
 
             if (jsonObject.ContainsKey("features") && jsonObject["features"] != null)
@@ -144,10 +143,10 @@ public static class FungameCheck
 
             if (errors.Count > 0)
             {
-                _logger.LogWarning($"fungame.json validation failed: {Path.GetFileName(filePath)}");
+                Warning($"fungame.json validation failed: {Path.GetFileName(filePath)}");
                 foreach (var error in errors)
                 {
-                    _logger.LogWarning($"  - {error}");
+                    Warning($"  - {error}");
                 }
 
                 return false;
@@ -155,10 +154,10 @@ public static class FungameCheck
 
             if (warnings.Count > 0)
             {
-                _logger.LogWarning($"fungame.json validation passed with defaults: {Path.GetFileName(filePath)}");
+                Warning($"fungame.json validation passed with defaults: {Path.GetFileName(filePath)}");
                 foreach (var warning in warnings)
                 {
-                    _logger.LogWarning($"  - {warning}");
+                    Warning($"  - {warning}");
                 }
             }
 
@@ -176,7 +175,7 @@ public static class FungameCheck
             {
                 if (!ValidateMapDataInObject(fungame.MapData))
                 {
-                    _logger.LogWarning($"fungame.json validation failed: {Path.GetFileName(filePath)}");
+                    Warning($"fungame.json validation failed: {Path.GetFileName(filePath)}");
                     return false;
                 }
             }
@@ -215,52 +214,53 @@ public static class FungameCheck
         return parts.Length is >= 2 and <= 4 && parts.All(part => int.TryParse(part, out _));
     }
 
-    private static void ValidateMapData(JObject mapObject, List<string> errors, List<string> _ = null)
+private static void ValidateMapData(JObject mapObject, List<string> errors)
     {
         if (mapObject == null)
         {
-            errors.Add(Locale("validation.map_invalid_type"));
+            errors.Add(Validation("map_invalid_type"));
             return;
         }
 
         if (!mapObject.ContainsKey("x"))
         {
-            errors.Add(Locale("validation.map_missing_field", "x"));
+            errors.Add(Validation("map_missing_field", "x"));
         }
         else if (mapObject["x"] == null || mapObject["x"].Type != JTokenType.Integer)
         {
-            errors.Add(Locale("validation.map_field_type_error", "x", "整数"));
+            errors.Add(Validation("map_field_type_error", "x", "整数"));
         }
 
         if (!mapObject.ContainsKey("y"))
         {
-            errors.Add(Locale("validation.map_missing_field", "y"));
+            errors.Add(Validation("map_missing_field", "y"));
         }
         else if (mapObject["y"] == null || mapObject["y"].Type != JTokenType.Integer)
         {
-            errors.Add(Locale("validation.map_field_type_error", "y", "整数"));
+            errors.Add(Validation("map_field_type_error", "y", "整数"));
         }
 
         if (!mapObject.ContainsKey("map"))
         {
-            errors.Add(Locale("validation.map_missing_field", "map"));
+            errors.Add(Validation("map_missing_field", "map"));
         }
-        else if (mapObject["map"] == null || mapObject["map"].Type != JTokenType.Array)
+        else if (mapObject["map"] == null 
+                 || mapObject["map"].Type != JTokenType.Array)
         {
-            errors.Add(Locale("validation.map_field_type_error", "map", "字符串数组"));
-        }
+            errors.Add(Validation("map_field_type_error", "map", "字符串数组")); }
         else
         {
-            if (mapObject["map"] is not JArray mapArray || mapArray.Count == 0)
+            if (mapObject["map"] is not JArray mapArray
+                || mapArray.Count == 0)
             {
-                errors.Add(Locale("validation.map_map_empty"));
+                errors.Add(Validation("map_map_empty"));
             }
             else
             {
                 for (int i = 0; i < mapArray.Count; i++)
                 {
                     if (mapArray[i].Type == JTokenType.String) continue;
-                    errors.Add(Locale("validation.map_row_not_string", i));
+                    errors.Add(Validation("map_row_not_string", i));
                     break;
                 }
             }
@@ -268,19 +268,21 @@ public static class FungameCheck
 
         if (!mapObject.ContainsKey("key"))
         {
-            errors.Add(Locale("validation.map_missing_field", "key"));
+            errors.Add(Validation("map_missing_field", "key"));
         }
-        else if (mapObject["key"] == null || mapObject["key"].Type != JTokenType.Object)
+        else if (mapObject["key"] == null
+                 || mapObject["key"].Type != JTokenType.Object)
         {
-            errors.Add(Locale("validation.map_field_type_error", "key", "对象"));
+            errors.Add(Validation("map_field_type_error", "key", "对象"));
         }
 
-        if (!mapObject.ContainsKey("items") || mapObject["items"] == null)
+        if (!mapObject.ContainsKey("items") 
+            || mapObject["items"] == null)
             return;
 
         if (mapObject["items"].Type != JTokenType.Array)
         {
-            errors.Add(Locale("validation.map_field_type_error", "items", "数组"));
+            errors.Add(Validation("map_field_type_error", "items", "数组"));
         }
         else
         {
@@ -291,7 +293,7 @@ public static class FungameCheck
             {
                 if (itemsArray[i].Type != JTokenType.Array)
                 {
-                    errors.Add(Locale("validation.map_item_row_not_array", i));
+                    errors.Add(Validation("map_item_row_not_array", i));
                     break;
                 }
 
@@ -301,24 +303,35 @@ public static class FungameCheck
                 for (int j = 0; j < rowArray.Count; j++)
                 {
                     if (rowArray[j].Type == JTokenType.String) continue;
-                    errors.Add(Locale("validation.map_item_not_string", i, j));
+                    errors.Add(Validation("map_item_not_string", i, j));
                     break;
                 }
             }
         }
     }
 
+    private static void SetDefaultIntegerField(JObject jsonObject, string fieldName, int defaultValue)
+    {
+        if (!jsonObject.ContainsKey(fieldName)
+            || jsonObject[fieldName] == null
+            || jsonObject[fieldName].Type == JTokenType.Null
+            || jsonObject[fieldName].Type != JTokenType.Integer)
+        {
+            jsonObject[fieldName] = defaultValue;
+        }
+    }
+    
     private static void ValidateFeatures(JArray featuresArray, List<string> errors, List<string> warnings = null)
     {
         if (featuresArray == null)
         {
-            errors.Add(Locale("validation.features_invalid_type"));
+            errors.Add(Validation("features_invalid_type"));
             return;
         }
 
         if (featuresArray.Count == 0)
         {
-            warnings?.Add(Locale("validation.features_empty"));
+            warnings?.Add(Validation("features_empty"));
             return;
         }
 
@@ -329,7 +342,7 @@ public static class FungameCheck
                 featuresArray[i].Type != JTokenType.Float &&
                 featuresArray[i].Type != JTokenType.Integer)
             {
-                warnings?.Add(Locale("validation.features_element_invalid", i));
+                warnings?.Add(Validation("features_element_invalid", i));
             }
         }
     }
@@ -338,13 +351,13 @@ public static class FungameCheck
     {
         if (spawnArray == null)
         {
-            errors.Add(Locale("validation.spawn_must_be_array"));
+            errors.Add(Validation("spawn_must_be_array"));
             return;
         }
 
         if (spawnArray.Count != 2)
         {
-            warnings?.Add(Locale("validation.spawn_wrong_count", spawnArray.Count));
+            warnings?.Add(Validation("spawn_wrong_count", spawnArray.Count));
             return;
         }
 
@@ -352,7 +365,7 @@ public static class FungameCheck
         {
             if (spawnArray[i].Type != JTokenType.Float && spawnArray[i].Type != JTokenType.Integer)
             {
-                warnings?.Add(Locale("validation.spawn_element_not_number", i));
+                warnings?.Add(Validation("spawn_element_not_number", i));
             }
         }
     }
@@ -361,25 +374,22 @@ public static class FungameCheck
     {
         if (mapData.Map == null || mapData.Map.Length == 0)
         {
-            _logger.LogWarning(Locale("validation.no_data", Locale("common.map"), "string map"));
+            Warning(Validation("no_data", Locale("common.map"), "string map"));
             return false;
         }
 
         if (mapData.Key == null || mapData.Key.Count == 0)
         {
-            _logger.LogWarning(Locale("validation.map_missing_field", "key"));
+            Warning(Validation("map_missing_field", "key"));
             return false;
         }
 
         var maxColCount = mapData.Map.Max(row => row?.Length ?? 0);
 
-        if (maxColCount == 0)
-        {
-            _logger.LogWarning(Locale("validation.row_data_empty", Locale("common.map")));
-            return false;
-        }
+        if (maxColCount != 0) return true;
+        Warning(Validation("row_data_empty", Locale("common.map")));
+        return false;
 
-        return true;
     }
 
     private static void ValidateRequiredFieldWithDefault(JObject jsonObject, string fieldName, List<string> warnings,
@@ -387,18 +397,18 @@ public static class FungameCheck
     {
         if (!jsonObject.ContainsKey(fieldName))
         {
-            warnings.Add(Locale("validation.field_missing_default", fieldName, defaultValue));
+            warnings.Add(Validation("field_missing_default", fieldName, defaultValue));
             jsonObject[fieldName] = defaultValue;
         }
         else if (jsonObject[fieldName] == null || jsonObject[fieldName].Type == JTokenType.Null)
         {
-            warnings.Add(Locale("validation.field_null_default", fieldName, defaultValue));
+            warnings.Add(Validation("field_null_default", fieldName, defaultValue));
             jsonObject[fieldName] = defaultValue;
         }
         else if (jsonObject[fieldName].Type == JTokenType.String &&
                  string.IsNullOrWhiteSpace(jsonObject[fieldName].ToString()))
         {
-            warnings.Add(Locale("validation.field_empty_string_default", fieldName, defaultValue));
+            warnings.Add(Validation("field_empty_string_default", fieldName, defaultValue));
             jsonObject[fieldName] = defaultValue;
         }
     }
@@ -408,24 +418,24 @@ public static class FungameCheck
     {
         if (!jsonObject.ContainsKey(fieldName))
         {
-            warnings.Add(Locale("validation.field_must_be_array_default", fieldName, defaultItem));
+            warnings.Add(Validation("field_must_be_array_default", fieldName, defaultItem));
             jsonObject[fieldName] = new JArray(new object[] { defaultItem });
         }
         else if (jsonObject[fieldName] == null || jsonObject[fieldName].Type == JTokenType.Null)
         {
-            warnings.Add(Locale("validation.field_null_array_default", fieldName, defaultItem));
+            warnings.Add(Validation("field_null_array_default", fieldName, defaultItem));
             jsonObject[fieldName] = new JArray(new object[] { defaultItem });
         }
         else if (jsonObject[fieldName].Type != JTokenType.Array)
         {
-            warnings.Add(Locale("validation.field_convert_to_array", fieldName));
+            warnings.Add(Validation("field_convert_to_array", fieldName));
             var currentValue = jsonObject[fieldName].ToString();
             jsonObject[fieldName] = new JArray(new object[] { currentValue });
         }
         else
         {
             if (jsonObject[fieldName] is JArray array && array.Count != 0) return;
-            warnings.Add(Locale("validation.array_empty_default", fieldName));
+            warnings.Add(Validation("array_empty_default", fieldName));
             jsonObject[fieldName] = new JArray(new object[] { defaultItem });
         }
     }
@@ -435,14 +445,14 @@ public static class FungameCheck
         if (!jsonObject.ContainsKey(fieldName) || jsonObject[fieldName] == null) return;
         if (jsonObject[fieldName].Type != JTokenType.Array)
         {
-            warnings.Add(Locale("validation.field_convert_to_array", fieldName));
+            warnings.Add(Validation("field_convert_to_array", fieldName));
             var currentValue = jsonObject[fieldName].ToString();
             jsonObject[fieldName] = new JArray(new object[] { currentValue });
         }
         else
         {
             if (jsonObject[fieldName] is JArray array && array.Count != 0) return;
-            warnings.Add(Locale("validation.array_empty_removed", fieldName));
+            warnings.Add(Validation("array_empty_removed", fieldName));
             jsonObject[fieldName].Remove();
         }
     }
@@ -481,5 +491,15 @@ public static class FungameCheck
     private static string Locale(string key, params object[] args)
     {
         return ModLocale.GetFormat($"{LocaleKeyPre}{key}", args);
+    }
+    
+    private static string Validation(string key, params object[] args)
+    {
+        return ModLocale.GetFormat($"log.validation.{key}", args);
+    }
+    
+    private static void Warning(string key)
+    {
+        Log.Warning(key, _logger);
     }
 }
