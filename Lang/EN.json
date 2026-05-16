@@ -53,7 +53,8 @@
       "string_map_applied": "String map applied, placed {0} blocks, {1} items, {2} failed",
       "load_success": "Successfully loaded map: start position({0}, {1}), size({2}x{3})",
       "load_failed": "Failed to load map: {0}",
-      "place_failed": "Failed to place {2} {3} at ({0}, {1}): {4}"
+      "place_failed": "Failed to place {2} {3} at ({0}, {1}): {4}",
+      "multiple_blocks_in_list": "Multiple blocks detected in list at ({0}, {1}), only the first one will be generated"
     },
     "error": {
       "no_fungame_file": "Cannot find fungame.json file: {0}",

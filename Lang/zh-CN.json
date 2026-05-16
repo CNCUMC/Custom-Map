@@ -53,7 +53,8 @@
       "string_map_applied": "字符串地图应用完成，放置 {0} 个方块，{1} 个物品，失败 {2} 个",
       "load_success": "成功加载地图: 起始坐标({0}, {1}), 尺寸({2}x{3})",
       "load_failed": "加载地图失败: {0}",
-      "place_failed": "在 ({0}, {1}) 放置{2} {3} 失败: {4}"
+      "place_failed": "在 ({0}, {1}) 放置{2} {3} 失败: {4}",
+      "multiple_blocks_in_list": "在 ({0}, {1}) 检测到列表中有多个物块，只生成第一个"
     },
     "error": {
       "no_fungame_file": "找不到 fungame.json 文件: {0}",
