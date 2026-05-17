@@ -24,7 +24,25 @@ public static class WorldGenerationPatch
     {
         WorldGeneration = __instance;
 
-        if (FungameCheck.ValidDirectories.Count > 0)
+        if (FungameCheck.HasRunningFungame)
+        {
+            var fungame = FungameCheck.CurrentFungame;
+
+            CurrentFungame = fungame;
+
+            ApplyFeaturesEarly(fungame.Feature);
+
+            if (fungame.MapData != null)
+            {
+                WorldGeneration.biomeOverride = fungame.MapData.Type;
+                Info("scene_type_set", fungame.MapData.Type);
+            }
+            else
+            {
+                SetDefaultSceneType(WorldGeneration);
+            }
+        }
+        else if (FungameCheck.ValidDirectories.Count > 0)
         {
             var firstFungameDir = FungameCheck.ValidDirectories[0];
             var fungameFilePath = Path.Combine(firstFungameDir, "fungame.json");
@@ -167,7 +185,25 @@ public static class WorldGenerationPatch
     {
         WorldGeneration.loadingText.text = Locale("initializing_world");
 
-        if (FungameCheck.ValidDirectories.Count > 0)
+        var fungame = FungameCheck.GetRunningFungame();
+        
+        if (fungame != null && fungame.MapData != null)
+        {
+            Info("loading_fungame_map", fungame.Name);
+            WorldGeneration.loadingText.text = Locale("loading_fungame_map", fungame.Name);
+            MapLoader.LoadAndApplyMapFromFungame(fungame);
+            ExecuteCommands(fungame);
+            Player.Tp(fungame.SpawnPosition);
+
+            string modInfo = $"{fungame.Name} v{fungame.Version}";
+            string authorInfo = $"by {fungame.Authors}";
+            string description = fungame.Description;
+
+            Player.Alert($"{modInfo}\n{authorInfo}", true);
+            Player.Alert(description, false, 6f);
+            MapLoader.LogMapInfo();
+        }
+        else if (FungameCheck.ValidDirectories.Count > 0)
         {
             var firstFungameDir = FungameCheck.ValidDirectories[0];
             var fungameFilePath = Path.Combine(firstFungameDir, "fungame.json");
@@ -175,19 +211,19 @@ public static class WorldGenerationPatch
             if (File.Exists(fungameFilePath))
             {
                 var jsonContent = File.ReadAllText(fungameFilePath);
-                var fungame = Newtonsoft.Json.JsonConvert.DeserializeObject<Fungame>(jsonContent);
+                var fallbackFungame = Newtonsoft.Json.JsonConvert.DeserializeObject<Fungame>(jsonContent);
 
-                if (fungame?.MapData != null)
+                if (fallbackFungame?.MapData != null)
                 {
-                    Info("loading_fungame_map", fungame.Name);
-                    WorldGeneration.loadingText.text = Locale("loading_fungame_map", fungame.Name);
-                    MapLoader.LoadAndApplyMapFromFungame(fungame);
-                    ExecuteCommands(fungame);
-                    Player.Tp(fungame.SpawnPosition);
+                    Info("loading_fungame_map", fallbackFungame.Name);
+                    WorldGeneration.loadingText.text = Locale("loading_fungame_map", fallbackFungame.Name);
+                    MapLoader.LoadAndApplyMapFromFungame(fallbackFungame);
+                    ExecuteCommands(fallbackFungame);
+                    Player.Tp(fallbackFungame.SpawnPosition);
 
-                    string modInfo = $"{fungame.Name} v{fungame.Version}";
-                    string authorInfo = $"by {fungame.Authors}";
-                    string description = fungame.Description;
+                    string modInfo = $"{fallbackFungame.Name} v{fallbackFungame.Version}";
+                    string authorInfo = $"by {fallbackFungame.Authors}";
+                    string description = fallbackFungame.Description;
 
                     Player.Alert($"{modInfo}\n{authorInfo}", true);
                     Player.Alert(description, false, 6f);
@@ -195,7 +231,7 @@ public static class WorldGenerationPatch
                 }
                 else
                 {
-                    Warning("no_map_data", fungame?.Name ?? "Unknown");
+                    Warning("no_map_data", fallbackFungame?.Name ?? "Unknown");
                 }
             }
             else
@@ -208,7 +244,7 @@ public static class WorldGenerationPatch
             Error("no_valid_directories");
         }
     }
-
+    
     private static void ExecuteCommands(Fungame fungame)
     {
         var commands = fungame.Command;

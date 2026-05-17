@@ -93,7 +93,7 @@ public class ModCommand : ModCommandBase
         {
             var fungame = fungames[i];
             var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
-            var marker = isCurrent ? " ->" : "  ";
+            var marker = isCurrent ? "->" : "  ";
 
             Command("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
         }
@@ -119,9 +119,12 @@ public class ModCommand : ModCommandBase
             return;
         }
 
+        WorldGenerationPatch.CurrentFungame = fungame;
+        
         Command("select.success", fungame.Name, fungame.Id);
         MapLoader.ReloadMap(fungame);
     }
+
 
     private static void CheckArg(string[] args, int index)
     {
