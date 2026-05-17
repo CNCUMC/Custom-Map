@@ -18,7 +18,7 @@
         "feature": "Features: {0}",
         "spawn": "Spawn point: {0}"
       },
-      "spawn": "Teleporting back to the spawn point now..."
+      "spawn": "Teleporting back to the spawn point {0} now..."
     }
   },
   "log": {

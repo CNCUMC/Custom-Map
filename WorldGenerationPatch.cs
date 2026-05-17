@@ -191,11 +191,7 @@ public static class WorldGenerationPatch
 
                     Player.Alert($"{modInfo}\n{authorInfo}", true);
                     Player.Alert(description, false, 6f);
-                    Log.Info("---------------------------", Logger);
-                    Log.Info(modInfo, Logger);
-                    Log.Info(authorInfo, Logger);
-                    Log.Info(description, Logger);
-                    Log.Info("---------------------------", Logger);
+                    MapLoader.LogMapInfo();
                 }
                 else
                 {

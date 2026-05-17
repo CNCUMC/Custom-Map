@@ -20,6 +20,14 @@ public class Fungame
     [JsonProperty("map_data")]
     public MapData MapData { get; set; }
 
+    public string Authors => Author is { Count: > 0 }
+        ? string.Join(", ", Author)
+        : "Unknown";
+    
+    public string Features => Feature is { Count: > 0 }
+        ? string.Join(", ", Feature)
+        : "Unknown";
+    
     public Vector2 SpawnPosition => new(
         Spawn is { Length: >= 2 } 
             ? Spawn[0]
@@ -27,10 +35,6 @@ public class Fungame
         Spawn is { Length: >= 2 } 
             ? Spawn[1]
             : 0);
-
-    public string Authors => Author is { Count: > 0 }
-        ? string.Join(", ", Author)
-        : "Unknown";
 }
 
 [UsedImplicitly]

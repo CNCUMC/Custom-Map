@@ -18,22 +18,13 @@ public static class FungameCheck
     public static readonly List<string> ValidDirectories = [];
     public static readonly List<string> CheckFailDirectories = [];
     public static readonly List<Fungame> Fungames = [];
-    public static Fungame RunningFungame => WorldGenerationPatch.CurrentFungame;
-    
+    public static Fungame CurrentFungame => WorldGenerationPatch.CurrentFungame;
+    public static bool HasRunningFungame => CurrentFungame != null;
+
     public static void Initialize()
     {
         _logger = Plugin.Logger;
         LoadFungameDirectories();
-    }
-    
-    public static Fungame GetRunningFungame()
-    {
-        return WorldGenerationPatch.CurrentFungame;
-    }
-
-    public static bool IsFungameRunning()
-    {
-        return WorldGenerationPatch.CurrentFungame != null;
     }
 
     private static void LoadFungameDirectories()
@@ -85,6 +76,15 @@ public static class FungameCheck
         }
     }
 
+    public static Fungame GetRunningFungame(bool throwIfNull = false)
+    {
+        if (CurrentFungame == null && throwIfNull)
+        {
+            throw new InvalidOperationException("No Fungame is currently running");
+        }
+        
+        return CurrentFungame;
+    }
     private static bool ValidateAndLoadFungame(string filePath)
     {
         try
@@ -112,7 +112,7 @@ public static class FungameCheck
                 var idValue = jsonObject["id"].ToString();
                 if (!IsValidId(idValue))
                 {
-                    warnings.Add(Locale("fungame_check.id_format_warning"));
+                    warnings.Add(Locale("id_format_warning"));
                     jsonObject["id"] = SanitizeId(idValue);
                 }
             }
@@ -124,14 +124,14 @@ public static class FungameCheck
                     for (int i = 0; i < authorArray.Count; i++)
                     {
                         if (authorArray[i].Type == JTokenType.String) continue;
-                        warnings.Add(Locale("fungame_check.author_not_string", i));
+                        warnings.Add(Locale("author_not_string", i));
                         authorArray[i].Remove();
                         i--;
                     }
 
                     if (authorArray.Count == 0)
                     {
-                        warnings.Add(Locale("fungame_check.author_empty"));
+                        warnings.Add(Locale("author_empty"));
                         jsonObject["author"] = new JArray(new object[] { "Unknown" });
                     }
                 }
@@ -172,7 +172,7 @@ public static class FungameCheck
 
             if (!IsValidVersion(fungame.Version))
             {
-                warnings.Add(Locale("fungame_check.version_format_warning", fungame.Version));
+                warnings.Add(Locale("version_format_warning", fungame.Version));
                 fungame.Version = "1.0";
             }
 
@@ -220,7 +220,7 @@ public static class FungameCheck
         return parts.Length is >= 2 and <= 4 && parts.All(part => int.TryParse(part, out _));
     }
 
-private static void ValidateMapData(JObject mapObject, List<string> errors)
+    private static void ValidateMapData(JObject mapObject, List<string> errors)
     {
         if (mapObject == null)
         {

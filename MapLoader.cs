@@ -212,7 +212,7 @@ public static class MapLoader
     public static void ReloadMap()
     {
         World.CheckForWorld();
-        
+        Log.Divider();
         try
         {
             var currentFungame = WorldGenerationPatch.CurrentFungame;
@@ -249,8 +249,25 @@ public static class MapLoader
         }
     }
     
-    public static void GetMapInfo()
-    { 
+    public static void LogMapInfo()
+    {
+        var fungame = FungameCheck.CurrentFungame;
+        Log.Divider();
+        LogConsole("info.name", fungame.Name);
+        LogConsole("info.id", fungame.Id);
+        LogConsole("info.version", fungame.Version);
+        LogConsole("info.authors", fungame.Authors);
+        LogConsole("info.description", fungame.Description);
+        LogConsole("info.feature", fungame.Features);
+        LogConsole("info.spawn", fungame.SpawnPosition);
+        Log.Divider();
+        Log.NewLine();
+    }
+    
+    private static void LogConsole(string key, params object[] args)
+    {
+        var message = ModLocale.GetFormat($"command.fungame.{key}", args);
+        Log.Info(message, Logger);
     }
 
     private static void Info(string key, params object[] args)

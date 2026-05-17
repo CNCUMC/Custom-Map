@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BepInEx.Logging;
 using HarmonyLib;
 using MossLib.Base;
 using MossLib.Tool;
-using UnityEngine.SceneManagement;
 
 namespace CustomFungamePack;
 
@@ -18,29 +16,21 @@ public class ModCommand : ModCommandBase
     [HarmonyPostfix]
     public static void RegisterCustomCommands(ConsoleScript __instance)
     {
-        var fungame = FungameCheck.RunningFungame;
-
         void Action(string[] args)
         {
+            World.CheckForWorld();
             Tools.CheckArgumentCount(args, 1);
             switch (args[1])
             {
                 case "reload":
-                    Locale("fungame.reload");
+                    LogConsole("reload");
                     MapLoader.ReloadMap();
                     break;
                 case "info":
-                    Locale("fungame.info.name", fungame.Name);
-                    Locale("fungame.info.id", fungame.Id);
-                    Locale("fungame.info.version", fungame.Version);
-                    Locale("fungame.info.authors", fungame.Authors);
-                    Locale("fungame.info.description", fungame.Description);
-                    Locale("fungame.info.feature", fungame.Feature);
-                    Locale("fungame.info.spawn", fungame.Spawn);
+                    MapLoader.LogMapInfo();
                     break;
                 case "spawn":
-                    Locale("fungame.spawn");
-                    Player.Tp(fungame.SpawnPosition);
+                    Spawn();
                     break;
                 default:
                     Warning("empty_type");
@@ -61,20 +51,33 @@ public class ModCommand : ModCommandBase
         };
         (string, string)[] valueTupleArray =
         [
-            ("string", Locale("fungame.string"))
+            ("string", Locale("string"))
         ];
         ConsoleScript.Commands.Add(new Command(
             "fungame",
-            Locale("fungame.description"),
+            Locale("description"),
             Action,
             argAutofill2,
             valueTupleArray)
         );
     }
 
+    private static void Spawn()
+    {
+        var fungame = FungameCheck.CurrentFungame;
+        LogConsole("spawn", fungame.SpawnPosition);
+        Player.Tp(fungame.SpawnPosition);
+    }
+
     private static string Locale(string key, params object[] args)
     {
-        return ModLocale.GetFormat($"command.{key}", args);
+        return ModLocale.GetFormat($"command.fungame.{key}", args);
+    }
+    
+    private static void LogConsole(string key, params object[] args)
+    {
+        var message = Locale(key, args);
+        Log.Info(message, Logger);
     }
 
     private static void Info(string key, params object[] args)
