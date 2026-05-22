@@ -75,13 +75,8 @@ public static class FungameCheck
         }
     }
 
-    public static Fungame GetRunningFungame(bool throwIfNull = false)
+    public static Fungame GetRunningFungame()
     {
-        if (CurrentFungame == null && throwIfNull)
-        {
-            throw new InvalidOperationException("No Fungame is currently running");
-        }
-        
         return CurrentFungame;
     }
     private static bool ValidateAndLoadFungame(string filePath)

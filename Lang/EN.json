@@ -16,7 +16,7 @@
         "version": "Version: {0}",
         "authors": "Authors: {0}",
         "description": "Description: {0}",
-        "feature": "Features: {0}",
+        "features": "Features: {0}",
         "spawn": "Spawn point: {0}"
       },
       "spawn": "Teleporting back to the spawn point {0} now...",

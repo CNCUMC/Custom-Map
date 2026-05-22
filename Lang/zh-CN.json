@@ -19,7 +19,7 @@
         "version": "版本: {0}",
         "authors": "作者: {0}",
         "description": "描述: {0}",
-        "feature": "特性: {0}",
+        "features": "特性: {0}",
         "spawn": "出生点: {0}"
       },
       "spawn": "传送回出生{0}中...",

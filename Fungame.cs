@@ -14,7 +14,7 @@ public class Fungame
     public string Version { get; set; }
     public List<string> Author { get; set; }
     public string Description { get; set; }
-    public Dictionary<string, object> Feature { get; set; } = new();
+    public Feature Feature { get; set; } = new();
     public List<string> Command { get; set; }
     public float[] Spawn { get; set; } = [0, 0];
     [JsonProperty("map_data")]
@@ -25,9 +25,9 @@ public class Fungame
     public string Authors => Author is { Count: > 0 }
         ? string.Join(", ", Author)
         : "Unknown";
-    public string Features => Feature is { Count: > 0 }
-        ? string.Join(", ", Feature.Keys)
-        : "Unknown";
+    public string Features => Feature != null 
+        ? $"Fullbright={Feature.Fullbright}, ForgivingLevel={Feature.ForgivingLevel}, Gravity={Feature.Gravity}, SkipTerrain={Feature.SkipTerrain}, SkipStructures={Feature.SkipStructures}, SkipBackground={Feature.SkipBackground}"
+        : "None";
     public Vector2 SpawnPosition => new(
         Spawn is { Length: >= 2 } 
             ? Spawn[0]
@@ -45,4 +45,15 @@ public class MapData
     public WorldGeneration.OverrideSceneType Type { get; set; } = WorldGeneration.OverrideSceneType.Debug;
     public string[] Map { get; set; } = [];
     public Dictionary<string, object> Key { get; set; } = new();
+}
+
+[UsedImplicitly]
+public class Feature
+{
+    public bool  Fullbright = true;
+    public bool  ForgivingLevel = false;
+    public float Gravity = 0.3f;
+    public bool  SkipTerrain = true;
+    public bool  SkipStructures = true;
+    public bool  SkipBackground = true;
 }
