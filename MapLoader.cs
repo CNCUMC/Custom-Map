@@ -263,9 +263,39 @@ public static class MapLoader
         Log.NewLine();
     }
     
+    public static void LogFungameList()
+    {
+        var fungames = FungameCheck.Fungames;
+
+        if (fungames == null || fungames.Count == 0)
+        {
+            Command("list.empty");
+            return;
+        }
+
+        Command("list.header", fungames.Count);
+
+        for (int i = 0; i < fungames.Count; i++)
+        {
+            var fungame = fungames[i];
+            var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
+            var marker = isCurrent ? "->" : "  ";
+
+            Command("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
+        }
+
+        Log.NewLine();
+    }
+    
     private static void LogConsole(string key, params object[] args)
     {
-        var message = ModLocale.Log($"command.fungame.{key}", args);
+        var message = ModLocale.GetFormat($"command.fungame.{key}", args);
+        Log.Info(message, Logger);
+    }
+
+    private static void Command(string key, params object[] args)
+    {
+        var message = ModLocale.GetFormat($"command.fungame.{key}", args);
         Log.Info(message, Logger);
     }
 

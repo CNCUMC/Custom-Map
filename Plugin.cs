@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using System.Collections.Generic;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -25,10 +26,10 @@ public class Plugin : BaseUnityPlugin
 
         ModLocale.Initialize(Logger);
         _harmony.PatchAll();
+        
         FungameCheck.Initialize();
         
         Configs.ReloadConfigs();
-        
         MoreLogs = Config.Bind(
             "General",
             "MoreLogs",

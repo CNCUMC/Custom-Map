@@ -41,7 +41,7 @@ public class ModCommand : ModCommandBase
                     break;
                 case "list":
                     CheckArg(args, 1);
-                    ListFungames();
+                    MapLoader.LogFungameList();
                     break;
                 default:
                     Warning("empty_type");
@@ -76,30 +76,6 @@ public class ModCommand : ModCommandBase
         );
     }
 
-    private static void ListFungames()
-    {
-        var fungames = FungameCheck.Fungames;
-
-        if (fungames == null || fungames.Count == 0)
-        {
-            Command("list.empty");
-            return;
-        }
-
-        Command("list.header", fungames.Count);
-
-        for (int i = 0; i < fungames.Count; i++)
-        {
-            var fungame = fungames[i];
-            var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
-            var marker = isCurrent ? "->" : "  ";
-
-            Command("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
-        }
-
-        Log.NewLine();
-    }
-
     private static void Select(string key)
     {
         if (string.IsNullOrWhiteSpace(key))
@@ -108,9 +84,24 @@ public class ModCommand : ModCommandBase
             return;
         }
 
-        var fungame = FungameCheck.Fungames.Find(f =>
-            f.Id.Equals(key, System.StringComparison.OrdinalIgnoreCase) ||
-            f.Name.Equals(key, System.StringComparison.OrdinalIgnoreCase));
+        Fungame fungame;
+
+        if (int.TryParse(key, out int index))
+        {
+            if (index < 1 || index > FungameCheck.Fungames.Count)
+            {
+                Command("select.invalid_index", index, FungameCheck.Fungames.Count);
+                return;
+            }
+
+            fungame = FungameCheck.Fungames[index - 1];
+        }
+        else
+        {
+            fungame = FungameCheck.Fungames.Find(f =>
+                f.Id.Equals(key, System.StringComparison.OrdinalIgnoreCase) ||
+                f.Name.Equals(key, System.StringComparison.OrdinalIgnoreCase));
+        }
 
         if (fungame == null)
         {
@@ -123,7 +114,6 @@ public class ModCommand : ModCommandBase
         Command("select.success", fungame.Name, fungame.Id);
         MapLoader.ReloadMap(fungame);
     }
-
 
     private static void CheckArg(string[] args, int index)
     {

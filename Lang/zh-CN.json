@@ -2,7 +2,10 @@
   "feature": {
     "fullbright": "全亮",
     "forgiving_level": "仁慈关卡",
-    "gravity": "重力"
+    "gravity": "重力",
+    "skip_terrain": "跳过地形",
+    "skip_structures": "跳过结构",
+    "skip_background": "跳过背景"
   },
   "command": {
     "fungame": {
@@ -28,7 +31,8 @@
       "select": {
         "no_key": "请提供要选择的 Fungame ID 或名称",
         "not_found": "未找到 Fungame: {0}",
-        "success": "已选择 {0} (ID: {1})"
+        "success": "已选择 {0} (ID: {1})",
+        "invalid_index": "无效的索引 {0}，请输入 1 到 {1} 之间的数字"
       }
     }
   },
