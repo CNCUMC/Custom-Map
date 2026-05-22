@@ -243,7 +243,8 @@ public static class FungameCheck
         else if (mapObject["map"] == null 
                  || mapObject["map"].Type != JTokenType.Array)
         {
-            errors.Add(Validation("map_field_type_error", "map", "字符串数组")); }
+            errors.Add(Validation("map_field_type_error", "map", "array")); }
+
         else
         {
             if (mapObject["map"] is not JArray mapArray
@@ -269,7 +270,7 @@ public static class FungameCheck
         else if (mapObject["key"] == null
                  || mapObject["key"].Type != JTokenType.Object)
         {
-            errors.Add(Validation("map_field_type_error", "key", "对象"));
+            errors.Add(Validation("map_field_type_error", "key", "object"));
         }
 
         if (!mapObject.ContainsKey("items") 
@@ -278,7 +279,7 @@ public static class FungameCheck
 
         if (mapObject["items"].Type != JTokenType.Array)
         {
-            errors.Add(Validation("map_field_type_error", "items", "数组"));
+            errors.Add(Validation("map_field_type_error", "items", "array"));
         }
         else
         {
