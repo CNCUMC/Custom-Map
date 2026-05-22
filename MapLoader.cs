@@ -257,7 +257,7 @@ public static class MapLoader
         LogConsole("info.version", fungame.Version);
         LogConsole("info.authors", fungame.Authors);
         LogConsole("info.description", fungame.Description);
-        LogConsole("info.feature", fungame.Features);
+        LogConsole("info.features", fungame.Features);
         LogConsole("info.spawn", fungame.SpawnPosition);
         Log.Divider();
         Log.NewLine();
