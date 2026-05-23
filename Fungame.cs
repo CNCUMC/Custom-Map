@@ -17,7 +17,7 @@ public class Fungame
     public List<string> Author { get; set; }
     public string Description { get; set; }
     public Feature Feature { get; set; } = new();
-    public List<string> Command { get; set; }
+    public CommandData CommandData { get; set; }
     public float[] Spawn { get; set; } = [0, 0];
     [JsonProperty("map_data")] public MapData MapData { get; set; }
     [JsonProperty("custom_structures")] public string CustomStructures;
@@ -60,4 +60,12 @@ public class Feature
     public bool Fullbright { get; set; } = true;
     public bool ForgivingLevel { get; set; } = false;
     public float Gravity { get; set; } = Physics2D.gravity.y;
+}
+
+[UsedImplicitly]
+public class CommandData
+{
+    [JsonProperty("once_commands")] public List<string> OnceCommands;
+    [JsonProperty("loop_commands")] public List<string> LoopCommands;
+    [JsonProperty("loop_interval")] public float LoopInterval;
 }

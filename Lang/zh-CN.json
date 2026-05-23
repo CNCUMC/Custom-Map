@@ -67,7 +67,8 @@
       "loading_fungame_map": "正在加载Fungame地图: {0}",
       "no_map_data": "Fungame {0} 不包含地图数据",
       "no_commands": "未启用任何 {0}",
-      "executing_command": "执行 {0}: {1}"
+      "executing_command": "执行 {0}: '{1}'",
+      "executing_loop_command": "执行循环 {0}: '{1}'"
     },
     "validation": {
       "map_invalid_type": "map 字段格式不正确",
@@ -129,7 +130,8 @@
       "terrain": "地形",
       "structure": "结构",
       "background": "背景",
-      "startup_command": "启动命令"
+      "startup_command": "启动命令",
+      "loop_command": "循环命令"
     },
     "mod_command": {
       "empty_type": "未知的指令类型",

@@ -67,7 +67,8 @@
       "loading_fungame_map": "Loading Fungame map: {0}",
       "no_map_data": "Fungame {0} does not contain map data",
       "no_commands": "No {0} enabled",
-      "executing_command": "Executing {0}: {1}"
+      "executing_command": "Executing {0}: {1}",
+      "executing_loop_command": "Executing loop {0}: {1}"
     },
     "validation": {
       "map_invalid_type": "map field format is incorrect",
@@ -132,6 +133,7 @@
       "structure": "Structure",
       "background": "Background",
       "startup_command": "Startup commands",
+      "loop_command": "Loop command",
       "forgiving_level_mode": "Forgiving level mode"
     },
     "mod_command": {

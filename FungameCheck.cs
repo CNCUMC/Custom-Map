@@ -62,6 +62,18 @@ public static class FungameCheck
             Author = ["Black_Moss"],
             Description = "a map template",
             Spawn = [3, 0],
+            CommandData = new CommandData
+            {
+                OnceCommands =
+                [
+                    "alert true Start!"
+                ],
+                LoopCommands =
+                [
+                    "alert false 10s!"
+                ],
+                LoopInterval = 0
+            },
             MapData = new MapData
             {
                 Map =
@@ -498,7 +510,7 @@ public static class FungameCheck
     {
         Log.Warning(key, _logger);
     }
-    
+
     private static void UninitializedWarning(string key)
     {
         _logger.LogWarning($"{key}");

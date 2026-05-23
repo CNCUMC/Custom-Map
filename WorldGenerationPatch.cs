@@ -15,6 +15,7 @@ public static class WorldGenerationPatch
     private static readonly ManualLogSource Logger = Plugin.Logger;
     public static WorldGeneration WorldGeneration;
     internal static Fungame CurrentFungame;
+    private static float _sLoopTimer;
 
     [HarmonyPatch("Awake")]
     [HarmonyPostfix]
@@ -96,8 +97,10 @@ public static class WorldGenerationPatch
 
         Physics2D.gravity = new Vector2(0, features.Gravity);
         Console.ConsoleScript.fullBright = CurrentFungame.Feature.Fullbright;
-    }
 
+        HandleLoopCommands();
+    }
+    
     private static void SetDefaultSceneType(WorldGeneration __instance)
     {
         __instance.biomeOverride = WorldGeneration.OverrideSceneType.Debug;
@@ -196,20 +199,46 @@ public static class WorldGenerationPatch
 
     private static void ExecuteCommands(Fungame fungame)
     {
-        var commands = fungame.Command;
-        if (commands == null || commands.Count == 0)
+        var commands = fungame.CommandData;
+        if (commands == null || (commands.OnceCommands == null || commands.OnceCommands.Count == 0) && (commands.LoopCommands == null || commands.LoopCommands.Count == 0))
         {
             MoreLogs("no_commands", ModLocale.Log("common.startup_command"));
             return;
         }
 
-        foreach (var command in commands)
+        if (commands.OnceCommands != null)
         {
-            MoreLogs("executing_command", ModLocale.Log("common.startup_command"), command);
+            foreach (var command in commands.OnceCommands)
+            {
+                MoreLogs("executing_command", ModLocale.Log("common.startup_command"), command);
+                Console.RunCommand(command);
+            }
+        }
+
+        _sLoopTimer = 0f;
+    }
+
+    private static void HandleLoopCommands()
+    {
+        var loopCommands = CurrentFungame?.CommandData?.LoopCommands;
+        if (loopCommands == null || loopCommands.Count == 0) return;
+        
+        var interval = CurrentFungame.CommandData.LoopInterval > 0 
+            ? CurrentFungame.CommandData.LoopInterval 
+            : 10f;
+        
+        _sLoopTimer += Time.deltaTime;
+
+        if (!(_sLoopTimer >= interval)) return;
+        _sLoopTimer = 0f;
+            
+        foreach (var command in loopCommands)
+        {
+            MoreLogs("executing_loop_command", ModLocale.Log("common.loop_command"), command);
             Console.RunCommand(command);
         }
     }
-
+    
     private static void MoreLogs(string key, params object[] args)
     {
         if (Configs.MoreLogs)
