@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using BepInEx.Logging;
 using MossLib.Tool;
 using Newtonsoft.Json.Linq;
 using UnityEngine.SceneManagement;
+using Console = MossLib.Tool.Console;
 
 namespace CustomFungamePack;
 
@@ -17,16 +17,27 @@ public static class MapLoader
     {
         try
         {
-            if (fungame?.MapData == null && fungame?.CustomStructures != null)
+            if (fungame == null)
             {
-                Error("load_error");
+                Error("no_current_fungame");
                 return;
             }
 
-            Debug.Assert(fungame != null, nameof(fungame) + " != null");
+            var hasMapData = fungame.MapData != null;
+            var hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
+
+            switch (hasMapData)
+            {
+                case false when !hasCustomStructures:
+                    Error("load_error");
+                    return;
+                case false:
+                    Warning("custom_structures_not_supported", ModLocale.Log("common.map"));
+                    return;
+            }
+
             var mapData = fungame.MapData;
 
-            Debug.Assert(mapData != null, nameof(mapData) + " != null");
             if (mapData.Map == null || mapData.Map.Length == 0)
             {
                 Error("invalid_format");
@@ -42,11 +53,6 @@ public static class MapLoader
         {
             Error("load_failed", ex.Message);
         }
-    }
-
-    public static void RefreshLoad()
-    {
-        LoadAndApplyMapFromFungame(FungameCheck.CurrentFungame);
     }
 
     private static void ParseAndApplyStringMap(Fungame fungame)
@@ -108,7 +114,8 @@ public static class MapLoader
         Info("string_map_applied", blockCount, itemCount, failCount);
     }
 
-    private static void ProcessValue(object value, ref int worldX, ref int worldY, ref int blockCount, ref int itemCount, ref int failCount)
+    private static void ProcessValue(object value, ref int worldX, ref int worldY, ref int blockCount,
+        ref int itemCount, ref int failCount)
     {
         switch (value)
         {
@@ -117,14 +124,14 @@ public static class MapLoader
                 ProcessListValue(jArray, ref worldX, ref worldY, ref blockCount, ref itemCount, ref failCount);
                 break;
             }
+            case long longValue:
+            {
+                PlaceBlock((int)longValue, worldX, worldY, ref blockCount, ref failCount);
+                break;
+            }
             case int intValue:
             {
                 PlaceBlock(intValue, worldX, worldY, ref blockCount, ref failCount);
-                break;
-            }
-            case double doubleValue:
-            {
-                PlaceBlock((long)doubleValue, worldX, worldY, ref blockCount, ref failCount);
                 break;
             }
             case string stringValue:
@@ -135,7 +142,8 @@ public static class MapLoader
         }
     }
 
-    private static void ProcessListValue(JArray jArray, ref int worldX, ref int worldY, ref int blockCount, ref int itemCount, ref int failCount)
+    private static void ProcessListValue(JArray jArray, ref int worldX, ref int worldY, ref int blockCount,
+        ref int itemCount, ref int failCount)
     {
         if (jArray == null || jArray.Count == 0)
         {
@@ -158,37 +166,41 @@ public static class MapLoader
                             {
                                 Warning("multiple_blocks_in_list", worldX, worldY);
                             }
-                            else if (longVal > 0)
+                            else if (longVal >= 0)
                             {
-                                PlaceBlock(longVal, worldX, worldY, ref blockCount, ref failCount);
+                                PlaceBlock((int)longVal, worldX, worldY, ref blockCount, ref failCount);
                                 hasPlacedBlock = true;
                             }
+
                             break;
-                        case double doubleVal:
+                        case int intVal:
                             if (hasPlacedBlock)
                             {
                                 Warning("multiple_blocks_in_list", worldX, worldY);
                             }
-                            else if (doubleVal > 0)
+                            else if (intVal >= 0)
                             {
-                                PlaceBlock((long)doubleVal, worldX, worldY, ref blockCount, ref failCount);
+                                PlaceBlock(intVal, worldX, worldY, ref blockCount, ref failCount);
                                 hasPlacedBlock = true;
                             }
+
                             break;
                         case string stringVal:
                             if (!string.IsNullOrEmpty(stringVal))
                             {
                                 PlaceItem(stringVal, worldX, worldY, ref itemCount, ref failCount);
                             }
+
                             break;
                     }
+
                     break;
                 }
             }
         }
     }
 
-    private static void PlaceBlock(long blockId, int x, int y, ref int blockCount, ref int failCount)
+    private static void PlaceBlock(int blockId, int x, int y, ref int blockCount, ref int failCount)
     {
         try
         {
@@ -215,7 +227,7 @@ public static class MapLoader
             failCount++;
         }
     }
-    
+
     public static void ReloadMap(Fungame fungame)
     {
         if (fungame == null)
@@ -223,6 +235,7 @@ public static class MapLoader
             Error("no_current_fungame");
             return;
         }
+
         World.CheckForWorld();
         Log.Divider();
         try
@@ -235,7 +248,7 @@ public static class MapLoader
             Error("reload_failed", ex.Message);
         }
     }
-    
+
     private static void RestartScene()
     {
         try
@@ -252,7 +265,7 @@ public static class MapLoader
             Error("scene_reload_failed", ex.Message);
         }
     }
-    
+
     public static void LogMapInfo()
     {
         var fungame = FungameCheck.CurrentFungame;
@@ -267,18 +280,18 @@ public static class MapLoader
         Log.Divider();
         Log.NewLine();
     }
-    
+
     public static void LogFungameList()
     {
         var fungames = FungameCheck.Fungames;
 
         if (fungames == null || fungames.Count == 0)
         {
-            Command("list.empty");
+            LogConsole("list.empty");
             return;
         }
 
-        Command("list.header", fungames.Count);
+        LogConsole("list.header", fungames.Count);
 
         for (int i = 0; i < fungames.Count; i++)
         {
@@ -286,19 +299,13 @@ public static class MapLoader
             var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
             var marker = isCurrent ? "->" : "  ";
 
-            Command("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
+            LogConsole("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
         }
 
         Log.NewLine();
     }
-    
-    private static void LogConsole(string key, params object[] args)
-    {
-        var message = ModLocale.GetFormat($"command.fungame.{key}", args);
-        Log.Info(message, Logger);
-    }
 
-    private static void Command(string key, params object[] args)
+    private static void LogConsole(string key, params object[] args)
     {
         var message = ModLocale.GetFormat($"command.fungame.{key}", args);
         Log.Info(message, Logger);

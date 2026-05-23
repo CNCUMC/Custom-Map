@@ -62,6 +62,7 @@
       "map_item_not_string": "Map items[{0}][{1}] must be a string",
       "map_and_custom_structures_conflict": "Cannot use map_data and custom_structures at the same time",
       "missing_map_or_custom_structures": "Missing map_data or custom_structures",
+      "custom_structures_without_mod": "Detected custom_structures field, but Custom Structures mod is not installed. Please install the mod first.",
       "features_invalid_type": "features field must be an array or object",
       "features_empty": "features array is empty, will be ignored",
       "features_element_invalid": "features element {0} format is incorrect, skipped",
@@ -85,17 +86,22 @@
       "load_failed": "Failed to load map: {0}",
       "place_failed": "Failed to place {2} {3} at ({0}, {1}): {4}",
       "multiple_blocks_in_list": "Multiple blocks detected in list at ({0}, {1}), only the first one will be generated",
+      "unsupported_value_type": "Unsupported value type: {0}, position ({1}, {2})",
+      "nested_structure_not_supported": "Nested structure not supported, position ({0}, {1})",
+      "unexpected_token_type": "Unexpected token type: {0}, position ({1}, {2})",
       "reload_success": "Successfully reloaded map: {0}",
       "reload_failed": "Failed to reload map: {0}",
       "restarting_scene": "Restarting scene...",
       "scene_reloading": "Reloading scene: {0}",
       "scene_reloaded": "Scene reloaded",
       "scene_reload_failed": "Failed to reload scene: {0}",
-      "no_current_fungame": "No current Fungame configuration loaded"
+      "no_current_fungame": "No current Fungame configuration loaded",
+      "map_loader.custom_structures_not_supported": "Custom structures are not supported for map loading: {0}"
     },
     "error": {
       "no_fungame_file": "Cannot find fungame.json file: {0}",
-      "no_valid_directories": "No valid Fungame directories, please check the Fungames folder"
+      "no_valid_directories": "No valid Fungame directories, please check the Fungames folder",
+      "custom_structures_mod_not_loaded": "Fungame '{0}' requires Custom Structures mod, but the mod is not loaded"
     },
     "common": {
       "map": "Map",
@@ -107,7 +113,7 @@
       "startup_command": "Startup commands",
       "forgiving_level_mode": "Forgiving level mode"
     },
-    "modcommand": {
+    "mod_command": {
       "empty_type": "Unknown command type"
     },
     "custom_structures_loader": {

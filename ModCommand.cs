@@ -10,7 +10,7 @@ namespace CustomFungamePack;
 public class ModCommand : ModCommandBase
 {
     private new static readonly ManualLogSource Logger = Plugin.Logger;
-    private const string LocaleKeyPre = "modcommand.";
+    private const string LocaleKeyPre = "mod_command.";
     private static Fungame Fungame => FungameCheck.CurrentFungame;
 
     [HarmonyPatch("RegisterAllCommands")]
@@ -43,10 +43,6 @@ public class ModCommand : ModCommandBase
                     CheckArg(args, 1);
                     MapLoader.LogFungameList();
                     break;
-                case "refresh":
-                    CheckArg(args, 1);
-                    MapLoader.RefreshLoad();
-                    break;
                 default:
                     Warning("empty_type");
                     break;
@@ -62,8 +58,7 @@ public class ModCommand : ModCommandBase
                     "info",
                     "spawn",
                     "select",
-                    "list",
-                    "refresh"
+                    "list"
                 ]
             }
         };

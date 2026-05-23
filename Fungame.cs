@@ -53,7 +53,7 @@ public class Feature
 {
     public bool Fullbright = true;
     public bool ForgivingLevel = false;
-    public float Gravity = 0.3f;
+    public float Gravity = Physics2D.gravity.y;
     public bool SkipTerrain = true;
     public bool SkipStructures = true;
     public bool SkipBackground = true;

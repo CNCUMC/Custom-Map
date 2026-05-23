@@ -66,6 +66,7 @@
       "map_item_not_string": "地图 items[{0}][{1}] 必须是字符串",
       "map_and_custom_structures_conflict": "不能同时使用 map_data 和 custom_structures",
       "missing_map_or_custom_structures": "缺少 map_data 或 custom_structures",
+      "custom_structures_without_mod": "检测到 custom_structures 字段，但未安装自定义结构模组（Custom Structures），请先安装该模组",
       "features_invalid_type": "features 字段必须是数组或对象",
       "features_empty": "features 数组为空，将被忽略",
       "features_element_invalid": "features 第 {0} 个元素格式不正确，已跳过",
@@ -89,6 +90,9 @@
       "load_failed": "加载地图失败: {0}",
       "place_failed": "在 ({0}, {1}) 放置{2} {3} 失败: {4}",
       "multiple_blocks_in_list": "在 ({0}, {1}) 检测到列表中有多个物块，只生成第一个",
+      "unsupported_value_type": "不支持的值类型: {0}，位置 ({1}, {2})",
+      "nested_structure_not_supported": "嵌套结构不被支持，位置 ({0}, {1})",
+      "unexpected_token_type": "意外的令牌类型: {0}，位置 ({1}, {2})",
       "reload_success": "成功重新加载地图: {0}",
       "reload_failed": "重新加载地图失败: {0}",
       "restarting_scene": "正在重启场景...",
@@ -99,7 +103,8 @@
     },
     "error": {
       "no_fungame_file": "找不到 fungame.json 文件: {0}",
-      "no_valid_directories": "没有有效的 Fungame 目录，请检查 Fungames 文件夹"
+      "no_valid_directories": "没有有效的 Fungame 目录，请检查 Fungames 文件夹",
+      "custom_structures_mod_not_loaded": "Fungame '{0}' 需要自定义结构模组，但该模组未加载"
     },
     "common": {
       "map": "地图",
@@ -111,7 +116,7 @@
       "startup_command": "启动命令",
       "forgiving_level_mode": "仁慈关卡模式"
     },
-    "modcommand": {
+    "mod_command": {
       "empty_type": "未知的指令类型"
     },
     "custom_structures_loader": {

@@ -35,6 +35,26 @@ public static class FungameCheck
         ValidDirectories.Clear();
         CheckFailDirectories.Clear();
         Fungames.Clear();
+
+        foreach (var fungamesDirectory in directories)
+        {
+            var missingFiles = (
+                from requiredFile
+                    in new[] { "fungame.json" }
+                let filePath = Path.Combine(fungamesDirectory, requiredFile)
+                where !File.Exists(filePath)
+                select requiredFile).ToList();
+
+            if (missingFiles.Count > 0)
+            {
+                Warning(
+                    $"{Path.GetFileName(fungamesDirectory)} Missing files: {string.Join(", ", missingFiles)}");
+                continue;
+            }
+
+            ValidDirectories.Add(fungamesDirectory);
+        }
+
         Fungames.Add(new Fungame
         {
             Name = $"{Plugin.Name} Template",
@@ -60,25 +80,6 @@ public static class FungameCheck
                 }
             }
         });
-
-        foreach (var fungamesDirectory in directories)
-        {
-            var missingFiles = (
-                from requiredFile
-                    in new[] { "fungame.json" }
-                let filePath = Path.Combine(fungamesDirectory, requiredFile)
-                where !File.Exists(filePath)
-                select requiredFile).ToList();
-
-            if (missingFiles.Count > 0)
-            {
-                Warning(
-                    $"{Path.GetFileName(fungamesDirectory)} Missing files: {string.Join(", ", missingFiles)}");
-                continue;
-            }
-
-            ValidDirectories.Add(fungamesDirectory);
-        }
 
         if (ValidDirectories.Count == 0) return;
         _logger.LogInfo($"Valid directories: {ValidDirectories.Count}, loading...");
@@ -158,7 +159,8 @@ public static class FungameCheck
             }
 
             bool hasCustomStructuresMod = Type.GetType("Custom_Structures.Plugin, Custom Structures") != null;
-            bool hasCustomStructuresField = jsonObject.ContainsKey("custom_structures") && jsonObject["custom_structures"] != null;
+            bool hasCustomStructuresField =
+                jsonObject.ContainsKey("custom_structures") && jsonObject["custom_structures"] != null;
             bool hasMapData = jsonObject.ContainsKey("map_data") && jsonObject["map_data"] != null;
 
             if (hasCustomStructuresField && hasMapData)
@@ -181,7 +183,7 @@ public static class FungameCheck
                 errors.Add(Validation("missing_map_or_custom_structures"));
             }
 
-            
+
             if (jsonObject.ContainsKey("features") && jsonObject["features"] != null)
             {
                 ValidateFeatures(jsonObject["features"] as JArray, errors, warnings);

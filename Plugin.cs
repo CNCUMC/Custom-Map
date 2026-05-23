@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using MossLib.Tool;
 
 namespace CustomFungamePack;
 
@@ -16,13 +17,14 @@ public class Plugin : BaseUnityPlugin
     
     internal new static ManualLogSource Logger;
     private readonly Harmony _harmony = new(Guid);
-
+    internal static Plugin Instance { get; private set; }
     public static ConfigEntry<bool> MoreLogs;
 
     public void Awake()
     {
+        Instance = this;
         Logger = base.Logger;
-
+        
         ModLocale.Initialize(Logger);
         _harmony.PatchAll();
         FungameCheck.Initialize();
