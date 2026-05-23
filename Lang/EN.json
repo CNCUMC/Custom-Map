@@ -2,7 +2,10 @@
   "feature": {
     "fullbright": "Fullbright",
     "forgiving_level": "Forgiving Level",
-    "gravity": "Gravity"
+    "gravity": "Gravity",
+    "skip_terrain": "Skip Terrain",
+    "skip_structures": "Skip Structures",
+    "skip_background": "Skip Background"
   },
   "command": {
     "fungame": {
@@ -28,7 +31,8 @@
       "select": {
         "no_key": "Please provide a Fungame ID or name to select",
         "not_found": "Fungame not found: {0}",
-        "success": "Selected {0} (ID: {1})"
+        "success": "Selected {0} (ID: {1})",
+        "invalid_index": "Invalid index {0}, please enter a number between 1 and {1}"
       }
     }
   },
@@ -96,7 +100,11 @@
       "scene_reloaded": "Scene reloaded",
       "scene_reload_failed": "Failed to reload scene: {0}",
       "no_current_fungame": "No current Fungame configuration loaded",
-      "map_loader.custom_structures_not_supported": "Custom structures are not supported for map loading: {0}"
+      "custom_structures_not_supported": "Custom structures are not supported for map loading: {0}",
+      "no_features_enabled": "No features enabled",
+      "feature_enabled": "{0} enabled",
+      "feature_enabled_with_value": "{0} enabled: {1}",
+      "skip_generation": "Skipped {0} generation"
     },
     "error": {
       "no_fungame_file": "Cannot find fungame.json file: {0}",
@@ -114,7 +122,8 @@
       "forgiving_level_mode": "Forgiving level mode"
     },
     "mod_command": {
-      "empty_type": "Unknown command type"
+      "empty_type": "Unknown command type",
+      "world_not_loaded": "World not loaded"
     },
     "custom_structures_loader": {
       "loading": "Loading custom structure: {0}",

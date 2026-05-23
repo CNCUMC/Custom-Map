@@ -146,31 +146,29 @@ public static class WorldGenerationPatch
             var firstFungameDir = FungameCheck.ValidDirectories[0];
             var fungameFilePath = Path.Combine(firstFungameDir, "fungame.json");
 
-            if (File.Exists(fungameFilePath))
-            {
-                var jsonContent = File.ReadAllText(fungameFilePath);
-                var fallbackFungame = Newtonsoft.Json.JsonConvert.DeserializeObject<Fungame>(jsonContent);
+            if (!File.Exists(fungameFilePath)) return;
+            var jsonContent = File.ReadAllText(fungameFilePath);
+            var fallbackFungame = Newtonsoft.Json.JsonConvert.DeserializeObject<Fungame>(jsonContent);
 
-                if (fallbackFungame?.MapData != null)
+            if (fallbackFungame?.MapData != null)
+            {
+                SpawnMap(fallbackFungame);
+            }
+            else if (fallbackFungame?.CustomStructures != null)
+            {
+                bool hasCustomStructuresMod = Type.GetType("Custom_Structures.Plugin, Custom Structures") != null;
+                if (hasCustomStructuresMod)
                 {
-                    SpawnMap(fallbackFungame);
-                }
-                else if (fallbackFungame?.CustomStructures != null)
-                {
-                    bool hasCustomStructuresMod = Type.GetType("Custom_Structures.Plugin, Custom Structures") != null;
-                    if (hasCustomStructuresMod)
-                    {
-                        CustomStructuresLoader.SpawnCustomStructures(fallbackFungame);
-                    }
-                    else
-                    {
-                        Error("custom_structures_mod_not_loaded", fallbackFungame.Name);
-                    }
+                    CustomStructuresLoader.SpawnCustomStructures(fallbackFungame);
                 }
                 else
                 {
-                    Warning("no_map_data", fallbackFungame?.Name ?? "Unknown");
+                    Error("custom_structures_mod_not_loaded", fallbackFungame.Name);
                 }
+            }
+            else
+            {
+                Warning("no_map_data", fallbackFungame?.Name ?? "Unknown");
             }
         }
         else

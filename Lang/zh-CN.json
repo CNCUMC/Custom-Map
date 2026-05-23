@@ -59,7 +59,7 @@
     "validation": {
       "map_invalid_type": "map 字段格式不正确",
       "map_missing_field": "地图缺少必需字段: {0}",
-      "map_field_not_type": "地图 {0} 字段必须是{1}",
+      "map_field_type_error": "地图 {0} 字段必须是{1}",
       "map_map_empty": "地图 map 数组不能为空",
       "map_row_not_string": "地图 map 第 {0} 行必须是字符串",
       "map_item_row_not_array": "地图 items 第 {0} 行必须是数组",
@@ -99,11 +99,14 @@
       "scene_reloading": "正在重新加载场景: {0}",
       "scene_reloaded": "场景已重新加载",
       "scene_reload_failed": "重新加载场景失败: {0}",
-      "no_current_fungame": "当前没有加载的 Fungame 配置"
+      "no_current_fungame": "当前没有加载的 Fungame 配置",
+      "custom_structures_not_supported": "自定义结构不支持用于地图加载: {0}",
+      "no_features_enabled": "未启用任何特性",
+      "feature_enabled": "已启用 {0}",
+      "feature_enabled_with_value": "已启用 {0}: {1}",
+      "skip_generation": "已跳过 {0} 生成"
     },
     "error": {
-      "no_fungame_file": "找不到 fungame.json 文件: {0}",
-      "no_valid_directories": "没有有效的 Fungame 目录，请检查 Fungames 文件夹",
       "custom_structures_mod_not_loaded": "Fungame '{0}' 需要自定义结构模组，但该模组未加载"
     },
     "common": {
@@ -113,8 +116,7 @@
       "terrain": "地形",
       "structure": "结构",
       "background": "背景",
-      "startup_command": "启动命令",
-      "forgiving_level_mode": "仁慈关卡模式"
+      "startup_command": "启动命令"
     },
     "mod_command": {
       "empty_type": "未知的指令类型",

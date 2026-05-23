@@ -3,8 +3,8 @@ using System.Linq;
 using BepInEx.Logging;
 using MossLib.Tool;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using Console = MossLib.Tool.Console;
 
 namespace CustomFungamePack;
 
@@ -44,6 +44,8 @@ public static class MapLoader
                 return;
             }
 
+            LogFeatureInfo(fungame.Feature);
+
             ParseAndApplyStringMap(fungame);
 
             MoreLogs("load_success", mapData.X, mapData.Y, mapData.Map.Length,
@@ -55,12 +57,64 @@ public static class MapLoader
         }
     }
 
+    private static void LogFeatureInfo(Feature feature)
+    {
+        if (feature == null)
+        {
+            Warning("no_features_enabled");
+            return;
+        }
+
+        var hasAnyFeature = false;
+
+        if (feature.Fullbright)
+        {
+            Info("feature_enabled", ModLocale.GetFormat("feature.fullbright"));
+            hasAnyFeature = true;
+        }
+
+        if (feature.ForgivingLevel)
+        {
+            Info("feature_enabled", ModLocale.GetFormat("feature.forgiving_level"));
+            hasAnyFeature = true;
+        }
+
+        if (!Mathf.Approximately(feature.Gravity, Physics2D.gravity.y))
+        {
+            Info("feature_enabled_with_value", ModLocale.GetFormat("feature.gravity"), feature.Gravity);
+            hasAnyFeature = true;
+        }
+
+        if (feature.SkipTerrain)
+        {
+            Info("skip_generation", ModLocale.Log("common.terrain"));
+            hasAnyFeature = true;
+        }
+
+        if (feature.SkipStructures)
+        {
+            Info("skip_generation", ModLocale.Log("common.structure"));
+            hasAnyFeature = true;
+        }
+
+        if (feature.SkipBackground)
+        {
+            Info("skip_generation", ModLocale.Log("common.background"));
+            hasAnyFeature = true;
+        }
+
+        if (!hasAnyFeature)
+        {
+            Warning("no_features_enabled");
+        }
+    }
+
     private static void ParseAndApplyStringMap(Fungame fungame)
     {
         var mapData = fungame.MapData;
         if (mapData.Map == null || mapData.Map.Length == 0)
         {
-            Warning("validation.no_data", ModLocale.Log("common.map"), "string map");
+            MoreLogs("validation.no_data", ModLocale.Log("common.map"), "string map");
             return;
         }
 
@@ -75,7 +129,7 @@ public static class MapLoader
 
         if (maxColCount == 0)
         {
-            Warning("validation.row_data_empty", "string map");
+            MoreLogs("validation.row_data_empty", "string map");
             return;
         }
 
@@ -228,26 +282,26 @@ public static class MapLoader
         }
     }
 
-    // public static void ReloadMap(Fungame fungame)
-    // {
-    //     if (fungame == null)
-    //     {
-    //         Error("no_current_fungame");
-    //         return;
-    //     }
-    //
-    //     World.CheckForWorld();
-    //     Log.Divider();
-    //     try
-    //     {
-    //         MoreLogs("restarting_scene");
-    //         RestartScene();
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Error("reload_failed", ex.Message);
-    //     }
-    // }
+    public static void ReloadMap(Fungame fungame)
+    {
+        if (fungame == null)
+        {
+            Error("no_current_fungame");
+            return;
+        }
+
+        World.CheckForWorld();
+        Log.Divider();
+        try
+        {
+            MoreLogs("restarting_scene");
+            RestartScene();
+        }
+        catch (Exception ex)
+        {
+            Error("reload_failed", ex.Message);
+        }
+    }
 
     private static void RestartScene()
     {
@@ -281,30 +335,30 @@ public static class MapLoader
         Log.NewLine();
     }
 
-    // public static void LogFungameList()
-    // {
-    //     var fungames = FungameCheck.Fungames;
-    //
-    //     if (fungames == null || fungames.Count == 0)
-    //     {
-    //         LogConsole("list.empty");
-    //         return;
-    //     }
-    //
-    //     LogConsole("list.header", fungames.Count);
-    //
-    //     for (int i = 0; i < fungames.Count; i++)
-    //     {
-    //         var fungame = fungames[i];
-    //         var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
-    //         var marker = isCurrent ? "->" : "  ";
-    //
-    //         LogConsole("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
-    //     }
-    //
-    //     Log.NewLine();
-    // }
-    
+    public static void LogFungameList()
+    {
+        var fungames = FungameCheck.Fungames;
+
+        if (fungames == null || fungames.Count == 0)
+        {
+            LogConsole("list.empty");
+            return;
+        }
+
+        LogConsole("list.header", fungames.Count);
+
+        for (int i = 0; i < fungames.Count; i++)
+        {
+            var fungame = fungames[i];
+            var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
+            var marker = isCurrent ? "->" : "  ";
+
+            LogConsole("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
+        }
+
+        Log.NewLine();
+    }
+
     private static void LogConsole(string key, params object[] args)
     {
         var message = ModLocale.GetFormat($"command.fungame.{key}", args);
@@ -316,7 +370,7 @@ public static class MapLoader
         var message = ModLocale.Log($"{LocaleKeyPre}{key}", args);
         Log.Info(message, Logger);
     }
-    
+
     private static void MoreLogs(string key, params object[] args)
     {
         if (Configs.MoreLogs)

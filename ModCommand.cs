@@ -25,9 +25,9 @@ public class ModCommand : ModCommandBase
                 switch (args[1])
                 {
                     case "reload":
-                        // if (CheckWorld()) return;
+                        if (CheckWorld()) return;
                         CheckArg(args, 1);
-                        // MapLoader.ReloadMap(FungameCheck.CurrentFungame);
+                        MapLoader.ReloadMap(FungameCheck.CurrentFungame);
                         break;
                     case "info":
                         CheckArg(args, 1);
@@ -36,15 +36,15 @@ public class ModCommand : ModCommandBase
                     case "spawn":
                         if (CheckWorld()) return;
                         CheckArg(args, 1);
-                        // Spawn();
+                        Spawn();
                         break;
                     case "select":
                         CheckArg(args, 2);
-                        // Select(args[2]);
+                        Select(args[2]);
                         break;
                     case "list":
                         CheckArg(args, 1);
-                        // MapLoader.LogFungameList();
+                        MapLoader.LogFungameList();
                         break;
                     default:
                         Warning("empty_type");
@@ -110,71 +110,71 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    // private static void Select(string key)
-    // {
-    //     if (string.IsNullOrWhiteSpace(key))
-    //     {
-    //         Command("fungame.select.no_key");
-    //         return;
-    //     }
-    //
-    //     if (FungameCheck.Fungames == null || FungameCheck.Fungames.Count == 0)
-    //     {
-    //         Command("fungame.list.empty");
-    //         return;
-    //     }
-    //
-    //     Fungame fungame;
-    //
-    //     if (int.TryParse(key, out int index))
-    //     {
-    //         if (index < 1 || index > FungameCheck.Fungames.Count)
-    //         {
-    //             Command("fungame.select.invalid_index", index, FungameCheck.Fungames.Count);
-    //             return;
-    //         }
-    //
-    //         fungame = FungameCheck.Fungames[index - 1];
-    //     }
-    //     else
-    //     {
-    //         fungame = FungameCheck.Fungames.Find(f =>
-    //             f != null &&
-    //             (f.Id?.Equals(key, System.StringComparison.OrdinalIgnoreCase) == true ||
-    //              f.Name?.Equals(key, System.StringComparison.OrdinalIgnoreCase) == true));
-    //     }
-    //
-    //     if (fungame == null)
-    //     {
-    //         Command("fungame.select.not_found", key);
-    //         return;
-    //     }
-    //
-    //     WorldGenerationPatch.CurrentFungame = fungame;
-    //
-    //     Command("fungame.select.success", fungame.Name, fungame.Id);
-    //
-    //     if (HasWorldLoaded())
-    //     {
-    //         MapLoader.ReloadMap(fungame);
-    //     }
-    //     else
-    //     {
-    //         Info("select_without_world", fungame.Name);
-    //     }
-    // }
+    private static void Select(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            Command("fungame.select.no_key");
+            return;
+        }
+    
+        if (FungameCheck.Fungames == null || FungameCheck.Fungames.Count == 0)
+        {
+            Command("fungame.list.empty");
+            return;
+        }
+    
+        Fungame fungame;
+    
+        if (int.TryParse(key, out int index))
+        {
+            if (index < 1 || index > FungameCheck.Fungames.Count)
+            {
+                Command("fungame.select.invalid_index", index, FungameCheck.Fungames.Count);
+                return;
+            }
+    
+            fungame = FungameCheck.Fungames[index - 1];
+        }
+        else
+        {
+            fungame = FungameCheck.Fungames.Find(f =>
+                f != null &&
+                (f.Id?.Equals(key, StringComparison.OrdinalIgnoreCase) == true ||
+                 f.Name?.Equals(key, StringComparison.OrdinalIgnoreCase) == true));
+        }
+    
+        if (fungame == null)
+        {
+            Command("fungame.select.not_found", key);
+            return;
+        }
+    
+        WorldGenerationPatch.CurrentFungame = fungame;
+    
+        Command("fungame.select.success", fungame.Name, fungame.Id);
+    
+        if (HasWorldLoaded())
+        {
+            MapLoader.ReloadMap(fungame);
+        }
+        else
+        {
+            Info("select_without_world", fungame.Name);
+        }
+    }
 
     private static void CheckArg(string[] args, int index)
     {
         Tools.CheckArgumentCount(args, index);
     }
 
-    // private static void Spawn()
-    // {
-    //     var fungame = FungameCheck.CurrentFungame;
-    //     LogConsole("spawn", fungame.SpawnPosition);
-    //     Player.Tp(fungame.SpawnPosition);
-    // }
+    private static void Spawn()
+    {
+        var fungame = FungameCheck.CurrentFungame;
+        LogConsole("spawn", fungame.SpawnPosition);
+        Player.Tp(fungame.SpawnPosition);
+    }
 
     private static string Locale(string key, params object[] args)
     {
