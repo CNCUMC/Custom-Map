@@ -15,11 +15,13 @@ namespace CustomFungamePack.Lang
             Add("feature.skip_terrain", "跳过地形");
             Add("feature.skip_structures", "跳过结构");
             Add("feature.skip_background", "跳过背景");
+            Add("feature.skip_background", "跳过背景");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame 的相关指令");
             Add("command.fungame.string", "选择功能");
             Add("command.fungame.parameter", "功能参数");
+            Add("command.fungame.help", "可用子命令:\n  reload  - 重新加载当前地图\n  info    - 显示地图信息\n  spawn   - 传送回出生点\n  select  - 选择 Fungame\n  list    - 列出所有 Fungame\n  feature - 管理特性 (list/get/set)\n  waypoint- 管理路径点 (list/get)");
             Add("command.fungame.reload", "正在重新加载地图...");
             
             // Command - Fungame - Info
@@ -35,11 +37,14 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.spawn", "传送回出生点{0}中...");
             
             // Command - Fungame - Waypoint
+            Add("command.fungame.waypoint.help", "路径点子命令:\n  list - 列出所有路径点\n  get <id或名称> - 传送到指定路径点");
             Add("command.fungame.waypoint.list_header", "可用路径点 ({0}):");
             Add("command.fungame.waypoint.list_item", "  {0}. {1} - 位置: {2}");
             Add("command.fungame.waypoint.teleport", "正在传送到路径点'{0}'，位置 {1}...");
             Add("command.fungame.waypoint.not_found", "未找到路径点: {0}");
             Add("command.fungame.waypoint.invalid_index", "无效的索引 {0}，请输入 1 到 {1} 之间的数字");
+            Add("command.fungame.waypoint.get_no_id", "请指定路径点 ID 或索引来传送");
+            Add("command.fungame.waypoint.unknown_subcommand", "未知的路径点子命令：{0}");
             
             // Command - Fungame - List
             Add("command.fungame.list.header", "已加载 {0} 个 Fungame:");
@@ -54,7 +59,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.select.invalid_index", "无效的索引 {0}，请输入 1 到 {1} 之间的数字");
             
             // Command - Fungame - Feature
-            Add("command.fungame.feature.no_subcommand", "请指定特性子命令：list、get 或 set");
+            Add("command.fungame.feature.help", "特性子命令:\n  list - 列出所有特性\n  get <name> - 获取特性值\n  set <name> <value> - 设置特性值");
             Add("command.fungame.feature.unknown_subcommand", "未知的特性子命令：{0}");
             Add("command.fungame.feature.get_no_name", "请指定要获取的特性名称");
             Add("command.fungame.feature.set_missing_params", "请指定特性名称和值来设置");

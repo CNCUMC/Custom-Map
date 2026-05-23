@@ -96,8 +96,9 @@ public static class WorldGenerationPatch
         }
 
         Physics2D.gravity = new Vector2(0, features.Gravity);
-        Console.ConsoleScript.fullBright = CurrentFungame.Feature.Fullbright;
-
+        if (CurrentFungame.Feature.Fullbright)
+            Console.ConsoleScript.fullBright = CurrentFungame.Feature.Fullbright;
+        
         HandleLoopCommands();
     }
     
@@ -195,6 +196,7 @@ public static class WorldGenerationPatch
 
         Player.Alert($"{modInfo}\n{authorInfo}", true);
         Player.Alert(description, false, 6f);
+        MapLoader.LogMapInfo();
     }
 
     private static void ExecuteCommands(Fungame fungame)

@@ -29,7 +29,7 @@ public class Plugin : BaseUnityPlugin
         LocaleGenerator.Register(new ZhCnLangGenerator(), Logger);
         LocaleGenerator.GenerateAll();
         _harmony.PatchAll();
-        // FungameCheck.Initialize();
+        FungameCheck.Initialize();
 
         MoreLogs = Config.Bind(
             "General",

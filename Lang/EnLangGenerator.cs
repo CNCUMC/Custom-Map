@@ -20,6 +20,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.description", "Fungame related commands");
             Add("command.fungame.string", "Select function");
             Add("command.fungame.parameter", "Function parameter");
+            Add("command.fungame.help", "Available subcommands:\n  reload  - Reload current map\n  info    - Show map info\n  spawn   - Teleport to spawn\n  select  - Select a Fungame\n  list    - List all Fungames\n  feature - Manage features (list/get/set)\n  waypoint- Manage waypoints (list/get)");
             Add("command.fungame.reload", "Reloading map...");
             
             // Command - Fungame - Info
@@ -35,11 +36,14 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.spawn", "Teleporting back to the spawn point {0} now...");
             
             // Command - Fungame - Waypoint
+            Add("command.fungame.waypoint.help", "Waypoint subcommands:\n  list - List all waypoints\n  get <id or name> - Teleport to waypoint");
             Add("command.fungame.waypoint.list_header", "Available waypoints ({0}):");
             Add("command.fungame.waypoint.list_item", "  {0}. {1} - Position: {2}");
             Add("command.fungame.waypoint.teleport", "Teleporting to waypoint '{0}' at position {1}...");
             Add("command.fungame.waypoint.not_found", "Waypoint not found: {0}");
             Add("command.fungame.waypoint.invalid_index", "Invalid index {0}, please enter a number between 1 and {1}");
+            Add("command.fungame.waypoint.get_no_id", "Please specify a waypoint ID or index to teleport to");
+            Add("command.fungame.waypoint.unknown_subcommand", "Unknown waypoint subcommand: {0}");
             
             // Command - Fungame - List
             Add("command.fungame.list.header", "Loaded {0} Fungame(s):");
@@ -54,7 +58,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.select.invalid_index", "Invalid index {0}, please enter a number between 1 and {1}");
             
             // Command - Fungame - Feature
-            Add("command.fungame.feature.no_subcommand", "Please specify a feature subcommand: list, get, or set");
+            Add("command.fungame.feature.help", "Feature subcommands:\n  list - List all features\n  get <name> - Get feature value\n  set <name> <value> - Set feature value");
             Add("command.fungame.feature.unknown_subcommand", "Unknown feature subcommand: {0}");
             Add("command.fungame.feature.get_no_name", "Please specify a feature name to get");
             Add("command.fungame.feature.set_missing_params", "Please specify feature name and value to set");

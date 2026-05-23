@@ -60,8 +60,9 @@ public class MapData
 public class Feature
 {
     public bool Fullbright { get; set; } = true;
-    public bool ForgivingLevel { get; set; } = false;
+    public bool ForgivingLevel { get; set; }
     public float Gravity { get; set; } = Physics2D.gravity.y;
+    public int JumpLimit { get; set; } = 3;
 }
 
 [UsedImplicitly]

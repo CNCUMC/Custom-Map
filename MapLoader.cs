@@ -71,37 +71,37 @@ public static class MapLoader
 
         if (feature.Fullbright)
         {
-            Info("feature_enabled", ModLocale.GetFormat("feature.fullbright"));
+            MoreLogs("feature_enabled", ModLocale.GetFormat("feature.fullbright"));
             hasAnyFeature = true;
         }
 
         if (feature.ForgivingLevel)
         {
-            Info("feature_enabled", ModLocale.GetFormat("feature.forgiving_level"));
+            MoreLogs("feature_enabled", ModLocale.GetFormat("feature.forgiving_level"));
             hasAnyFeature = true;
         }
 
         if (!Mathf.Approximately(feature.Gravity, Physics2D.gravity.y))
         {
-            Info("feature_enabled_with_value", ModLocale.GetFormat("feature.gravity"), feature.Gravity);
+            MoreLogs("feature_enabled_with_value", ModLocale.GetFormat("feature.gravity"), feature.Gravity);
             hasAnyFeature = true;
         }
 
         if (fungame.SkipTerrain)
         {
-            Info("skip_generation", ModLocale.Log("common.terrain"));
+            MoreLogs("skip_generation", ModLocale.Log("common.terrain"));
             hasAnyFeature = true;
         }
 
         if (fungame.SkipStructures)
         {
-            Info("skip_generation", ModLocale.Log("common.structure"));
+            MoreLogs("skip_generation", ModLocale.Log("common.structure"));
             hasAnyFeature = true;
         }
 
         if (fungame.SkipBackground)
         {
-            Info("skip_generation", ModLocale.Log("common.background"));
+            MoreLogs("skip_generation", ModLocale.Log("common.background"));
             hasAnyFeature = true;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;
 using MossLib.Base;
@@ -14,65 +15,22 @@ public class ModCommand : ModCommandBase
     private new static readonly ManualLogSource Logger = Plugin.Logger;
     private const string LocaleKeyPre = "mod_command.";
 
+    // Feature uses auto-properties, not public fields — must use GetProperties()
+    private static readonly PropertyInfo[] FeatureProperties =
+        typeof(Feature).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
     [HarmonyPatch("RegisterAllCommands")]
     [HarmonyPostfix]
     public static void RegisterCustomCommands(ConsoleScript __instance)
     {
         try
         {
-            void Action(string[] args)
-            {
-                switch (args[1])
-                {
-                    case "reload":
-                        if (CheckWorld()) return;
-                        CheckArg(args, 1);
-                        MapLoader.ReloadMap(FungameCheck.CurrentFungame);
-                        break;
-                    case "info":
-                        CheckArg(args, 1);
-                        MapLoader.LogMapInfo();
-                        break;
-                    case "spawn":
-                        if (CheckWorld()) return;
-                        CheckArg(args, 1);
-                        Spawn();
-                        break;
-                    case "select":
-                        CheckArg(args, 2);
-                        Select(args[2]);
-                        break;
-                    case "list":
-                        CheckArg(args, 1);
-                        if (args.Length > 2)
-                        {
-                            Select(args[2]);
-                        }
-                        else
-                        {
-                            MapLoader.LogFungameList();
-                        }
-
-                        break;
-                    case "feature":
-                        HandleFeature(args);
-                        break;
-                    case "waypoint":
-                        if (CheckWorld()) return;
-                        CheckArg(args, 1);
-                        Waypoint(args.Length > 2 ? args[2] : null);
-                        break;
-                    default:
-                        Warning("empty_type");
-                        break;
-                }
-            }
-
-            Dictionary<int, List<string>> argAutofill2 = new Dictionary<int, List<string>>
+            var argAutofill = new Dictionary<int, List<string>>
             {
                 {
                     0,
                     [
+                        "help",
                         "reload",
                         "info",
                         "spawn",
@@ -83,25 +41,28 @@ public class ModCommand : ModCommandBase
                     ]
                 }
             };
-            (string, string)[] valueTupleArray =
-            [
+
+            var paramDescriptions = new[]
+            {
                 ("string", Fungame("string")),
                 ("string", Fungame("parameter")),
                 ("string", Fungame("parameter"))
-            ];
+            };
+
             ConsoleScript.Commands.Add(new Command(
                 "fungame",
                 Fungame("description"),
-                Action,
-                argAutofill2,
-                valueTupleArray)
+                ExecuteFungameCommand,
+                argAutofill,
+                paramDescriptions)
             );
+
             ConsoleScript.Commands.Add(new Command(
                 "fg",
                 Fungame("description"),
-                Action,
-                argAutofill2,
-                valueTupleArray)
+                ExecuteFungameCommand,
+                argAutofill,
+                paramDescriptions)
             );
         }
         catch (Exception ex)
@@ -109,10 +70,58 @@ public class ModCommand : ModCommandBase
             Plugin.Logger.LogError($"Failed to register custom commands: {ex.Message}\n{ex.StackTrace}");
         }
     }
-    
-    private static void Waypoint(string waypointId)
+
+    private static void ExecuteFungameCommand(string[] args)
     {
-        if (CheckWorld()) return;
+        switch (args[1])
+        {
+            case "help":
+                InfoFungame("help");
+                break;
+            case "reload":
+                if (!EnsureWorldLoaded()) return;
+                CheckArg(args, 1);
+                MapLoader.ReloadMap(FungameCheck.CurrentFungame);
+                break;
+            case "info":
+                CheckArg(args, 1);
+                MapLoader.LogMapInfo();
+                break;
+            case "spawn":
+                if (!EnsureWorldLoaded()) return;
+                CheckArg(args, 1);
+                Spawn();
+                break;
+            case "select":
+                CheckArg(args, 2);
+                Select(args[2]);
+                break;
+            case "list":
+                CheckArg(args, 1);
+                if (args.Length > 2)
+                    Select(args[2]);
+                else
+                    MapLoader.LogFungameList();
+                break;
+            case "feature":
+                HandleFeature(args);
+                break;
+            case "waypoint":
+                HandleWaypoint(args);
+                break;
+            default:
+                InfoFungame("help");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Handles waypoint subcommands with the same structure as HandleFeature:
+    /// no subcommand → list, "list" → list, "get <id>" → teleport, "help" → help.
+    /// </summary>
+    private static void HandleWaypoint(string[] args)
+    {
+        if (!EnsureWorldLoaded()) return;
 
         var fungame = FungameCheck.CurrentFungame;
         if (fungame == null)
@@ -122,17 +131,50 @@ public class ModCommand : ModCommandBase
         }
 
         var waypoints = GetWaypoints(fungame);
+
+        // No subcommand → default to list
+        if (args.Length < 3)
+        {
+            ListWaypoints(waypoints);
+            return;
+        }
+
+        var subCommand = args[2].ToLower();
+
+        switch (subCommand)
+        {
+            case "list":
+                ListWaypoints(waypoints);
+                break;
+            case "help":
+                InfoFungame("waypoint.help");
+                break;
+            case "get":
+                if (args.Length < 4)
+                {
+                    InfoFungame("waypoint.get_no_id");
+                    return;
+                }
+                TeleportToWaypointById(waypoints, args[3]);
+                break;
+            default:
+                InfoFungame("waypoint.unknown_subcommand", subCommand);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Resolves a waypoint by index or name and teleports the player.
+    /// </summary>
+    private static void TeleportToWaypointById(List<Waypoint> waypoints, string waypointId)
+    {
         if (waypoints == null || waypoints.Count == 0)
         {
             Error("no_waypoints");
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(waypointId))
-        {
-            ListWaypoints(waypoints);
-            return;
-        }
+        Waypoint target;
 
         if (int.TryParse(waypointId, out int index))
         {
@@ -142,42 +184,42 @@ public class ModCommand : ModCommandBase
                 return;
             }
 
-            var waypoint = waypoints[index - 1];
-            if (waypoint == null)
+            target = waypoints[index - 1];
+            if (target == null)
             {
                 ErrorFungame("waypoint.not_found", waypointId);
                 return;
             }
 
-            InfoFungame("waypoint.teleport", waypoint.Id ?? $"waypoint_{index}", waypoint.Position);
-            Player.Tp(waypoint.Position);
+            TeleportToWaypoint(target, target.Id ?? $"waypoint_{index}");
             return;
         }
 
-        var namedWaypoint = waypoints.Find(wp => 
+        target = waypoints.Find(wp =>
             wp != null && wp.Id?.Equals(waypointId, StringComparison.OrdinalIgnoreCase) == true);
 
-        if (namedWaypoint == null)
+        if (target == null)
         {
             ErrorFungame("waypoint.not_found", waypointId);
             return;
         }
 
-        InfoFungame("waypoint.teleport", namedWaypoint.Id, namedWaypoint.Position);
-        Player.Tp(namedWaypoint.Position);
+        TeleportToWaypoint(target, target.Id);
     }
-    
+
+    private static void TeleportToWaypoint(Waypoint waypoint, string displayId)
+    {
+        InfoFungame("waypoint.teleport", displayId, waypoint.Position);
+        Player.Tp(waypoint.Position);
+    }
+
     private static List<Waypoint> GetWaypoints(Fungame fungame)
     {
         if (fungame.Waypoints is { Count: > 0 })
-        {
             return fungame.Waypoints;
-        }
 
         if (fungame.Waypoint != null)
-        {
             return [fungame.Waypoint];
-        }
 
         return [];
     }
@@ -197,9 +239,7 @@ public class ModCommand : ModCommandBase
         {
             var wp = waypoints[i];
             if (wp != null)
-            {
                 InfoFungame("waypoint.list_item", i + 1, wp.Id ?? $"waypoint_{i + 1}", wp.Position);
-            }
         }
 
         Log.Divider();
@@ -207,8 +247,6 @@ public class ModCommand : ModCommandBase
 
     private static void HandleFeature(string[] args)
     {
-        if (CheckWorld()) return;
-
         var fungame = FungameCheck.CurrentFungame;
         if (fungame?.Feature == null)
         {
@@ -216,11 +254,10 @@ public class ModCommand : ModCommandBase
             return;
         }
 
-        CheckArg(args, 2);
-
+        // No subcommand → default to list
         if (args.Length < 3)
         {
-            Command("feature.no_subcommand");
+            ListFeatures(fungame.Feature);
             return;
         }
 
@@ -231,26 +268,27 @@ public class ModCommand : ModCommandBase
             case "list":
                 ListFeatures(fungame.Feature);
                 break;
+            case "help":
+                InfoFungame("feature.help");
+                break;
             case "get":
                 if (args.Length < 4)
                 {
-                    Fungame("feature.get_no_name");
+                    InfoFungame("feature.get_no_name");
                     return;
                 }
-
                 GetFeature(fungame.Feature, args[3]);
                 break;
             case "set":
                 if (args.Length < 5)
                 {
-                    Fungame("feature.set_missing_params");
+                    InfoFungame("feature.set_missing_params");
                     return;
                 }
-
                 SetFeature(fungame.Feature, args[3], args[4]);
                 break;
             default:
-                Fungame("feature.unknown_subcommand", subCommand);
+                InfoFungame("feature.unknown_subcommand", subCommand);
                 break;
         }
     }
@@ -260,14 +298,11 @@ public class ModCommand : ModCommandBase
         Log.Divider();
         InfoFungame("feature.list_header");
 
-        var fields =
-            typeof(Feature).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-        foreach (var field in fields)
+        foreach (var prop in FeatureProperties)
         {
-            var value = field.GetValue(feature);
-            var displayName = GetFeatureDisplayName(field.Name);
-            InfoFungame("feature.item", $"{displayName} ({field.Name})", value);
+            var value = prop.GetValue(feature);
+            var displayName = GetFeatureDisplayName(prop.Name);
+            InfoFungame("feature.item", $"{displayName} ({prop.Name})", value);
         }
 
         Log.Divider();
@@ -275,24 +310,24 @@ public class ModCommand : ModCommandBase
 
     private static void GetFeature(Feature feature, string featureName)
     {
-        var field = FindFeatureField(featureName);
+        var prop = FindFeatureProperty(featureName);
 
-        if (field == null)
+        if (prop == null)
         {
             ErrorFungame("feature.not_found", featureName);
             return;
         }
 
-        var value = field.GetValue(feature);
-        var displayName = GetFeatureDisplayName(field.Name);
-        InfoFungame("feature.get_success", $"{displayName} ({field.Name})", value);
+        var value = prop.GetValue(feature);
+        var displayName = GetFeatureDisplayName(prop.Name);
+        InfoFungame("feature.get_success", $"{displayName} ({prop.Name})", value);
     }
 
     private static void SetFeature(Feature feature, string featureName, string valueStr)
     {
-        var field = FindFeatureField(featureName);
+        var prop = FindFeatureProperty(featureName);
 
-        if (field == null)
+        if (prop == null)
         {
             ErrorFungame("feature.not_found", featureName);
             return;
@@ -300,19 +335,13 @@ public class ModCommand : ModCommandBase
 
         try
         {
-            var convertedValue = Convert.ChangeType(valueStr, field.FieldType);
+            var convertedValue = Convert.ChangeType(valueStr, prop.PropertyType);
+            prop.SetValue(feature, convertedValue);
 
-            if (field.FieldType == typeof(float))
-            {
-                if (field.Name.ToLower() == "gravity")
-                {
-                    Physics2D.gravity = new Vector2(0, (float)convertedValue);
-                }
-            }
+            ApplyFeatureSideEffects(prop, convertedValue);
 
-            field.SetValue(feature, convertedValue);
-            var displayName = GetFeatureDisplayName(field.Name);
-            InfoFungame("feature.set_success", $"{displayName} ({field.Name})", convertedValue);
+            var displayName = GetFeatureDisplayName(prop.Name);
+            InfoFungame("feature.set_success", $"{displayName} ({prop.Name})", convertedValue);
         }
         catch (Exception)
         {
@@ -320,17 +349,21 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    private static System.Reflection.FieldInfo FindFeatureField(string featureName)
+    private static void ApplyFeatureSideEffects(PropertyInfo prop, object value)
     {
-        var fields =
-            typeof(Feature).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-        foreach (var field in fields)
+        if (prop.PropertyType == typeof(float)
+            && prop.Name.Equals("Gravity", StringComparison.OrdinalIgnoreCase))
         {
-            if (field.Name.Equals(featureName, StringComparison.OrdinalIgnoreCase))
-            {
-                return field;
-            }
+            Physics2D.gravity = new Vector2(0, (float)value);
+        }
+    }
+
+    private static PropertyInfo FindFeatureProperty(string featureName)
+    {
+        foreach (var prop in FeatureProperties)
+        {
+            if (prop.Name.Equals(featureName, StringComparison.OrdinalIgnoreCase))
+                return prop;
         }
 
         return null;
@@ -341,7 +374,9 @@ public class ModCommand : ModCommandBase
         var localeKey = $"feature.{ConvertToSnakeCase(fieldName)}";
         var localized = ModLocale.GetFormat(localeKey);
 
-        return localized.StartsWith("feature.") ? fieldName : localized;
+        return localized.StartsWith("feature.", StringComparison.Ordinal)
+            ? fieldName
+            : localized;
     }
 
     private static string ConvertToSnakeCase(string input)
@@ -367,11 +402,11 @@ public class ModCommand : ModCommandBase
         return result.ToString();
     }
 
-    private static bool CheckWorld()
+    private static bool EnsureWorldLoaded()
     {
-        if (HasWorldLoaded()) return false;
+        if (HasWorldLoaded()) return true;
         Error("world_not_loaded");
-        return true;
+        return false;
     }
 
     private static bool HasWorldLoaded()
@@ -390,13 +425,13 @@ public class ModCommand : ModCommandBase
     {
         if (string.IsNullOrWhiteSpace(key))
         {
-            Fungame("select.no_key");
+            InfoFungame("select.no_key");
             return;
         }
 
         if (FungameCheck.Fungames == null || FungameCheck.Fungames.Count == 0)
         {
-            Fungame("list.empty");
+            InfoFungame("list.empty");
             return;
         }
 
@@ -406,7 +441,7 @@ public class ModCommand : ModCommandBase
         {
             if (index < 1 || index > FungameCheck.Fungames.Count)
             {
-                Fungame("select.invalid_index", index, FungameCheck.Fungames.Count);
+                InfoFungame("select.invalid_index", index, FungameCheck.Fungames.Count);
                 return;
             }
 
@@ -422,22 +457,18 @@ public class ModCommand : ModCommandBase
 
         if (fungame == null)
         {
-            Fungame("select.not_found", key);
+            InfoFungame("select.not_found", key);
             return;
         }
 
         WorldGenerationPatch.CurrentFungame = fungame;
 
-        Fungame("select.success", fungame.Name, fungame.Id);
+        InfoFungame("select.success", fungame.Name, fungame.Id);
 
         if (HasWorldLoaded())
-        {
             MapLoader.ReloadMap(fungame);
-        }
         else
-        {
             Command("select.without_world", fungame.Name);
-        }
     }
 
     private static void CheckArg(string[] args, int index)
@@ -448,7 +479,7 @@ public class ModCommand : ModCommandBase
     private static void Spawn()
     {
         var fungame = FungameCheck.CurrentFungame;
-        LogConsole("spawn", fungame.SpawnPosition);
+        InfoFungame("spawn", fungame.SpawnPosition);
         Player.Tp(fungame.SpawnPosition);
     }
 
