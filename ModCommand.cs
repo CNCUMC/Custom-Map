@@ -44,7 +44,15 @@ public class ModCommand : ModCommandBase
                         break;
                     case "list":
                         CheckArg(args, 1);
-                        MapLoader.LogFungameList();
+                        if (args.Length > 2)
+                        {
+                            Select(args[2]);
+                        }
+                        else
+                        {
+                            MapLoader.LogFungameList();
+                        }
+
                         break;
                     default:
                         Warning("empty_type");
@@ -90,7 +98,7 @@ public class ModCommand : ModCommandBase
             Plugin.Logger.LogError($"Failed to register custom commands: {ex.Message}\n{ex.StackTrace}");
         }
     }
-    
+
     private static bool CheckWorld()
     {
         if (HasWorldLoaded()) return false;
@@ -117,15 +125,15 @@ public class ModCommand : ModCommandBase
             Command("fungame.select.no_key");
             return;
         }
-    
+
         if (FungameCheck.Fungames == null || FungameCheck.Fungames.Count == 0)
         {
             Command("fungame.list.empty");
             return;
         }
-    
+
         Fungame fungame;
-    
+
         if (int.TryParse(key, out int index))
         {
             if (index < 1 || index > FungameCheck.Fungames.Count)
@@ -133,7 +141,7 @@ public class ModCommand : ModCommandBase
                 Command("fungame.select.invalid_index", index, FungameCheck.Fungames.Count);
                 return;
             }
-    
+
             fungame = FungameCheck.Fungames[index - 1];
         }
         else
@@ -143,24 +151,24 @@ public class ModCommand : ModCommandBase
                 (f.Id?.Equals(key, StringComparison.OrdinalIgnoreCase) == true ||
                  f.Name?.Equals(key, StringComparison.OrdinalIgnoreCase) == true));
         }
-    
+
         if (fungame == null)
         {
             Command("fungame.select.not_found", key);
             return;
         }
-    
+
         WorldGenerationPatch.CurrentFungame = fungame;
-    
+
         Command("fungame.select.success", fungame.Name, fungame.Id);
-    
+
         if (HasWorldLoaded())
         {
             MapLoader.ReloadMap(fungame);
         }
         else
         {
-            Info("select_without_world", fungame.Name);
+            Command("select.without_world", fungame.Name);
         }
     }
 
