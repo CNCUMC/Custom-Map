@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BepInEx.Logging;
 using MossLib.Tool;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -374,6 +375,55 @@ public static class MapLoader
         }
 
         PickItems(FungameCheck.CurrentFungame);
+    }
+
+    public static void ReloadFungameFromDisk(Fungame fungame)
+    {
+        if (fungame == null)
+        {
+            Error("no_current_fungame");
+            return;
+        }
+
+        var directoryPath = fungame.DirectoryPath;
+        if (string.IsNullOrEmpty(directoryPath))
+        {
+            Error("no_directory_path");
+            return;
+        }
+
+        var jsonPath = Path.Combine(directoryPath, "fungame.json");
+        if (!File.Exists(jsonPath))
+        {
+            Error("fungame_json_not_found", jsonPath);
+            return;
+        }
+
+        try
+        {
+            var jsonContent = File.ReadAllText(jsonPath);
+            var reloadedFungame = JsonConvert.DeserializeObject<Fungame>(jsonContent);
+
+            if (reloadedFungame == null)
+            {
+                Error("fungame_deserialize_failed");
+                return;
+            }
+
+            reloadedFungame.DirectoryPath = directoryPath;
+
+            var index = FungameCheck.Fungames.FindIndex(f => f.Id == fungame.Id);
+            if (index >= 0)
+                FungameCheck.Fungames[index] = reloadedFungame;
+
+            WorldGenerationPatch.CurrentFungame = reloadedFungame;
+
+            MoreLogs("fungame_reloaded_from_disk", reloadedFungame.Name);
+        }
+        catch (Exception ex)
+        {
+            Error("fungame_reload_failed", ex.Message);
+        }
     }
 
     public static void ReloadMap(Fungame fungame)

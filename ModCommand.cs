@@ -81,6 +81,7 @@ public class ModCommand : ModCommandBase
             case "reload":
                 if (!EnsureWorldLoaded()) return;
                 CheckArg(args, 1);
+                MapLoader.ReloadFungameFromDisk(FungameCheck.CurrentFungame);
                 MapLoader.ReloadMap(FungameCheck.CurrentFungame);
                 break;
             case "info":

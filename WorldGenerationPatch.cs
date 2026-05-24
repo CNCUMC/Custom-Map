@@ -36,7 +36,7 @@ public static class WorldGenerationPatch
             }
             else
             {
-                SetDefaultSceneType(WorldGeneration);
+                SetDefaultSceneType(WorldGeneration, fungame);
             }
         }
         else
@@ -53,7 +53,7 @@ public static class WorldGenerationPatch
                 }
                 else
                 {
-                    SetDefaultSceneType(WorldGeneration);
+                    SetDefaultSceneType(WorldGeneration, fungame);
                 }
             }
             else
@@ -91,9 +91,10 @@ public static class WorldGenerationPatch
         HandleLoopCommands();
     }
 
-    private static void SetDefaultSceneType(WorldGeneration __instance)
+    private static void SetDefaultSceneType(WorldGeneration __instance, Fungame fungame = null)
     {
-        __instance.biomeOverride = WorldGeneration.OverrideSceneType.Debug;
+        __instance.biomeOverride = fungame?.Type ?? WorldGeneration.OverrideSceneType.Debug;
+        MoreLogs("scene_type_set", __instance.biomeOverride);
     }
 
     [HarmonyPatch("WorldCreateBackground")]
