@@ -170,6 +170,7 @@ public static class MapLoader
         }
 
         MoreLogs("string_map_applied", blockCount, itemCount, failCount);
+        PickItems(fungame);
     }
 
     private static void ProcessValue(object value, ref int worldX, ref int worldY, ref int blockCount,
@@ -371,6 +372,8 @@ public static class MapLoader
         {
             Player.Tp(FungameCheck.CurrentFungame.SpawnPosition);
         }
+
+        PickItems(FungameCheck.CurrentFungame);
     }
 
     public static void ReloadMap(Fungame fungame)
@@ -392,6 +395,7 @@ public static class MapLoader
         {
             Error("reload_failed", ex.Message);
         }
+        PickItems(fungame);
     }
 
     private static void RestartScene()
@@ -455,6 +459,15 @@ public static class MapLoader
         }
 
         Log.NewLine();
+    }
+
+    public static void PickItems(Fungame fungame)
+    {
+        var items = fungame.Items;
+        foreach (var item in items)
+        {
+            Player.PickItem(item.Id, item.Slot, item.Force);
+        }
     }
 
     private static void LogConsole(string key, params object[] args)

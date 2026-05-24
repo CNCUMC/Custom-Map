@@ -22,7 +22,7 @@ public class Fungame
     public CommandData CommandData { get; set; }
     public WaypointData WaypointData { get; set; }
     public List<WaypointData> Waypoints { get; set; } = [];
-    public List<ItemData> Item { get; set; } = [];
+    public List<ItemData> Items { get; set; } = [];
     public float[] Spawn { get; set; } = [0, 0];
     public int X { get; set; } = 0;
     public int Y { get; set; } = 0;
@@ -98,5 +98,6 @@ public class WaypointData
 public class ItemData
 {
     public string Id { get; set; }
-    public string Slot { get; set; }
+    public int Slot { get; set; }
+    public bool Force { get; set; }
 }

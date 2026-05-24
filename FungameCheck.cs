@@ -64,7 +64,40 @@ public static class FungameCheck
                 { "6", 6 },
                 { "0", 0 }
             }
-        }
+        },
+        Items =
+        [
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 0
+            },
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 1
+            },
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 2
+            },
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 3
+            },
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 4
+            },
+            new ItemData
+            {
+                Id = "geofruit",
+                Slot = 5
+            }
+        ]
     };
 
     public static void Initialize()
@@ -185,8 +218,8 @@ public static class FungameCheck
                                     && !string.IsNullOrWhiteSpace(jsonObject["build_mode_save"].ToString());
 
             int contentTypeCount = (hasMapData ? 1 : 0)
-                + (hasCustomStructuresField ? 1 : 0)
-                + (hasBuildModeSave ? 1 : 0);
+                                   + (hasCustomStructuresField ? 1 : 0)
+                                   + (hasBuildModeSave ? 1 : 0);
 
             if (contentTypeCount > 1)
             {
