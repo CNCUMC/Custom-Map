@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,14 +13,14 @@ public static class FungameCheck
 {
     private static ManualLogSource _logger;
     private const string LocaleKeyPre = "fungame_check.";
-    private static readonly string FungamesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fungames");
+    public static readonly string FungamesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fungames");
     public static readonly List<string> ValidDirectories = [];
     public static readonly List<string> CheckFailDirectories = [];
     public static readonly List<Fungame> Fungames = [];
     public static Fungame CurrentFungame => WorldGenerationPatch.CurrentFungame;
     public static bool HasRunningFungame => CurrentFungame != null;
 
-    public static Fungame TemplateFungame = new()
+    public static readonly Fungame TemplateFungame = new()
     {
         Name = $"{Plugin.Name} Template",
         Id = "t",
@@ -179,10 +179,18 @@ public static class FungameCheck
             bool hasCustomStructuresField =
                 jsonObject.ContainsKey("custom_structures") && jsonObject["custom_structures"] != null;
             bool hasMapData = jsonObject.ContainsKey("map_data") && jsonObject["map_data"] != null;
+            bool hasBuildModeSave = jsonObject.ContainsKey("build_mode_save")
+                                    && jsonObject["build_mode_save"] != null
+                                    && jsonObject["build_mode_save"].Type != JTokenType.Null
+                                    && !string.IsNullOrWhiteSpace(jsonObject["build_mode_save"].ToString());
 
-            if (hasCustomStructuresField && hasMapData)
+            int contentTypeCount = (hasMapData ? 1 : 0)
+                + (hasCustomStructuresField ? 1 : 0)
+                + (hasBuildModeSave ? 1 : 0);
+
+            if (contentTypeCount > 1)
             {
-                errors.Add(Validation("map_and_custom_structures_conflict"));
+                errors.Add(Validation("multiple_content_types"));
             }
             else if (hasCustomStructuresField)
             {
@@ -195,9 +203,13 @@ public static class FungameCheck
             {
                 ValidateMapData(jsonObject["map_data"] as JObject, errors);
             }
+            else if (hasBuildModeSave)
+            {
+                // build_mode_save is valid
+            }
             else
             {
-                errors.Add(Validation("missing_map_or_custom_structures"));
+                errors.Add(Validation("missing_content_type"));
             }
 
 
@@ -245,6 +257,7 @@ public static class FungameCheck
                 }
             }
 
+            fungame.DirectoryPath = Path.GetDirectoryName(filePath);
             Fungames.Add(fungame);
 
             var name = fungame.Name;
@@ -520,5 +533,16 @@ public static class FungameCheck
     private static void UninitializedWarning(string key)
     {
         _logger.LogWarning($"{key}");
+    }
+
+    /// <summary>
+    /// Get the directory path of the specified fungame, or the currently running fungame.
+    /// </summary>
+    /// <param name="fungame">The fungame to get the path for. If null, uses the currently running fungame.</param>
+    /// <returns>The directory path of the fungame, or null if not found.</returns>
+    public static string GetFungamePath(Fungame fungame = null)
+    {
+        var target = fungame ?? CurrentFungame;
+        return string.IsNullOrEmpty(target?.DirectoryPath) ? null : target.DirectoryPath;
     }
 }

@@ -35,6 +35,9 @@
     <Reference Include="BepInEx">
       <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="BuildMod">
+      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\plugins\BuildMod.dll</HintPath>
+    </Reference>
     <Reference Include="Custom Structures">
       <HintPath>..\..\..\Downloads\CustomStructures\Custom Structures.dll</HintPath>
     </Reference>

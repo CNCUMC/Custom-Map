@@ -129,39 +129,55 @@ public static class WorldGenerationPatch
     {
         WorldGeneration.loadingText.text = Locale("initializing_world");
 
-        var fungame = FungameCheck.CurrentFungame;
+        var fungame = FungameCheck.CurrentFungame
+            ?? FungameCheck.Fungames.FirstOrDefault();
 
-        if (fungame is { MapData: not null })
+        if (fungame == null)
+        {
+            Error("no_valid_directories");
+            return;
+        }
+
+        bool hasMapData = fungame.MapData != null;
+        bool hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
+        bool hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
+
+        int contentTypeCount = (hasMapData ? 1 : 0)
+            + (hasCustomStructures ? 1 : 0)
+            + (hasBuildModeSave ? 1 : 0);
+
+        if (contentTypeCount > 1)
+        {
+            Error("multiple_content_types", fungame.Name);
+            return;
+        }
+
+        if (contentTypeCount == 0)
+        {
+            Warning("no_content_type", fungame.Name);
+            return;
+        }
+
+        if (hasMapData)
         {
             SpawnMap(fungame);
         }
-        else
+        else if (hasCustomStructures)
         {
-            var fallbackFungame = FungameCheck.Fungames.FirstOrDefault();
-            if (fallbackFungame?.MapData != null)
+            bool hasCustomStructuresMod = Type.GetType(
+                "Custom_Structures.Plugin, Custom Structures") != null;
+            if (hasCustomStructuresMod)
             {
-                SpawnMap(fallbackFungame);
-            }
-            else if (fallbackFungame?.CustomStructures != null)
-            {
-                bool hasCustomStructuresMod = Type.GetType("Custom_Structures.Plugin, Custom Structures") != null;
-                if (hasCustomStructuresMod)
-                {
-                    CustomStructuresLoader.SpawnCustomStructures(fallbackFungame);
-                }
-                else
-                {
-                    Error("custom_structures_mod_not_loaded", fallbackFungame.Name);
-                }
-            }
-            else if (fallbackFungame != null)
-            {
-                Warning("no_map_data", fallbackFungame.Name);
+                CustomStructuresLoader.SpawnCustomStructures(fungame);
             }
             else
             {
-                Error("no_valid_directories");
+                Error("custom_structures_mod_not_loaded", fungame.Name);
             }
+        }
+        else if (hasBuildModeSave)
+        {
+            BuildModeSaveLoader.SpawnBuildModeSave(fungame);
         }
     }
 
@@ -171,7 +187,6 @@ public static class WorldGenerationPatch
         WorldGeneration.loadingText.text = Locale("loading_fungame_map", fungame.Name);
         MapLoader.LoadAndApplyMapFromFungame(fungame);
         ExecuteCommands(fungame);
-        Player.Tp(fungame.SpawnPosition);
 
         string modInfo = $"{fungame.Name} v{fungame.Version}";
         string authorInfo = $"by {fungame.Authors}";
@@ -180,6 +195,7 @@ public static class WorldGenerationPatch
         Player.Alert($"{modInfo}\n{authorInfo}", true);
         Player.Alert(description, false, 6f);
         MapLoader.LogMapInfo();
+        Player.Tp(fungame.SpawnPosition);
     }
 
     private static void ExecuteCommands(Fungame fungame)

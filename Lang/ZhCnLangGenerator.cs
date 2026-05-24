@@ -1,4 +1,4 @@
-﻿using MossLib.Base;
+using MossLib.Base;
 
 namespace CustomFungamePack.Lang
 {
@@ -89,6 +89,7 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.initializing_world", "初始化Fungame地图...");
             Add("log.world_generation.loading_fungame_map", "正在加载Fungame地图: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} 不包含地图数据");
+            Add("log.world_generation.no_content_type", "Fungame '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
             Add("log.world_generation.no_commands", "未启用任何 {0}");
             Add("log.world_generation.executing_command", "执行 {0}: '{1}'");
             Add("log.world_generation.executing_loop_command", "执行循环 {0}: '{1}'");
@@ -101,8 +102,8 @@ namespace CustomFungamePack.Lang
             Add("log.validation.map_row_not_string", "地图 map 第 {0} 行必须是字符串");
             Add("log.validation.map_item_row_not_array", "地图 items 第 {0} 行必须是数组");
             Add("log.validation.map_item_not_string", "地图 items[{0}][{1}] 必须是字符串");
-            Add("log.validation.map_and_custom_structures_conflict", "不能同时使用 map_data 和 custom_structures");
-            Add("log.validation.missing_map_or_custom_structures", "缺少 map_data 或 custom_structures");
+            Add("log.validation.multiple_content_types", "不能同时使用多种内容类型（map_data、custom_structures、build_mode_save），只能选择一种");
+            Add("log.validation.missing_content_type", "缺少内容类型（map_data、custom_structures 或 build_mode_save）");
             Add("log.validation.custom_structures_without_mod", "检测到 custom_structures 字段，但未安装自定义结构模组（Custom Structures），请先安装该模组");
             Add("log.validation.features_invalid_type", "features 字段必须是数组或对象");
             Add("log.validation.features_empty", "features 数组为空，将被忽略");
@@ -147,6 +148,7 @@ namespace CustomFungamePack.Lang
             Add("log.error.no_fungame_file", "找不到 fungame.json 文件: {0}");
             Add("log.error.no_valid_directories", "没有有效的 Fungame 目录，请检查 Fungames 文件夹");
             Add("log.error.custom_structures_mod_not_loaded", "Fungame '{0}' 需要自定义结构模组，但该模组未加载");
+            Add("log.error.multiple_content_types", "Fungame '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
             
             // Log - Common
             Add("log.common.map", "地图");
@@ -166,6 +168,8 @@ namespace CustomFungamePack.Lang
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "正在加载自定义结构: {0}");
             Add("log.custom_structures_loader.failed", "加载自定义结构({0})失败: {1}");
+            Add("log.custom_structures_loader.not_found", "未找到 {0}, 反射失败");
+            Add("log.custom_structures_loader.not_found_custom_structures", "未找到自定义结构文件");
         }
     }
 }

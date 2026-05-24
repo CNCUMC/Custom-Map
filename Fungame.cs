@@ -19,25 +19,31 @@ public class Fungame
     public Feature Feature { get; set; } = new();
     public CommandData CommandData { get; set; }
     public Waypoint Waypoint { get; set; }
-    [JsonProperty("waypoints")] public List<Waypoint> Waypoints { get; set; } = [];
+    public List<Waypoint> Waypoints { get; set; } = [];
     public float[] Spawn { get; set; } = [0, 0];
+    public int X { get; set; } = 0;
+    public int Y { get; set; } = 0;
+    public Vector2 MapPosition => new(X, Y);
     [JsonProperty("map_data")] public MapData MapData { get; set; }
     [JsonProperty("custom_structures")] public string CustomStructures;
+    [JsonProperty("build_mode_save")] public string BuildModeSave;
+
     [JsonProperty("skip_terrain")] public bool SkipTerrain { get; set; } = true;
     [JsonProperty("skip_structures")] public bool SkipStructures { get; set; } = true;
     [JsonProperty("skip_background")] public bool SkipBackground { get; set; } = true;
 
-    public string Authors => Author is { Count: > 0 }
+    [JsonIgnore] public string DirectoryPath { get; set; }
+
+    [JsonIgnore] public string Authors => Author is { Count: > 0 }
         ? string.Join(", ", Author)
         : "Unknown";
 
-    public string Features => Feature != null
+    [JsonIgnore] public string Features => Feature != null
         ? string.Join(", ", typeof(Feature).GetProperties().Select(prop =>
             $"{prop.Name}={prop.GetValue(Feature)}"))
         : "None";
 
-
-    public Vector2 SpawnPosition => new(
+    [JsonIgnore] public Vector2 SpawnPosition => new(
         Spawn is { Length: >= 2 }
             ? Spawn[0]
             : 0,
@@ -49,8 +55,6 @@ public class Fungame
 [UsedImplicitly]
 public class MapData
 {
-    public int X { get; set; } = 0;
-    public int Y { get; set; } = 0;
     public WorldGeneration.OverrideSceneType Type { get; set; } = WorldGeneration.OverrideSceneType.Debug;
     public string[] Map { get; set; } = [];
     public Dictionary<string, object> Key { get; set; } = new();

@@ -1,4 +1,4 @@
-﻿using MossLib.Base;
+using MossLib.Base;
 
 namespace CustomFungamePack.Lang
 {
@@ -88,6 +88,7 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.initializing_world", "Initializing Fungame map...");
             Add("log.world_generation.loading_fungame_map", "Loading Fungame map: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} does not contain map data");
+            Add("log.world_generation.no_content_type", "Fungame '{0}' has no content type defined (MapData, CustomStructures, or BuildModeSave)");
             Add("log.world_generation.no_commands", "No {0} enabled");
             Add("log.world_generation.executing_command", "Executing {0}: {1}");
             Add("log.world_generation.executing_loop_command", "Executing loop {0}: {1}");
@@ -100,8 +101,8 @@ namespace CustomFungamePack.Lang
             Add("log.validation.map_row_not_string", "Map map row {0} must be a string");
             Add("log.validation.map_item_row_not_array", "Map items row {0} must be an array");
             Add("log.validation.map_item_not_string", "Map items[{0}][{1}] must be a string");
-            Add("log.validation.map_and_custom_structures_conflict", "Cannot use map_data and custom_structures at the same time");
-            Add("log.validation.missing_map_or_custom_structures", "Missing map_data or custom_structures");
+            Add("log.validation.multiple_content_types", "Cannot use multiple content types (map_data, custom_structures, build_mode_save) at the same time, only one is allowed");
+            Add("log.validation.missing_content_type", "Missing content type (map_data, custom_structures, or build_mode_save)");
             Add("log.validation.custom_structures_without_mod", "Detected custom_structures field, but Custom Structures mod is not installed. Please install the mod first.");
             Add("log.validation.features_invalid_type", "features field must be an array or object");
             Add("log.validation.features_empty", "features array is empty, will be ignored");
@@ -146,6 +147,7 @@ namespace CustomFungamePack.Lang
             Add("log.error.no_fungame_file", "Cannot find fungame.json file: {0}");
             Add("log.error.no_valid_directories", "No valid Fungame directories, please check the Fungames folder");
             Add("log.error.custom_structures_mod_not_loaded", "Fungame '{0}' requires Custom Structures mod, but the mod is not loaded");
+            Add("log.error.multiple_content_types", "Fungame '{0}' has multiple content types defined (MapData, CustomStructures, BuildModeSave). Only one type is allowed.");
             
             // Log - Common
             Add("log.common.map", "Map");
@@ -165,6 +167,8 @@ namespace CustomFungamePack.Lang
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "Loading custom structure: {0}");
             Add("log.custom_structures_loader.failed", "Failed to load custom structure ({0}): {1}");
+            Add("log.custom_structures_loader.not_found", "{0} not found, reflection failed");
+            Add("log.custom_structures_loader.not_found_custom_structures", "Custom structure file not found");
         }
     }
 }

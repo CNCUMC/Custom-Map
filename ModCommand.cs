@@ -468,7 +468,7 @@ public class ModCommand : ModCommandBase
         if (HasWorldLoaded())
             MapLoader.ReloadMap(fungame);
         else
-            Command("select.without_world", fungame.Name);
+            InfoFungame("select.without_world", fungame.Name);
     }
 
     private static void CheckArg(string[] args, int index)

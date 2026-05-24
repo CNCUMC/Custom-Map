@@ -48,7 +48,7 @@ public static class MapLoader
 
             ParseAndApplyStringMap(fungame);
 
-            MoreLogs("load_success", mapData.X, mapData.Y, mapData.Map.Length,
+            MoreLogs("load_success", fungame.X, fungame.Y, mapData.Map.Length,
                 mapData.Map.Max(row => row?.Length ?? 0));
         }
         catch (Exception ex)
@@ -135,7 +135,7 @@ public static class MapLoader
             return;
         }
 
-        var worldY = mapData.Y;
+        var worldY = fungame.Y;
         var blockCount = 0;
         var itemCount = 0;
         var failCount = 0;
@@ -149,7 +149,7 @@ public static class MapLoader
                 continue;
             }
 
-            var worldX = mapData.X;
+            var worldX = fungame.X;
 
             foreach (var charStr in mapRow.Select(t => t.ToString()))
             {
@@ -324,7 +324,7 @@ public static class MapLoader
 
     public static void LogMapInfo()
     {
-        var fungame = FungameCheck.Fungames.FirstOrDefault();
+        var fungame = FungameCheck.CurrentFungame ?? FungameCheck.Fungames.FirstOrDefault();
         if (fungame == null)
         {
             Error("no_current_fungame");
@@ -359,7 +359,7 @@ public static class MapLoader
         for (int i = 0; i < fungames.Count; i++)
         {
             var fungame = fungames[i];
-            var isCurrent = fungame.Id == FungameCheck.Fungames.FirstOrDefault()?.Id;
+            var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
             var marker = isCurrent ? "->" : "  ";
 
             LogConsole("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
