@@ -23,6 +23,8 @@ public class ModCommand : ModCommandBase
         typeof(Feature).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
     private static bool _autofillRegistered;
+    private static List<string> _cachedFeatureNames = new();
+    private static List<string> _cachedFungameNames = new();
 
     [HarmonyPatch("RegisterAllCommands")]
     [HarmonyPostfix]
@@ -100,10 +102,12 @@ public class ModCommand : ModCommandBase
             .ToList();
 
         var featureNames = FeatureProperties
-            .Select(p => GetFeatureDisplayName(p.Name))
-            .Where(name => !string.IsNullOrEmpty(name))
+            .Select(p => p.Name)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+
+        _cachedFeatureNames = featureNames;
+        _cachedFungameNames = fungameNames ?? new List<string>();
 
         if ((fungameNames is not { Count: > 0 }) && featureNames.Count == 0)
         {
@@ -113,24 +117,74 @@ public class ModCommand : ModCommandBase
 
         foreach (var cmd in targetCommands)
         {
-            if (fungameNames is { Count: > 0 })
+            if (featureNames.Count > 0 || fungameNames is { Count: > 0 })
             {
                 if (!cmd.argAutofill.ContainsKey(1))
                     cmd.argAutofill[1] = new List<string>();
 
-                cmd.argAutofill[1].AddRange(fungameNames);
-            }
+                if (featureNames.Count > 0)
+                    cmd.argAutofill[1].AddRange(featureNames);
 
-            if (featureNames.Count > 0)
-            {
-                if (!cmd.argAutofill.ContainsKey(2))
-                    cmd.argAutofill[2] = new List<string>();
-
-                cmd.argAutofill[2].AddRange(featureNames);
+                if (fungameNames is { Count: > 0 })
+                    cmd.argAutofill[1].AddRange(fungameNames);
             }
         }
 
         _autofillRegistered = true;
+    }
+
+    [HarmonyPatch("HandleDescriptionText")]
+    [HarmonyPrefix]
+    private static void PreHandleDescriptionText(string[] args)
+    {
+        UpdateAutofillContext(args);
+    }
+
+    [HarmonyPatch("TryFinishCommandPart")]
+    [HarmonyPrefix]
+    private static void PreTryFinishCommandPart(string[] args)
+    {
+        UpdateAutofillContext(args);
+    }
+
+    private static void UpdateAutofillContext(string[] args)
+    {
+        if (args == null || args.Length < 2)
+            return;
+
+        string cmdName = args[0];
+        if (cmdName != "fungame" && cmdName != "fg")
+            return;
+
+        var cmd = ConsoleScript.SearchExact(cmdName);
+        if (cmd?.argAutofill == null)
+            return;
+
+        int key = args.Length - 2;
+        if (key != 1)
+            return;
+
+        var contextList = new List<string>();
+        string subcommand = args[1].ToLower();
+
+        switch (subcommand)
+        {
+            case "feature":
+                contextList.AddRange(_cachedFeatureNames);
+                break;
+            case "select":
+            case "list":
+                if (_cachedFungameNames.Count > 0)
+                    contextList.AddRange(_cachedFungameNames);
+                break;
+            default:
+                contextList.AddRange(_cachedFeatureNames);
+                if (_cachedFungameNames.Count > 0)
+                    contextList.AddRange(_cachedFungameNames);
+                break;
+        }
+
+        cmd.argAutofill[key] = contextList;
     }
 
     private static void ExecuteFungameCommand(string[] args)
@@ -607,7 +661,6 @@ public class ModCommand : ModCommandBase
         }
 
         var subCommand = args[2].ToLower();
-
 
         if (args.Length < 5)
         {
