@@ -171,7 +171,6 @@ public static class FungameCheck
             var errors = new List<string>();
             var warnings = new List<string>();
 
-            // Normalize PascalCase keys from older fg save output to lowercase
             NormalizeKey(jsonObject, "Name", "name");
             NormalizeKey(jsonObject, "Id", "id");
             NormalizeKey(jsonObject, "Version", "version");
@@ -241,7 +240,7 @@ public static class FungameCheck
                 warnings.Add(Validation("multiple_content_types"));
             }
 
-            // Priority: MapData > custom_structures > build_mode_save
+            // map_data > custom_structures > build_mode_save
             if (hasMapData)
             {
                 ValidateMapData(jsonObject["map_data"] as JObject, errors);
@@ -350,7 +349,6 @@ public static class FungameCheck
             return;
         }
 
-        // Normalize PascalCase keys from older fg save output to lowercase
         if (!mapObject.ContainsKey("map") && mapObject.ContainsKey("Map"))
             mapObject["map"] = mapObject["Map"];
         if (!mapObject.ContainsKey("key") && mapObject.ContainsKey("Key"))
@@ -597,11 +595,6 @@ public static class FungameCheck
         _logger.LogWarning($"{key}");
     }
 
-    /// <summary>
-    /// Get the directory path of the specified fungame, or the currently running fungame.
-    /// </summary>
-    /// <param name="fungame">The fungame to get the path for. If null, uses the currently running fungame.</param>
-    /// <returns>The directory path of the fungame, or null if not found.</returns>
     public static string GetFungamePath(Fungame fungame = null)
     {
         var target = fungame ?? CurrentFungame;

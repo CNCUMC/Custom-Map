@@ -18,7 +18,6 @@ public class ModCommand : ModCommandBase
     private new static readonly ManualLogSource Logger = Plugin.Logger;
     private const string LocaleKeyPre = "mod_command.";
 
-    // Feature uses auto-properties, not public fields — must use GetProperties()
     private static readonly PropertyInfo[] FeatureProperties =
         typeof(Feature).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -78,6 +77,8 @@ public class ModCommand : ModCommandBase
 
     private static void ExecuteFungameCommand(string[] args)
     {
+        if (args.Length == 1)
+            InfoFungame("help");
         switch (args[1])
         {
             case "help":
@@ -120,9 +121,6 @@ public class ModCommand : ModCommandBase
                 break;
             case "exit":
                 HandleExit(args);
-                break;
-            default:
-                InfoFungame("help");
                 break;
         }
     }
@@ -175,12 +173,10 @@ public class ModCommand : ModCommandBase
     {
         var fungame = FungameCheck.CurrentFungame;
 
-        // 解析可选的 targetName 参数
         string targetPath = null;
 
         if (args.Length == 3)
         {
-            // fg save <targetName>  — 全量保存到目标 Fungame
             if (!args[2].Contains(","))
             {
                 targetPath = ResolveTargetPath(args[2]);
@@ -192,14 +188,12 @@ public class ModCommand : ModCommandBase
             }
             else
             {
-                // 只有一个坐标，缺少结束坐标
                 ErrorFungame("save.missing_end_coord");
                 return;
             }
         }
         else if (args.Length == 5)
         {
-            // fg save <x1,y1> <x2,y2> <targetName>  — 区域保存到目标 Fungame
             targetPath = ResolveTargetPath(args[4]);
             if (targetPath == null)
             {
@@ -208,7 +202,6 @@ public class ModCommand : ModCommandBase
             }
         }
 
-        // 没有选中 Fungame 但有目标路径时，加载目标目录的 fungame.json 或创建默认实例
         if (fungame == null)
         {
             if (targetPath == null)
@@ -231,7 +224,7 @@ public class ModCommand : ModCommandBase
         {
             var jsonPath = Path.Combine(directoryPath, "fungame.json");
 
-            if (args.Length == 4 || args.Length == 5)
+            if (args.Length is 4 or 5)
             {
                 SaveAreaAsMapData(fungame, jsonPath, args[2], args[3]);
                 return;
@@ -263,13 +256,8 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    /// <summary>
-    /// 通过文件夹名称查找目标 Fungame 的目录路径。
-    /// 先在 ValidDirectories 中查找，若未找到则在 Fungames 根目录下搜索。
-    /// </summary>
     private static string ResolveTargetPath(string targetName)
     {
-        // 先在已验证的目录中查找
         foreach (var dir in FungameCheck.ValidDirectories)
         {
             var folderName = Path.GetFileName(dir);
@@ -277,7 +265,6 @@ public class ModCommand : ModCommandBase
                 return dir;
         }
 
-        // 再在 Fungames 根目录下按文件夹名查找
         var directPath = Path.Combine(FungameCheck.FungamesPath, targetName);
         if (Directory.Exists(directPath))
             return directPath;
@@ -285,9 +272,6 @@ public class ModCommand : ModCommandBase
         return null;
     }
 
-    /// <summary>
-    /// 从目标目录加载 fungame.json，若不存在或加载失败则创建默认实例
-    /// </summary>
     private static Fungame LoadOrCreateDefaultFungame(string targetPath)
     {
         var targetJsonPath = Path.Combine(targetPath, "fungame.json");
@@ -314,7 +298,7 @@ public class ModCommand : ModCommandBase
             Name = folderName,
             Id = folderName.ToLower(),
             Version = "1.0.0",
-            Author = new List<string> { "Unknown" },
+            Author = ["Unknown"],
             Description = $"Saved from area scan",
             DirectoryPath = targetPath
         };
@@ -327,13 +311,8 @@ public class ModCommand : ModCommandBase
         var startParts = startStr.Split(',');
         var endParts = endStr.Split(',');
 
-        if (startParts.Length != 2 || endParts.Length != 2)
-        {
-            ErrorFungame("save.invalid_coordinates");
-            return;
-        }
-
-        if (!float.TryParse(startParts[0].Trim(), out float wx1) ||
+        if (startParts.Length != 2 || endParts.Length != 2 ||
+            !float.TryParse(startParts[0].Trim(), out float wx1) ||
             !float.TryParse(startParts[1].Trim(), out float wy1) ||
             !float.TryParse(endParts[0].Trim(), out float wx2) ||
             !float.TryParse(endParts[1].Trim(), out float wy2))
@@ -412,7 +391,6 @@ public class ModCommand : ModCommandBase
             keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
         }
 
-        // X/Y 是地图原点坐标（放置位置），不随选区改变
         fungame.MapData = new MapData
         {
             Map = mapRows,
@@ -583,17 +561,22 @@ public class ModCommand : ModCommandBase
 
                 GetFeature(fungame.Feature, args[3]);
                 break;
-            case "set":
+            default:
                 if (args.Length < 5)
                 {
-                    InfoFungame("feature.set_missing_params");
-                    return;
+                    if (args.Length < 4)
+                    {
+                        InfoFungame("feature.set_missing_params");
+                        return;
+                    }
+
+                    SetFeature(fungame.Feature, args[2], args[3]);
+                }
+                else
+                {
+                    InfoFungame("feature.unknown_subcommand", subCommand);
                 }
 
-                SetFeature(fungame.Feature, args[3], args[4]);
-                break;
-            default:
-                InfoFungame("feature.unknown_subcommand", subCommand);
                 break;
         }
     }

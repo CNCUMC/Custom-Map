@@ -404,7 +404,6 @@ public static class MapLoader
             var jsonContent = File.ReadAllText(jsonPath);
             var jsonObject = JObject.Parse(jsonContent);
 
-            // Normalize PascalCase keys from older fg save output to lowercase
             NormalizeKey(jsonObject, "Name", "name");
             NormalizeKey(jsonObject, "Id", "id");
             NormalizeKey(jsonObject, "Version", "version");
@@ -417,7 +416,6 @@ public static class MapLoader
             NormalizeKey(jsonObject, "X", "x");
             NormalizeKey(jsonObject, "Y", "y");
 
-            // Normalize MapData internal keys
             if (jsonObject.ContainsKey("map_data") && jsonObject["map_data"] is JObject mapObj)
             {
                 if (!mapObj.ContainsKey("map") && mapObj.ContainsKey("Map"))
