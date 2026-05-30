@@ -33,12 +33,9 @@ public class SpikeStabberScriptPatch
             if (!string.IsNullOrEmpty(data.Sound))
                 __instance.sound = data.Sound;
 
-            if (data.Undestroy && data.Cooldown > 0f &&
-                LastTriggerTime.TryGetValue(__instance, out float lastTime) &&
-                Time.time - lastTime < data.Cooldown)
-                return false;
-
-            return true;
+            return !data.Undestroy || !(data.Cooldown > 0f) ||
+                   !LastTriggerTime.TryGetValue(__instance, out float lastTime) ||
+                   !(Time.time - lastTime < data.Cooldown);
         }
         catch
         {
@@ -55,27 +52,26 @@ public class SpikeStabberScriptPatch
 
         try
         {
-            if (data.Undestroy && data.Cooldown > 0f &&
-                LastTriggerTime.TryGetValue(__instance, out float lastTime) &&
-                Time.time - lastTime < data.Cooldown)
-                return;
-
-            if (data.Undestroy)
+            switch (data.Undestroy)
             {
-                LastTriggerTime[__instance] = Time.time;
+                case true when data.Cooldown > 0f &&
+                               LastTriggerTime.TryGetValue(__instance, out float lastTime) &&
+                               Time.time - lastTime < data.Cooldown:
+                    return;
+                case true:
+                    LastTriggerTime[__instance] = Time.time;
 
-                __instance.CheckStab();
+                    __instance.CheckStab();
 
-                __instance.StartCoroutine(ResetSpikeCoroutine(__instance));
+                    __instance.StartCoroutine(ResetSpikeCoroutine(__instance));
+                    break;
             }
 
-            if (data.NoLight)
-            {
-                if (LightField?.GetValue(__instance) is Light2D light)
-                    light.enabled = false;
-                if (__instance.bonusLight != null)
-                    __instance.bonusLight.enabled = false;
-            }
+            if (!data.NoLight) return;
+            if (LightField?.GetValue(__instance) is Light2D light)
+                light.enabled = false;
+            if (__instance.bonusLight != null)
+                __instance.bonusLight.enabled = false;
         }
         catch
         {
@@ -91,9 +87,9 @@ public class SpikeStabberScriptPatch
         if (cooldown > 0f)
             yield return new WaitForSeconds(cooldown);
 
-        if (instance == null || WorldGeneration.world == null) yield break;
+        if (!instance || !WorldGeneration.world) yield break;
 
-        Plugin.Logger.LogInfo(instance.transform.localPosition);
+        World.PlaceItem(instance.transform.position, "spikestabber");
 
         Object.Destroy(instance.gameObject);
     }

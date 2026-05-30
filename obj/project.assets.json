@@ -1,7 +1,7 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
-    "net472": {
+    ".NETFramework,Version=v4.7.2": {
       "Microsoft.NETFramework.ReferenceAssemblies/1.0.3": {
         "type": "package",
         "dependencies": {
@@ -410,7 +410,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net472": [
+    ".NETFramework,Version=v4.7.2": [
       "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3"
     ]
   },
@@ -440,7 +440,6 @@
       },
       "frameworks": {
         "net472": {
-          "framework": "net472",
           "targetAlias": "net472",
           "projectReferences": {}
         }
@@ -459,7 +458,6 @@
     },
     "frameworks": {
       "net472": {
-        "framework": "net472",
         "targetAlias": "net472",
         "dependencies": {
           "Microsoft.NETFramework.ReferenceAssemblies": {
