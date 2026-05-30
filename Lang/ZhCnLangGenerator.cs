@@ -31,7 +31,8 @@ namespace CustomFungamePack.Lang
                 "list    - 列出所有 Fungame\n  " +
                 "feature - 管理特性 (list/get/set)\n  " +
                 "waypoint- 管理路径点 (list/get)\n  " +
-                "save    - 保存当前Fungame到本地");
+                "save    - 保存当前Fungame到本地\n  " +
+                "save as - 交互式选取区域并保存为地图数据");
 
             // Command - Fungame - Info
             Add("command.fungame.info.name", "名称: {0}");
@@ -77,21 +78,16 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.success", "已将 Fungame '{0}' 保存到: {1}");
             Add("command.fungame.save.failed", "保存 Fungame '{0}' 失败: {1}");
             Add("command.fungame.save.no_directory", "当前 Fungame 没有关联的目录路径，无法保存");
-            Add("command.fungame.save.invalid_coordinates", "无效的坐标格式，请使用 Vector2 格式：\"x,y\" (例如 \"86,-11\")");
+            Add("command.fungame.save.invalid_position", "无效的位置格式，请使用 Vector2 格式：\"x,y\" (例如 \"86,-11\")");
             Add("command.fungame.save.area_empty", "指定区域超出世界边界或为空");
             Add("command.fungame.save.area_success", "已保存区域物块地图: ({0},{1}) 到 ({2},{3}), 尺寸 {4}x{5}, {6} 种物块类型 → {7}");
             Add("command.fungame.save.target_not_found", "目标 Fungame 文件夹 '{0}' 未找到");
-            Add("command.fungame.save.missing_end_coord", "缺少结束坐标，请提供两个坐标参数 (例如: fg save 86,-11 2,45)");
-            Add("command.fungame.save.as.start_coordinates", "请鼠标左键点击选择起始坐标...");
-            Add("command.fungame.save.as.end_coordinates", "请鼠标左键点击选择结束坐标...");
-            Add("command.fungame.save.as.confirm", "坐标已记录，再次输入相同指令以确认保存。");
+            Add("command.fungame.save.missing_end_position", "缺少结束位置，请提供两个位置参数 (例如: fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.start_position", "请鼠标左键点击选择起始位置...");
+            Add("command.fungame.save.as.end_position", "请鼠标左键点击选择结束位置...");
+            Add("command.fungame.save.as.confirm", "位置已记录，再次输入相同指令以确认保存。");
 
             // Command - Fungame - Feature
-            Add("command.fungame.feature.help",
-                "特性子命令:\n  " +
-                "list - 列出所有特性\n  " +
-                "get <name> - 获取特性值\n  " +
-                "set <name> <value> - 设置特性值");
             Add("command.fungame.feature.unknown_subcommand", "未知的特性子命令：{0}");
             Add("command.fungame.feature.set_missing_params", "请指定特性名称和值来设置");
             Add("command.fungame.feature.list_header", "当前特性设置：");

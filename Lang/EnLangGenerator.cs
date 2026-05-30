@@ -31,7 +31,8 @@ namespace CustomFungamePack.Lang
                 "list    - List all Fungames\n  " +
                 "feature - Manage features (list/get/set)\n  " +
                 "waypoint- Manage waypoints (list/get)\n  " +
-                "save    - Save current Fungame to local file");
+                "save    - Save current Fungame to local file\n  " +
+                "save as - Interactively select area and save as map data");
 
             // Command - Fungame - Info
             Add("command.fungame.info.name", "Name: {0}");
@@ -79,23 +80,19 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.success", "Fungame '{0}' saved to: {1}");
             Add("command.fungame.save.failed", "Failed to save Fungame '{0}': {1}");
             Add("command.fungame.save.no_directory", "Current Fungame has no associated directory path, cannot save");
-            Add("command.fungame.save.invalid_coordinates",
-                "Invalid coordinate format. Use Vector2 format: \"x,y\" (e.g. \"86,-11\")");
+            Add("command.fungame.save.invalid_position",
+                "Invalid position format. Use Vector2 format: \"x,y\" (e.g. \"86,-11\")");
             Add("command.fungame.save.area_empty", "Specified area is outside world bounds or empty");
             Add("command.fungame.save.area_success",
                 "Area block map saved: ({0},{1}) to ({2},{3}), size {4}x{5}, {6} block types → {7}");
             Add("command.fungame.save.target_not_found", "Target Fungame folder '{0}' not found");
-            Add("command.fungame.save.missing_end_coord",
-                "Missing end coordinate, please provide both coordinates (e.g. fg save 86,-11 2,45)");
-            Add("command.fungame.save.as.start_coordinates", "Left-click to select the start coordinate...");
-            Add("command.fungame.save.as.end_coordinates", "Left-click to select the end coordinate...");
-            Add("command.fungame.save.as.confirm", "Coordinates recorded. Re-enter the same command to confirm and save.");
+            Add("command.fungame.save.missing_end_position",
+                "Missing end position, please provide both positions (e.g. fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.start_position", "Left-click to select the start position...");
+            Add("command.fungame.save.as.end_position", "Left-click to select the end position...");
+            Add("command.fungame.save.as.confirm", "Position recorded. Re-enter the same command to confirm and save.");
 
             // Command - Fungame - Feature
-            Add("command.fungame.feature.help", "Feature subcommands:\n  " +
-                                                "list - List all features\n  " +
-                                                "get <name> - Get feature value\n  " +
-                                                "set <name> <value> - Set feature value");
             Add("command.fungame.feature.unknown_subcommand", "Unknown feature subcommand: {0}");
             Add("command.fungame.feature.set_missing_params", "Please specify feature name and value to set");
             Add("command.fungame.feature.list_header", "Current feature settings:");

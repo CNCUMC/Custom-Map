@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,11 +26,6 @@ public class ModCommand : ModCommandBase
     private static bool _autofillRegistered;
     private static List<string> _cachedFeatureNames = [];
     private static List<string> _cachedFungameIds = [];
-
-    // Pending interactive save state (fg save as / fg save as XXX)
-    private static Vector2? _pendingSaveStart;
-    private static Vector2? _pendingSaveEnd;
-    private static string _pendingSaveTargetPath;
 
     [HarmonyPatch("RegisterAllCommands")]
     [HarmonyPostfix]
@@ -276,13 +272,22 @@ public class ModCommand : ModCommandBase
 
     private static void HandleSave(string[] args)
     {
+        // fg save as / fg save as XXX
+        if (args.Length is 3 or 4 && args[2].Equals("as", StringComparison.OrdinalIgnoreCase))
+        {
+            var targetName = args.Length == 4 ? args[3] : null;
+            HandleSaveAs(targetName);
+            return;
+        }
+
         var fungame = FungameCheck.CurrentFungame;
 
         string targetPath = null;
 
-        if (args.Length == 3)
+        switch (args.Length)
         {
-            if (!args[2].Contains(","))
+            // fg save XXX
+            case 3 when !args[2].Contains(","):
             {
                 targetPath = ResolveTargetPath(args[2]);
                 if (targetPath == null)
@@ -290,20 +295,24 @@ public class ModCommand : ModCommandBase
                     ErrorFungame("save.target_not_found", args[2]);
                     return;
                 }
+
+                break;
             }
-            else
-            {
-                ErrorFungame("save.missing_end_coord");
+            // fg save xx,xx
+            case 3:
+                ErrorFungame("save.missing_end_position");
                 return;
-            }
-        }
-        else if (args.Length == 5)
-        {
-            targetPath = ResolveTargetPath(args[4]);
-            if (targetPath == null)
+            // fg save xx,xx xx,xx XXX
+            case 5:
             {
-                ErrorFungame("save.target_not_found", args[4]);
-                return;
+                targetPath = ResolveTargetPath(args[4]);
+                if (targetPath == null)
+                {
+                    ErrorFungame("save.target_not_found", args[4]);
+                    return;
+                }
+
+                break;
             }
         }
 
@@ -359,6 +368,73 @@ public class ModCommand : ModCommandBase
         {
             ErrorFungame("save.failed", fungame.Name, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// 启动交互式保存模式：鼠标左键点击世界内两点，保存区域为地图数据。
+    /// </summary>
+    private static void HandleSaveAs(string targetName)
+    {
+        if (!EnsureWorldLoaded()) return;
+
+        GameConsole.Instance.StartCoroutine(SaveAsCoroutine(targetName));
+    }
+
+    private static IEnumerator SaveAsCoroutine(string targetName)
+    {
+        yield return null;
+
+        var fungame = FungameCheck.CurrentFungame;
+        string targetPath = null;
+
+        if (!string.IsNullOrEmpty(targetName))
+        {
+            targetPath = ResolveTargetPath(targetName);
+            if (targetPath == null)
+            {
+                ErrorFungame("save.target_not_found", targetName);
+                yield break;
+            }
+
+            fungame ??= LoadOrCreateDefaultFungame(targetPath);
+        }
+
+        if (fungame == null)
+        {
+            Error("no_fungame");
+            yield break;
+        }
+
+        var directoryPath = targetPath ?? fungame.DirectoryPath;
+        if (string.IsNullOrEmpty(directoryPath))
+        {
+            ErrorFungame("save.no_directory");
+            yield break;
+        }
+
+        // Step 1: Left-click to select start position
+        TipFungame("save.as.start_position");
+
+        var waiter1 = Key.WaitForLeftClick();
+        yield return waiter1;
+        var startPos = waiter1.Result;
+
+        // Wait one frame to ensure click state is cleared before waiting for second click
+        yield return null;
+
+        // Step 2: Left-click to select end position
+        TipFungame("save.as.end_position");
+
+        var waiter2 = Key.WaitForLeftClick();
+        yield return waiter2;
+        var endPos = waiter2.Result;
+
+        // Step 3: Save the area as map data
+        var jsonPath = Path.Combine(directoryPath, "fungame.json");
+        var startStr = $"{startPos.x},{startPos.y}";
+        var endStr = $"{endPos.x},{endPos.y}";
+
+        SaveAreaAsMapData(fungame, jsonPath, startStr, endStr);
     }
 
     private static string ResolveTargetPath(string targetName)
@@ -424,7 +500,7 @@ public class ModCommand : ModCommandBase
             !float.TryParse(endParts[0].Trim(), out float wx2) ||
             !float.TryParse(endParts[1].Trim(), out float wy2))
         {
-            ErrorFungame("save.invalid_coordinates");
+            ErrorFungame("save.invalid_position");
             return;
         }
 
@@ -451,7 +527,11 @@ public class ModCommand : ModCommandBase
             return;
         }
 
-        var blockIds = new ushort[regionW, regionH];
+        var blockIds = new ushort[regionW][];
+        for (int index = 0; index < regionW; index++)
+        {
+            blockIds[index] = new ushort[regionH];
+        }
 
         var uniqueBlockIds = new List<ushort>();
         var blockToChar = new Dictionary<ushort, string>();
@@ -467,7 +547,7 @@ public class ModCommand : ModCommandBase
                 int by = cMaxY - y;
                 ushort id = world.GetBlock(new Vector2Int(bx, by));
 
-                blockIds[x, y] = id;
+                blockIds[x][y] = id;
 
                 if (id > 0 && !blockToChar.ContainsKey(id))
                 {
@@ -483,7 +563,7 @@ public class ModCommand : ModCommandBase
             var chars = new char[regionW];
             for (int x = 0; x < regionW; x++)
             {
-                ushort id = blockIds[x, y];
+                ushort id = blockIds[x][y];
                 chars[x] = blockToChar.TryGetValue(id, out string ch)
                     ? ch[0]
                     : '0';
@@ -840,6 +920,12 @@ public class ModCommand : ModCommandBase
     private static string Fungame(string key, params object[] args)
     {
         return Command($"fungame.{key}", args);
+    }
+
+    private static void TipFungame(string key, params object[] args)
+    {
+        var message = Fungame(key, args);
+        Log.Alert(message, Logger, false);
     }
 
     private static void InfoFungame(string key, params object[] args)
