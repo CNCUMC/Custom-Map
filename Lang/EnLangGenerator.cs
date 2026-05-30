@@ -88,6 +88,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.target_not_found", "Target Fungame folder '{0}' not found");
             Add("command.fungame.save.missing_end_position",
                 "Missing end position, please provide both positions (e.g. fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.default_description", "Saved from area scan");
             Add("command.fungame.save.as.start_position", "Left-click to select the start position...");
             Add("command.fungame.save.as.end_position", "Left-click to select the end position...");
             Add("command.fungame.save.as.confirm", "Position recorded. Re-enter the same command to confirm and save.");
@@ -189,6 +190,15 @@ namespace CustomFungamePack.Lang
                 "Fungame '{0}' requires Custom Structures mod, but the mod is not loaded");
             Add("log.error.multiple_content_types",
                 "Fungame '{0}' has multiple content types defined (MapData, CustomStructures, BuildModeSave). Only one type is allowed.");
+
+            // Log - Fungame Load
+            Add("log.fungame_load.empty_target_path", "Target path cannot be null or empty");
+            Add("log.fungame_load.unauthorized", "No permission to read file '{0}': {1}");
+            Add("log.fungame_load.io_error", "Failed to read file '{0}': {1}");
+            Add("log.fungame_load.file_empty", "File '{0}' is empty, will create default configuration");
+            Add("log.fungame_load.deserialize_null", "File '{0}' deserialization returned null, will create default configuration");
+            Add("log.fungame_load.invalid_json", "File '{0}' has invalid JSON format: {1}");
+            Add("log.fungame_load.no_folder_name", "Could not resolve a valid folder name from path '{0}'");
 
             // Log - Common
             Add("log.common.map", "Map");

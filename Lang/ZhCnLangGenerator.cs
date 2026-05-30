@@ -83,6 +83,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.area_success", "已保存区域物块地图: ({0},{1}) 到 ({2},{3}), 尺寸 {4}x{5}, {6} 种物块类型 → {7}");
             Add("command.fungame.save.target_not_found", "目标 Fungame 文件夹 '{0}' 未找到");
             Add("command.fungame.save.missing_end_position", "缺少结束位置，请提供两个位置参数 (例如: fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.default_description", "区域扫描保存");
             Add("command.fungame.save.as.start_position", "请鼠标左键点击选择起始位置...");
             Add("command.fungame.save.as.end_position", "请鼠标左键点击选择结束位置...");
             Add("command.fungame.save.as.confirm", "位置已记录，再次输入相同指令以确认保存。");
@@ -178,6 +179,15 @@ namespace CustomFungamePack.Lang
             Add("log.error.custom_structures_mod_not_loaded", "Fungame '{0}' 需要自定义结构模组，但该模组未加载");
             Add("log.error.multiple_content_types",
                 "Fungame '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
+
+            // Log - Fungame Load
+            Add("log.fungame_load.empty_target_path", "目标路径不能为空");
+            Add("log.fungame_load.unauthorized", "无权读取文件 '{0}': {1}");
+            Add("log.fungame_load.io_error", "读取文件 '{0}' 失败: {1}");
+            Add("log.fungame_load.file_empty", "文件 '{0}' 为空，将创建默认配置");
+            Add("log.fungame_load.deserialize_null", "文件 '{0}' 反序列化失败（返回 null），将创建默认配置");
+            Add("log.fungame_load.invalid_json", "文件 '{0}' JSON 格式无效: {1}");
+            Add("log.fungame_load.no_folder_name", "无法从路径 '{0}' 解析有效的文件夹名称");
 
             // Log - Common
             Add("log.common.map", "地图");

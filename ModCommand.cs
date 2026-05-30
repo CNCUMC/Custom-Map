@@ -116,7 +116,7 @@ public class ModCommand : ModCommandBase
 
         _autofillRegistered = true;
     }
-    
+
     [HarmonyPatch("HandleDescriptionText")]
     [HarmonyPrefix]
     private static void PreHandleDescriptionText(string[] args)
@@ -370,9 +370,6 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    /// <summary>
-    /// 启动交互式保存模式：鼠标左键点击世界内两点，保存区域为地图数据。
-    /// </summary>
     private static void HandleSaveAs(string targetName)
     {
         if (!EnsureWorldLoaded()) return;
@@ -412,24 +409,20 @@ public class ModCommand : ModCommandBase
             yield break;
         }
 
-        // Step 1: Left-click to select start position
         TipFungame("save.as.start_position");
 
         var waiter1 = Key.WaitForLeftClick();
         yield return waiter1;
         var startPos = waiter1.Result;
 
-        // Wait one frame to ensure click state is cleared before waiting for second click
         yield return null;
 
-        // Step 2: Left-click to select end position
         TipFungame("save.as.end_position");
 
         var waiter2 = Key.WaitForLeftClick();
         yield return waiter2;
         var endPos = waiter2.Result;
 
-        // Step 3: Save the area as map data
         var jsonPath = Path.Combine(directoryPath, "fungame.json");
         var startStr = $"{startPos.x},{startPos.y}";
         var endStr = $"{endPos.x},{endPos.y}";
@@ -454,35 +447,92 @@ public class ModCommand : ModCommandBase
             : null;
     }
 
+    private const string DefaultVersion = "1.0.0";
+    private static readonly List<string> DefaultAuthor = ["Unknown"];
+
     private static Fungame LoadOrCreateDefaultFungame(string targetPath)
     {
+        if (string.IsNullOrWhiteSpace(targetPath))
+            throw new ArgumentException(ModLocale.Log("fungame_load.empty_target_path"), nameof(targetPath));
+
         var targetJsonPath = Path.Combine(targetPath, "fungame.json");
-        if (File.Exists(targetJsonPath))
+
+        var loaded = TryLoadFungame(targetJsonPath, targetPath);
+        if (loaded != null)
+            return loaded;
+
+        return CreateDefaultFungame(targetPath);
+    }
+
+    private static Fungame TryLoadFungame(string jsonPath, string targetPath)
+    {
+        string json;
+        try
         {
-            try
-            {
-                var json = File.ReadAllText(targetJsonPath);
-                var loaded = JsonConvert.DeserializeObject<Fungame>(json);
-                if (loaded != null)
-                {
-                    loaded.DirectoryPath = targetPath;
-                    return loaded;
-                }
-            }
-            catch
-            {
-                // ignored
-            }
+            json = File.ReadAllText(jsonPath);
+        }
+        catch (FileNotFoundException)
+        {
+            return null;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return null;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Logger.LogWarning(ModLocale.Log("fungame_load.unauthorized", jsonPath, ex.Message));
+            return null;
+        }
+        catch (Exception ex) when (ex is IOException or PathTooLongException)
+        {
+            Logger.LogWarning(ModLocale.Log("fungame_load.io_error", jsonPath, ex.Message));
+            return null;
         }
 
-        var folderName = Path.GetFileName(targetPath);
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            Logger.LogWarning(ModLocale.Log("fungame_load.file_empty", jsonPath));
+            return null;
+        }
+
+        try
+        {
+            var loaded = JsonConvert.DeserializeObject<Fungame>(json);
+            if (loaded == null)
+            {
+                Logger.LogWarning(ModLocale.Log("fungame_load.deserialize_null", jsonPath));
+                return null;
+            }
+
+            loaded.DirectoryPath = targetPath;
+            return loaded;
+        }
+        catch (JsonException ex)
+        {
+            Logger.LogWarning(ModLocale.Log("fungame_load.invalid_json", jsonPath, ex.Message));
+            return null;
+        }
+    }
+
+    private static Fungame CreateDefaultFungame(string targetPath)
+    {
+        var folderName =
+            Path.GetFileName(targetPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            Logger.LogWarning(ModLocale.Log("fungame_load.no_folder_name", targetPath));
+            return null;
+        }
+
         return new Fungame
         {
             Name = folderName,
-            Id = folderName.ToLower(),
-            Version = "1.0.0",
-            Author = ["Unknown"],
-            Description = $"Saved from area scan",
+            Id = folderName.ToLowerInvariant(),
+            Version = DefaultVersion,
+            Author = DefaultAuthor,
+            Description = Fungame("save.as.default_description"),
             DirectoryPath = targetPath
         };
     }
@@ -762,7 +812,7 @@ public class ModCommand : ModCommandBase
 
         Log.Divider();
     }
-    
+
     private static void SetFeature(Feature feature, string featureName, string valueStr)
     {
         var prop = FindFeatureProperty(featureName);
@@ -822,7 +872,7 @@ public class ModCommand : ModCommandBase
             ? fieldName
             : localized;
     }
-    
+
     private static bool EnsureWorldLoaded()
     {
         if (HasWorldLoaded()) return true;
