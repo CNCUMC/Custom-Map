@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -9,7 +10,7 @@ using MossLib.Tool;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace CustomFungamePack;
+namespace CustomFungamePack.Loader;
 
 [BepInDependency(CustomStructuresGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public static class CustomStructuresLoader
@@ -17,6 +18,64 @@ public static class CustomStructuresLoader
     private const string LocaleKeyPre = "custom_structures_loader.";
     private static readonly ManualLogSource Logger = Plugin.Logger;
     private const string CustomStructuresGuid = "com.Jimmyking.morestructures";
+
+    /// <summary>
+    /// 当使用 MapData 类型 Fungame 时，抑制 Custom Structures 模组的自动生成。
+    /// 该模组有自己的 Harmony 补丁，会在世界生成时自动放置已注册的结构。
+    /// 通过清除其结构注册表来防止其自动生成干扰 MapData 的地图块。
+    /// </summary>
+    public static void SuppressAutoGeneration()
+    {
+        try
+        {
+            if (!Chainloader.PluginInfos.TryGetValue(CustomStructuresGuid, out var targetPlugin))
+                return;
+
+            var assembly = targetPlugin.Instance.GetType().Assembly;
+            var structureLoaderType = assembly.GetType("Custom_Structures.StructureLoader");
+            if (structureLoaderType == null)
+            {
+                Warning("suppress.structure_loader_not_found");
+                return;
+            }
+
+            var definitionsField = structureLoaderType.GetField("StructureDefinitions",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+            if (definitionsField != null)
+            {
+                if (definitionsField.GetValue(null) is not IDictionary { Count: > 0 } dict) return;
+                dict.Clear();
+                Info("suppress.cleared_definitions");
+                return;
+            }
+
+            foreach (var field in structureLoaderType.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+                                                                BindingFlags.Static))
+            {
+                if (!field.FieldType.Name.Contains("Dictionary") && !field.FieldType.Name.Contains("List") &&
+                    !field.FieldType.Name.Contains("IEnumerable")) continue;
+                var value = field.GetValue(null);
+                switch (value)
+                {
+                    case IDictionary { Count: > 0 } dict2:
+                        dict2.Clear();
+                        Info("suppress.cleared_field", field.Name);
+                        return;
+                    case IList { Count: > 0 } list:
+                        list.Clear();
+                        Info("suppress.cleared_field", field.Name);
+                        return;
+                }
+            }
+
+            Info("suppress.no_registry");
+        }
+        catch (Exception ex)
+        {
+            Warning("suppress.failed", ex.Message);
+        }
+    }
 
     private static readonly Regex V1NameRegex =
         new("StructureDefinitions\\[\"(.*?)\"\\]", RegexOptions.Compiled);
@@ -144,6 +203,12 @@ public static class CustomStructuresLoader
     {
         var message = ModLocale.Log($"{LocaleKeyPre}{key}", args);
         Log.Info(message, Logger);
+    }
+
+    private static void Warning(string key, params object[] args)
+    {
+        var message = ModLocale.Log($"{LocaleKeyPre}{key}", args);
+        Log.Warning(message, Logger);
     }
 
     private static void Error(string key, params object[] args)

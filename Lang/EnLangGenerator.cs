@@ -10,13 +10,13 @@ namespace CustomFungamePack.Lang
         {
             // Feature
             Add("feature.fullbright", "Fullbright");
-            Add("feature.forgiving_level", "Forgiving Level");
+            Add("feature.forgivinglevel", "Forgiving Level");
             Add("feature.gravity", "Gravity");
-            Add("feature.skip_terrain", "Skip Terrain");
-            Add("feature.skip_structures", "Skip Structures");
-            Add("feature.skip_background", "Skip Background");
-            Add("feature.jump_limit", "Jump Limit");
-            Add("feature.climb_limit", "Climb Limit");
+            Add("feature.skipterrain", "Skip Terrain");
+            Add("feature.skipstructures", "Skip Structures");
+            Add("feature.skipbackground", "Skip Background");
+            Add("feature.jumplimit", "Jump Limit");
+            Add("feature.climblimit", "Climb Limit");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame related commands");
@@ -29,7 +29,7 @@ namespace CustomFungamePack.Lang
                 "spawn   - Teleport to spawn\n  " +
                 "select  - Select a Fungame\n  " +
                 "list    - List all Fungames\n  " +
-                "feature - Manage features (list/get/set)\n  " +
+                "feature - Manage features\n  " +
                 "waypoint- Manage waypoints (list/get)\n  " +
                 "save    - Save current Fungame to local file\n  " +
                 "save as - Interactively select area and save as map data");
@@ -73,8 +73,10 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.select.invalid_index", "Invalid index {0}, please enter a number between 1 and {1}");
 
             // Command - Fungame - Exit
-            Add("command.fungame.exit", "Exiting current Fungame, returning to {0} mode...");
+            Add("command.fungame.exiting", "Returning to {0}...");
             Add("command.fungame.exit.invalid_target", "Unknown exit target: {0}, available: none, tutorial");
+            Add("command.fungame.exit.target.none", "vanilla game");
+            Add("command.fungame.exit.target.tutorial", "tutorial");
 
             // Command - Fungame - Save
             Add("command.fungame.save.success", "Fungame '{0}' saved to: {1}");
@@ -123,9 +125,12 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.no_content_type",
                 "Fungame '{0}' has no content type defined (MapData, CustomStructures, or BuildModeSave)");
             Add("log.world_generation.no_commands", "No {0} enabled");
-            Add("log.world_generation.exited_to_vanilla", "Exited Fungame, returned to vanilla game");
+            Add("log.world_generation.exited_fungame", "Exited Fungame");
             Add("log.world_generation.executing_command", "Executing {0}: {1}");
             Add("log.world_generation.executing_loop_command", "Executing loop {0}: {1}");
+            Add("log.world_generation.start_game_fungame", "Starting game with configured Fungame: {0} (ID: {1})");
+            Add("log.world_generation.start_game_fungame_not_found", "Configured Fungame (ID: {0}) not found, using default");
+            Add("log.world_generation.no_fungame_selected", "No Fungame selected, generating vanilla world");
 
             // Log - Validation
             Add("log.validation.map_invalid_type", "map field format is incorrect");
@@ -214,12 +219,18 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.empty_type", "Unknown command type");
             Add("log.mod_command.world_not_loaded", "World not loaded");
             Add("log.mod_command.no_waypoints", "No waypoints defined in current Fungame");
+            Add("log.mod_command.exit_no_target", "Please specify exit target: none (vanilla) or tutorial");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "Loading custom structure: {0}");
             Add("log.custom_structures_loader.failed", "Failed to load custom structure ({0}): {1}");
             Add("log.custom_structures_loader.not_found", "{0} not found, reflection failed");
             Add("log.custom_structures_loader.not_found_custom_structures", "Custom structure file not found");
+            Add("log.custom_structures_loader.suppress.structure_loader_not_found", "Could not find StructureLoader type");
+            Add("log.custom_structures_loader.suppress.cleared_definitions", "Suppressed Custom Structures auto-generation (cleared StructureDefinitions)");
+            Add("log.custom_structures_loader.suppress.cleared_field", "Suppressed Custom Structures auto-generation (cleared {0})");
+            Add("log.custom_structures_loader.suppress.no_registry", "Custom Structures mod found but no structure registry to clear");
+            Add("log.custom_structures_loader.suppress.failed", "Failed to suppress Custom Structures auto-generation: {0}");
 
             // Log - Build Mode Save Loader
             Add("log.build_mode_save_loader.loading",

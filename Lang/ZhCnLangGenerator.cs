@@ -10,13 +10,13 @@ namespace CustomFungamePack.Lang
         {
             // Feature
             Add("feature.fullbright", "全亮");
-            Add("feature.forgiving_level", "仁慈关卡");
+            Add("feature.forgivinglevel", "仁慈关卡");
             Add("feature.gravity", "重力");
-            Add("feature.skip_terrain", "跳过地形");
-            Add("feature.skip_structures", "跳过结构");
-            Add("feature.skip_background", "跳过背景");
-            Add("feature.jump_limit", "跳跃极限");
-            Add("feature.climb_limit", "攀爬极限");
+            Add("feature.skipterrain", "跳过地形");
+            Add("feature.skipstructures", "跳过结构");
+            Add("feature.skipbackground", "跳过背景");
+            Add("feature.jumplimit", "跳跃极限");
+            Add("feature.climblimit", "攀爬极限");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame 的相关指令");
@@ -29,7 +29,7 @@ namespace CustomFungamePack.Lang
                 "spawn   - 传送回出生点\n  " +
                 "select  - 选择 Fungame\n  " +
                 "list    - 列出所有 Fungame\n  " +
-                "feature - 管理特性 (list/get/set)\n  " +
+                "feature - 管理特性\n  " +
                 "waypoint- 管理路径点 (list/get)\n  " +
                 "save    - 保存当前Fungame到本地\n  " +
                 "save as - 交互式选取区域并保存为地图数据");
@@ -71,8 +71,10 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.select.invalid_index", "无效的索引 {0}，请输入 1 到 {1} 之间的数字");
 
             // Command - Fungame - Exit
-            Add("command.fungame.exit", "正在退出当前 Fungame，返回{0}模式...");
+            Add("command.fungame.exiting", "正在返回{0}...");
             Add("command.fungame.exit.invalid_target", "未知的退出目标: {0}，可用: none, tutorial");
+            Add("command.fungame.exit.target.none", "原版游戏");
+            Add("command.fungame.exit.target.tutorial", "教程");
 
             // Command - Fungame - Save
             Add("command.fungame.save.success", "已将 Fungame '{0}' 保存到: {1}");
@@ -99,7 +101,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.invalid_value", "{0} 的值无效：{1}");
 
             // Log - Fungame Check
-            Add("log.fungame_check.id_format_warning", "ID格式不正确，将自动修正");
+            Add("log.fungame_check.id_format_warning", "ID格式不正确，将自动修正"); 
             Add("log.fungame_check.author_not_string", "作者元素 {0} 不是字符串，已移除");
             Add("log.fungame_check.author_empty", "作者数组为空，已设置默认值");
             Add("log.fungame_check.version_format_warning", "版本格式'{0}'不正确，将使用默认版本'1.0.0'");
@@ -117,9 +119,12 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.no_content_type",
                 "Fungame '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
             Add("log.world_generation.no_commands", "未启用任何 {0}");
-            Add("log.world_generation.exited_to_vanilla", "已退出 Fungame，返回原版游戏");
+            Add("log.world_generation.exited_fungame", "已退出 Fungame");
             Add("log.world_generation.executing_command", "执行 {0}: '{1}'");
             Add("log.world_generation.executing_loop_command", "执行循环 {0}: '{1}'");
+            Add("log.world_generation.start_game_fungame", "开始游戏时自动使用配置的 Fungame: {0} (ID: {1})");
+            Add("log.world_generation.start_game_fungame_not_found", "未找到配置的 Fungame (ID: {0})，将使用默认");
+            Add("log.world_generation.no_fungame_selected", "未选择 Fungame，生成原版世界");
 
             // Log - Validation
             Add("log.validation.map_invalid_type", "map 字段格式不正确");
@@ -203,12 +208,18 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.empty_type", "未知的指令类型");
             Add("log.mod_command.world_not_loaded", "未加载世界");
             Add("log.mod_command.no_waypoints", "当前 Fungame 未定义路径点");
+            Add("log.mod_command.exit_no_target", "请指定退出目标: none (原版) 或 tutorial (教程关)");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "正在加载自定义结构: {0}");
             Add("log.custom_structures_loader.failed", "加载自定义结构({0})失败: {1}");
             Add("log.custom_structures_loader.not_found", "未找到 {0}, 反射失败");
             Add("log.custom_structures_loader.not_found_custom_structures", "未找到自定义结构文件");
+            Add("log.custom_structures_loader.suppress.structure_loader_not_found", "未找到 StructureLoader 类型");
+            Add("log.custom_structures_loader.suppress.cleared_definitions", "已清除自定义结构注册表（StructureDefinitions），已抑制自动生成");
+            Add("log.custom_structures_loader.suppress.cleared_field", "已清除 {0}，已抑制 Custom Structures 自动生成");
+            Add("log.custom_structures_loader.suppress.no_registry", "找到 Custom Structures 模组但无可清除的结构注册表");
+            Add("log.custom_structures_loader.suppress.failed", "抑制 Custom Structures 自动生成失败: {0}");
 
             // Log - Build Mode Save Loader
             Add("log.build_mode_save_loader.loading", "正在加载 Build Mode 存档: {0} (方块: {1}, 液体: {2}, 背景: {3})");

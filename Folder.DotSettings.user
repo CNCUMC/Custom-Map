@@ -309,4 +309,5 @@
   &lt;Assembly Path="E:\MossProject\CasualtiesUnknown\Moss-Lib\bin\Debug\net472\MossLib.dll" /&gt;&#xD;
   &lt;Assembly Path="F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\plugins\BuildMod.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=bepinex/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=bepinex/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=buildmode/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

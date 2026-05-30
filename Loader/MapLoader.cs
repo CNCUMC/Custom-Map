@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace CustomFungamePack;
+namespace CustomFungamePack.Loader;
 
 public static class MapLoader
 {
@@ -535,7 +535,7 @@ public static class MapLoader
         Log.NewLine();
     }
 
-    public static void PickItems(Fungame fungame)
+    private static void PickItems(Fungame fungame)
     {
         var items = fungame.Items;
         foreach (var item in items)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BepInEx.Logging;
+using CustomFungamePack.Loader;
 using HarmonyLib;
 using MossLib.Tool;
 using UnityEngine;
@@ -31,6 +32,7 @@ public static class WorldGenerationPatch
 
             if (fungame.MapData != null)
             {
+                SuppressCustomStructuresForMapData();
                 WorldGeneration.biomeOverride = fungame.Type;
                 MoreLogs("scene_type_set", fungame.Type);
             }
@@ -44,15 +46,37 @@ public static class WorldGenerationPatch
             WorldGeneration.biomeOverride = ExitTargetScene.Value;
             MoreLogs("scene_type_set", ExitTargetScene.Value);
         }
-        else
+        else if (Configs.StartGameUseFungame)
         {
-            var fungame = FungameCheck.Fungames.FirstOrDefault();
+            Fungame fungame = null;
+
+            if (!string.IsNullOrEmpty(Configs.FirstUseFungame))
+            {
+                var targetId = Configs.FirstUseFungame;
+                fungame = FungameCheck.Fungames.FirstOrDefault(f =>
+                    f != null &&
+                    (f.Id?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true ||
+                     f.Name?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
+
+                if (fungame != null)
+                {
+                    Info("start_game_fungame", fungame.Name, fungame.Id);
+                }
+                else
+                {
+                    Warning("start_game_fungame_not_found", targetId);
+                }
+            }
+
+            fungame ??= FungameCheck.Fungames.FirstOrDefault();
+
             if (fungame != null)
             {
                 CurrentFungame = fungame;
 
                 if (fungame.MapData != null)
                 {
+                    SuppressCustomStructuresForMapData();
                     WorldGeneration.biomeOverride = fungame.Type;
                     MoreLogs("scene_type_set", fungame.Type);
                 }
@@ -67,6 +91,15 @@ public static class WorldGenerationPatch
                 SetDefaultSceneType(WorldGeneration);
             }
         }
+    }
+
+    /// <summary>
+    /// 当使用 MapData 类型 Fungame 时，抑制 Custom Structures 模组的自动生成，
+    /// 防止其在地图生成过程中随机放置自定义结构，干扰 MapData 的地图块。
+    /// </summary>
+    private static void SuppressCustomStructuresForMapData()
+    {
+        Loader.CustomStructuresLoader.SuppressAutoGeneration();
     }
 
     [HarmonyPatch("Update")]
@@ -138,16 +171,18 @@ public static class WorldGenerationPatch
         if (ExitTargetScene.HasValue)
         {
             ExitTargetScene = null;
-            Info("exited_to_vanilla");
+            Info("exited_fungame");
             return;
         }
 
-        var fungame = FungameCheck.CurrentFungame
-                      ?? FungameCheck.Fungames.FirstOrDefault();
+        var fungame = FungameCheck.CurrentFungame;
 
         if (fungame == null)
         {
-            Error("no_valid_directories");
+            if (FungameCheck.Fungames.Count > 0)
+                Warning("no_fungame_selected");
+            else
+                Error("no_valid_directories");
             return;
         }
 

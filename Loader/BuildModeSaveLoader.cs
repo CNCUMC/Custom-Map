@@ -5,7 +5,7 @@ using BepInEx.Logging;
 using MossLib.Tool;
 using UnityEngine;
 
-namespace CustomFungamePack;
+namespace CustomFungamePack.Loader;
 
 [BepInDependency(BuildModeGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public static class BuildModeSaveLoader

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
+using CustomFungamePack.Loader;
 using HarmonyLib;
 using MossLib.Base;
 using MossLib.Tool;
@@ -161,10 +162,16 @@ public class ModCommand : ModCommandBase
                 if (_cachedFungameIds.Count > 0)
                     contextList.AddRange(_cachedFungameIds);
                 break;
-            default:
-                contextList.AddRange(_cachedFeatureNames);
-                if (_cachedFungameIds.Count > 0)
+            case "waypoint":
+                contextList.AddRange(["list", "get", "help"]);
+                break;
+            case "save":
+                contextList.Add("as");
+                if (_cachedFungameIds is { Count: > 0 })
                     contextList.AddRange(_cachedFungameIds);
+                break;
+            case "exit":
+                contextList.AddRange(["tutorial", "none"]);
                 break;
         }
 
@@ -442,9 +449,10 @@ public class ModCommand : ModCommandBase
         }
 
         var directPath = Path.Combine(FungameCheck.FungamesPath, targetName);
-        return Directory.Exists(directPath)
-            ? directPath
-            : null;
+        if (!Directory.Exists(directPath))
+            Directory.CreateDirectory(directPath);
+
+        return directPath;
     }
 
     private const string DefaultVersion = "1.0.0";
@@ -649,28 +657,36 @@ public class ModCommand : ModCommandBase
     {
         if (!EnsureWorldLoaded()) return;
 
-        WorldGenerationPatch.ExitTargetScene = WorldGeneration.OverrideSceneType.None;
-
-        if (args.Length >= 3)
+        if (args.Length < 3)
         {
-            var target = args[2].ToLower();
-            switch (target)
-            {
-                case "tutorial":
-                    WorldGenerationPatch.ExitTargetScene = WorldGeneration.OverrideSceneType.Tutorial;
-                    break;
-                case "none":
-                    WorldGenerationPatch.ExitTargetScene = WorldGeneration.OverrideSceneType.None;
-                    break;
-                default:
-                    ErrorFungame("exit.invalid_target", target);
-                    WorldGenerationPatch.ExitTargetScene = null;
-                    return;
-            }
+            Error("exit_no_target");
+            return;
         }
 
+        var target = args[2].ToLower();
+
+        if (target != "tutorial" && target != "none")
+        {
+            ErrorFungame("exit.invalid_target", target);
+            return;
+        }
+
+        WorldGenerationPatch.ExitTargetScene = target switch
+        {
+            "tutorial" => WorldGeneration.OverrideSceneType.Tutorial,
+            "none" => WorldGeneration.OverrideSceneType.None,
+            _ => null
+        };
+
         WorldGenerationPatch.CurrentFungame = null;
-        InfoFungame("exit", WorldGenerationPatch.ExitTargetScene.Value);
+
+        var targetName = target switch
+        {
+            "tutorial" => Fungame("exit.target.tutorial"),
+            "none" => Fungame("exit.target.none"),
+            _ => target
+        };
+        InfoFungame("exiting", targetName);
 
         var currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
