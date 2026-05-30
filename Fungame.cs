@@ -95,6 +95,7 @@ public class Feature
     [JsonProperty("mine")] public MineData MineData { get; set; }
     [JsonProperty("jumppad")] public JumpPadData JumpPadData { get; set; }
     [JsonProperty("turret")] public TurretData TurretData { get; set; }
+    [JsonProperty("sound_cannon")] public SoundCannonData SoundCannonData { get; set; }
 }
 
 [UsedImplicitly]
@@ -115,6 +116,14 @@ public class TurretData
     [JsonProperty("no_light")] public bool NoLight { get; set; }
     [JsonProperty("explosion_params")]
     public ExplosionParamsData ExplosionParamsData { get; set; }
+}
+
+[UsedImplicitly]
+public class SoundCannonData
+{
+    [JsonProperty("max_distance")] public float MaxDistance { get; set; } = 50f;
+    [JsonProperty("charge_time")] public float ChargeTime { get; set; } = 5f;
+    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
 }
 
 [UsedImplicitly]

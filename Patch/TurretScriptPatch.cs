@@ -31,7 +31,7 @@ public class TurretScriptPatch
 
         foreach (var instruction in instructions)
         {
-            if (instruction.opcode == OpCodes.Ldc_R4 && (float)instruction.operand == 15.0f)
+            if (instruction.opcode == OpCodes.Ldc_R4 && Mathf.Approximately((float)instruction.operand, 15f))
             {
                 yield return new CodeInstruction(OpCodes.Call, getCooldownMethod);
             }
