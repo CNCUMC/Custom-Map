@@ -23,8 +23,13 @@ public class ModCommand : ModCommandBase
         typeof(Feature).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
     private static bool _autofillRegistered;
-    private static List<string> _cachedFeatureNames = new();
-    private static List<string> _cachedFungameNames = new();
+    private static List<string> _cachedFeatureNames = [];
+    private static List<string> _cachedFungameIds = [];
+
+    // Pending interactive save state (fg save as / fg save as XXX)
+    private static Vector2? _pendingSaveStart;
+    private static Vector2? _pendingSaveEnd;
+    private static string _pendingSaveTargetPath;
 
     [HarmonyPatch("RegisterAllCommands")]
     [HarmonyPostfix]
@@ -94,9 +99,9 @@ public class ModCommand : ModCommandBase
         if (targetCommands.Count == 0)
             return;
 
-        var fungameNames = FungameCheck.Fungames?
+        var fungameIds = FungameCheck.Fungames?
             .Where(f => f != null)
-            .Select(f => f.Name)
+            .Select(f => f.Id)
             .Where(name => !string.IsNullOrEmpty(name))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -107,32 +112,15 @@ public class ModCommand : ModCommandBase
             .ToList();
 
         _cachedFeatureNames = featureNames;
-        _cachedFungameNames = fungameNames ?? new List<string>();
+        _cachedFungameIds = fungameIds ?? [];
 
-        if ((fungameNames is not { Count: > 0 }) && featureNames.Count == 0)
+        if (fungameIds is not { Count: > 0 } && featureNames.Count == 0)
         {
-            _autofillRegistered = true;
-            return;
-        }
-
-        foreach (var cmd in targetCommands)
-        {
-            if (featureNames.Count > 0 || fungameNames is { Count: > 0 })
-            {
-                if (!cmd.argAutofill.ContainsKey(1))
-                    cmd.argAutofill[1] = new List<string>();
-
-                if (featureNames.Count > 0)
-                    cmd.argAutofill[1].AddRange(featureNames);
-
-                if (fungameNames is { Count: > 0 })
-                    cmd.argAutofill[1].AddRange(fungameNames);
-            }
         }
 
         _autofillRegistered = true;
     }
-
+    
     [HarmonyPatch("HandleDescriptionText")]
     [HarmonyPrefix]
     private static void PreHandleDescriptionText(string[] args)
@@ -174,13 +162,13 @@ public class ModCommand : ModCommandBase
                 break;
             case "select":
             case "list":
-                if (_cachedFungameNames.Count > 0)
-                    contextList.AddRange(_cachedFungameNames);
+                if (_cachedFungameIds.Count > 0)
+                    contextList.AddRange(_cachedFungameIds);
                 break;
             default:
                 contextList.AddRange(_cachedFeatureNames);
-                if (_cachedFungameNames.Count > 0)
-                    contextList.AddRange(_cachedFungameNames);
+                if (_cachedFungameIds.Count > 0)
+                    contextList.AddRange(_cachedFungameIds);
                 break;
         }
 
@@ -375,18 +363,19 @@ public class ModCommand : ModCommandBase
 
     private static string ResolveTargetPath(string targetName)
     {
-        foreach (var dir in FungameCheck.ValidDirectories)
+        foreach (var dir in
+                 from dir in FungameCheck.ValidDirectories
+                 let folderName = Path.GetFileName(dir)
+                 where string.Equals(folderName, targetName, StringComparison.OrdinalIgnoreCase)
+                 select dir)
         {
-            var folderName = Path.GetFileName(dir);
-            if (string.Equals(folderName, targetName, StringComparison.OrdinalIgnoreCase))
-                return dir;
+            return dir;
         }
 
         var directPath = Path.Combine(FungameCheck.FungamesPath, targetName);
-        if (Directory.Exists(directPath))
-            return directPath;
-
-        return null;
+        return Directory.Exists(directPath)
+            ? directPath
+            : null;
     }
 
     private static Fungame LoadOrCreateDefaultFungame(string targetPath)
@@ -406,6 +395,7 @@ public class ModCommand : ModCommandBase
             }
             catch
             {
+                // ignored
             }
         }
 
@@ -692,22 +682,7 @@ public class ModCommand : ModCommandBase
 
         Log.Divider();
     }
-
-    private static void GetFeature(Feature feature, string featureName)
-    {
-        var prop = FindFeatureProperty(featureName);
-
-        if (prop == null)
-        {
-            ErrorFungame("feature.not_found", featureName);
-            return;
-        }
-
-        var value = prop.GetValue(feature);
-        var displayName = GetFeatureDisplayName(prop.Name);
-        InfoFungame("feature.get_success", $"{displayName} ({prop.Name})", value);
-    }
-
+    
     private static void SetFeature(Feature feature, string featureName, string valueStr)
     {
         var prop = FindFeatureProperty(featureName);
@@ -760,37 +735,14 @@ public class ModCommand : ModCommandBase
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        var localeKey = $"feature.{ConvertToSnakeCase(fieldName)}";
+        var localeKey = $"feature.{fieldName.ToLower()}";
         var localized = ModLocale.GetFormat(localeKey);
 
         return localized.StartsWith("feature.", StringComparison.Ordinal)
             ? fieldName
             : localized;
     }
-
-    private static string ConvertToSnakeCase(string input)
-    {
-        if (string.IsNullOrEmpty(input)) return input;
-
-        var result = new System.Text.StringBuilder();
-        result.Append(char.ToLower(input[0]));
-
-        for (int i = 1; i < input.Length; i++)
-        {
-            if (char.IsUpper(input[i]))
-            {
-                result.Append('_');
-                result.Append(char.ToLower(input[i]));
-            }
-            else
-            {
-                result.Append(input[i]);
-            }
-        }
-
-        return result.ToString();
-    }
-
+    
     private static bool EnsureWorldLoaded()
     {
         if (HasWorldLoaded()) return true;

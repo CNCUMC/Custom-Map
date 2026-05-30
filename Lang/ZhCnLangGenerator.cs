@@ -82,6 +82,9 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.area_success", "已保存区域物块地图: ({0},{1}) 到 ({2},{3}), 尺寸 {4}x{5}, {6} 种物块类型 → {7}");
             Add("command.fungame.save.target_not_found", "目标 Fungame 文件夹 '{0}' 未找到");
             Add("command.fungame.save.missing_end_coord", "缺少结束坐标，请提供两个坐标参数 (例如: fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.start_coordinates", "请鼠标左键点击选择起始坐标...");
+            Add("command.fungame.save.as.end_coordinates", "请鼠标左键点击选择结束坐标...");
+            Add("command.fungame.save.as.confirm", "坐标已记录，再次输入相同指令以确认保存。");
 
             // Command - Fungame - Feature
             Add("command.fungame.feature.help",

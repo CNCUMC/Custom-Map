@@ -87,6 +87,9 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.save.target_not_found", "Target Fungame folder '{0}' not found");
             Add("command.fungame.save.missing_end_coord",
                 "Missing end coordinate, please provide both coordinates (e.g. fg save 86,-11 2,45)");
+            Add("command.fungame.save.as.start_coordinates", "Left-click to select the start coordinate...");
+            Add("command.fungame.save.as.end_coordinates", "Left-click to select the end coordinate...");
+            Add("command.fungame.save.as.confirm", "Coordinates recorded. Re-enter the same command to confirm and save.");
 
             // Command - Fungame - Feature
             Add("command.fungame.feature.help", "Feature subcommands:\n  " +
