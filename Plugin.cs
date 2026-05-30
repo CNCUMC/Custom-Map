@@ -3,6 +3,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using CustomFungamePack.Lang;
 using HarmonyLib;
+using MossLib.Constant;
 using MossLib.Tool;
 
 namespace CustomFungamePack;
@@ -118,6 +119,10 @@ public class Plugin : BaseUnityPlugin
                 Undestroy = true,
                 NoLight = true,
                 Cooldown = 3
+            },
+            GeyserData = new GeyserData
+            {
+                Cooldown = 1
             }
         },
         MapData = new MapData
@@ -162,28 +167,28 @@ public class Plugin : BaseUnityPlugin
                 "11                                                                                                                                    11",
                 "11                                                                                                                                    11",
                 "11                                                                                                                                    11",
+                "11                                                                                                                   1111111111111111111",
+                "11                                                                                                                   1111111111111111111",
+                "11                                                                                                                   11               11",
+                "11                                                                                                                   11               11",
                 "11                                                                                                                                    11",
                 "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                         7  7  7  7 11",
+                "11                                                                                                                      7 7 7 7 7 7 7 11",
                 "11                                                                                                             11    1111111111111111111",
                 "11                                                                                                             11    1111111111111111111",
                 "11                                                                                                             11    115             511",
-                "11                                                                                                             11    11               11",
-                "11                                                                                                             11    115             511",
-                "11                                                                                                             11    11               11",
-                "11                                                                                                             11                     11",
-                "11                                                                                                             11                     11",
-                "11                                                                                                             11          1111111111111",
-                "11                                                                                                             11          1111111111111",
-                "11                                                                                                             11          11         11",
-                "11                                                                                                             11          11         11",
-                "11                                                                                                             11          11         11",
-                "11                                                                                                                   11111111         11",
-                "11                                                                                                                   11111111         11",
+                "11                                                                                                  1111111111111    11               11",
+                "11                                                                                                  1111111111111    115             511",
+                "11                                                                                                  11                                11",
+                "11                                                                                                  119 9 9 9 9 9                     11",
+                "11                                                                                                  11                                11",
+                "11                                                                                                  119 9 9 9 911          1111111111111",
+                "11                                                                                                  11         11          1111111111111",
+                "11                                                                                                  119 9 9 9 911          11         11",
+                "11                                                                                                  11         11          11         11",
+                "11                                                                                                  11 89 9 9 911          11         11",
+                "11                                                                                                  1111111111111    11111111         11",
+                "11                                                                                                  1111111111111    11111111         11",
                 "11                                                                                                                                    11",
                 "11                                                                                                                                    11",
                 "11 6                                                                                                                                  11",
@@ -200,7 +205,9 @@ public class Plugin : BaseUnityPlugin
                 { "4", "jumppad" },
                 { "5", "turret" },
                 { "6", "soundcannon" },
-                { "7", "spikestabber" }
+                { "7", "spikestabber" },
+                { "8", "geyser" },
+                { "9", "lifepodpump" },
             }
         },
         Items =

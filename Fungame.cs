@@ -97,6 +97,7 @@ public class Feature
     [JsonProperty("turret")] public TurretData TurretData { get; set; }
     [JsonProperty("sound_cannon")] public SoundCannonData SoundCannonData { get; set; }
     [JsonProperty("spike_stabber")] public SpikeStabberData SpikeStabberData { get; set; }
+    [JsonProperty("geyser")] public GeyserData GeyserData { get; set; }
 }
 
 [UsedImplicitly]
@@ -135,6 +136,16 @@ public class SpikeStabberData
     [JsonProperty("no_light")] public bool NoLight { get; set; }
     [JsonProperty("sound")] public string Sound { get; set; }
     [JsonProperty("cooldown")] public float Cooldown { get; set; } = 5f;
+}
+
+[UsedImplicitly]
+public class GeyserData
+{
+    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 10f;
+    [JsonProperty("activate_duration")] public float ActivateDuration { get; set; } = 4.5f;
+    [JsonProperty("rumble_time")] public float RumbleTime { get; set; } = 1f;
+    [JsonProperty("range")] public float Range { get; set; } = 64f;
+    [JsonProperty("no_liquid")] public bool NoLiquid { get; set; }
 }
 
 [UsedImplicitly]
