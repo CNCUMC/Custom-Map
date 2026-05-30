@@ -10,13 +10,27 @@ namespace CustomFungamePack.Lang
         {
             // Feature
             Add("feature.fullbright", "Fullbright");
-            Add("feature.forgivinglevel", "Forgiving Level");
+            Add("feature.forgiving_level", "Forgiving Level");
             Add("feature.gravity", "Gravity");
-            Add("feature.skipterrain", "Skip Terrain");
-            Add("feature.skipstructures", "Skip Structures");
-            Add("feature.skipbackground", "Skip Background");
-            Add("feature.jumplimit", "Jump Limit");
-            Add("feature.climblimit", "Climb Limit");
+            Add("feature.jump_limit", "Jump Limit");
+            Add("feature.climb_limit", "Climb Limit");
+            Add("feature.mine", "Mine");
+            Add("feature.jump_pad", "Jump Pad");
+            Add("feature.turret", "Turret");
+            Add("feature.sound_cannon", "Sound Cannon");
+            Add("feature.spike_stabber", "Spike Stabber");
+            Add("feature.geyser", "Geyser");
+            Add("feature.beartrap", "Bear Trap");
+            Add("feature.turret", "Turret");
+            Add("feature.turretdata", "Turret");
+            Add("feature.sound_cannon", "Sound Cannon");
+            Add("feature.soundcannondata", "Sound Cannon");
+            Add("feature.spike_stabber", "Spike Stabber");
+            Add("feature.spikestabberdata", "Spike Stabber");
+            Add("feature.geyser", "Geyser");
+            Add("feature.geyserdata", "Geyser");
+            Add("feature.beartrap", "Bear Trap");
+            Add("feature.beartrapdata", "Bear Trap");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame related commands");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -61,7 +62,15 @@ public class Fungame
     [JsonIgnore]
     public string Features => Feature != null
         ? string.Join(", ", typeof(Feature).GetProperties().Select(prop =>
-            $"{prop.Name}={prop.GetValue(Feature)}"))
+        {
+            var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
+            var name = jsonAttr?.PropertyName ?? prop.Name;
+            var value = prop.GetValue(Feature);
+            var displayValue = value is not null and not string
+                ? value.ToString()
+                : value ?? "null";
+            return $"{name}={displayValue}";
+        }))
         : "None";
 
     [JsonIgnore]
@@ -87,18 +96,18 @@ public class MapData
 [UsedImplicitly]
 public class Feature
 {
-    public bool Fullbright { get; set; } = true;
-    public bool ForgivingLevel { get; set; }
-    public float Gravity { get; set; } = Physics2D.gravity.y;
-    public int JumpLimit { get; set; } = 0;
-    public int ClimbLimit { get; set; } = 0;
+    [JsonProperty("fullbright")]public bool Fullbright { get; set; } = true;
+    [JsonProperty("forgiving_level")]public bool ForgivingLevel { get; set; }
+    [JsonProperty("gravity")]public float Gravity { get; set; } = Physics2D.gravity.y;
+    [JsonProperty("jump_limit")]public int JumpLimit { get; set; } = 0;
+    [JsonProperty("climb_limit")]public int ClimbLimit { get; set; } = 0;
     [JsonProperty("mine")] public MineData MineData { get; set; }
-    [JsonProperty("jumppad")] public JumpPadData JumpPadData { get; set; }
+    [JsonProperty("jump_pad")] public JumpPadData JumpPadData { get; set; }
     [JsonProperty("turret")] public TurretData TurretData { get; set; }
     [JsonProperty("sound_cannon")] public SoundCannonData SoundCannonData { get; set; }
     [JsonProperty("spike_stabber")] public SpikeStabberData SpikeStabberData { get; set; }
     [JsonProperty("geyser")] public GeyserData GeyserData { get; set; }
-    [JsonProperty("bear_trap")] public BearTrapData BearTrapData { get; set; }
+    [JsonProperty("beartrap")] public BearTrapData BearTrapData { get; set; }
 }
 
 [UsedImplicitly]
@@ -113,12 +122,14 @@ public class JumpPadData
 public class TurretData
 {
     [JsonProperty("cooldown")] public float Cooldown { get; set; } = 15f;
-    [JsonProperty("shot_power_multiplier")] public float ShotPowerMultiplier { get; set; } = 1f;
+
+    [JsonProperty("shot_power_multiplier")]
+    public float ShotPowerMultiplier { get; set; } = 1f;
+
     [JsonProperty("range")] public float Range { get; set; } = 100f;
     [JsonProperty("undestroy")] public bool Undestroy { get; set; }
     [JsonProperty("no_light")] public bool NoLight { get; set; }
-    [JsonProperty("explosion_params")]
-    public ExplosionParamsData ExplosionParamsData { get; set; }
+    [JsonProperty("explosion_params")] public ExplosionParamsData ExplosionParamsData { get; set; }
 }
 
 [UsedImplicitly]
@@ -161,8 +172,9 @@ public class BearTrapData
 public class MineData
 {
     [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-    [JsonProperty("explosion_params_data")]
-    public ExplosionParamsData ExplosionParamsData { get; set; }
+
+    [JsonProperty("explosion_params")] public ExplosionParamsData ExplosionParamsData { get; set; }
+
     [JsonProperty("cooldown")] public float Cooldown { get; set; } = 0.8f;
 }
 

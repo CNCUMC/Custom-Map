@@ -882,11 +882,17 @@ public class ModCommand : ModCommandBase
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        var localeKey = $"feature.{fieldName.ToLower()}";
+        // Try to get the JsonProperty name for better locale key matching
+        var prop = typeof(Feature).GetProperty(fieldName);
+        var jsonName = prop?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName;
+        var localeKey = jsonName != null
+            ? $"feature.{jsonName}"
+            : $"feature.{fieldName.ToLower()}";
+
         var localized = ModLocale.GetFormat(localeKey);
 
         return localized.StartsWith("feature.", StringComparison.Ordinal)
-            ? fieldName
+            ? jsonName ?? fieldName
             : localized;
     }
 

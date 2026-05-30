@@ -12,11 +12,15 @@ namespace CustomFungamePack.Lang
             Add("feature.fullbright", "全亮");
             Add("feature.forgivinglevel", "仁慈關卡");
             Add("feature.gravity", "重力");
-            Add("feature.skipterrain", "跳過地形");
-            Add("feature.skipstructures", "跳過結構");
-            Add("feature.skipbackground", "跳過背景");
             Add("feature.jumplimit", "跳躍極限");
             Add("feature.climblimit", "攀爬極限");
+            Add("feature.mine", "地雷");
+            Add("feature.jump_pad", "彈跳板");
+            Add("feature.turret", "炮塔");
+            Add("feature.sound_cannon", "音波炮");
+            Add("feature.spike_stabber", "尖刺陷阱");
+            Add("feature.geyser", "間歇泉");
+            Add("feature.beartrap", "捕獸夾");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame 的相關指令");
