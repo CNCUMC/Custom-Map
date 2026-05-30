@@ -92,8 +92,18 @@ public class Feature
     public float Gravity { get; set; } = Physics2D.gravity.y;
     public int JumpLimit { get; set; } = 0;
     public int ClimbLimit { get; set; } = 0;
-    public bool MineUndestroy { get; set; }
-    public ExplosionParamsData MineExplosionParamsData { get; set; }
+    [JsonProperty("mine_data")] public MineData MineData { get; set; }
+}
+
+[UsedImplicitly]
+public class MineData
+{
+    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
+
+    [JsonProperty("explosion_params_data")]
+    public ExplosionParamsData ExplosionParamsData { get; set; }
+
+    [JsonProperty("explosion_delay")] public float ExplosionDelay { get; set; } = 0.8f;
 }
 
 [UsedImplicitly]
