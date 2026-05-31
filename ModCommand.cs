@@ -790,28 +790,18 @@ public class ModCommand : ModCommandBase
             return;
         }
 
-        if (args.Length < 3)
+        switch (args.Length)
         {
-            InfoFungame("feature.help");
-            ListFeatures(fungame.Feature);
-            return;
-        }
-
-        var subCommand = args[2].ToLower();
-
-        if (args.Length < 5)
-        {
-            if (args.Length < 4)
-            {
-                InfoFungame("feature.set_missing_params");
+            case < 3:
+                InfoFungame("help");
+                ListFeatures(fungame.Feature);
                 return;
-            }
-
-            SetFeature(fungame.Feature, args[2], args[3]);
-        }
-        else
-        {
-            InfoFungame("feature.unknown_subcommand", subCommand);
+            case >= 4:
+                SetFeature(fungame.Feature, args[2], args[3]);
+                break;
+            default:
+                InfoFungame("feature.set_missing_params");
+                break;
         }
     }
 
@@ -823,18 +813,54 @@ public class ModCommand : ModCommandBase
         foreach (var prop in FeatureProperties)
         {
             var value = prop.GetValue(feature);
-            var displayName = GetFeatureDisplayName(prop.Name);
-            InfoFungame("feature.item", $"{displayName} ({prop.Name})", value);
+            var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
+            var displayName = Locale($"feature.{GetFeatureDisplayName(prop.Name)}");
+
+            if (value != null && !IsSimpleType(prop.PropertyType))
+            {
+                InfoFungame("feature.item", displayName, jsonName);
+                foreach (var subProp in prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!IsSimpleType(subProp.PropertyType)) continue;
+                    var subValue = subProp.GetValue(value);
+                    var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
+                    var subDisplay = Locale($"feature.{GetFeatureDisplayName($"{jsonName}.{subJson}")}");
+                    InfoFungame("feature.sub_item", subDisplay, subJson, subValue);
+                }
+            }
+            else
+            {
+                InfoFungame("feature.item", $"  {displayName} ({jsonName})", value);
+            }
         }
 
         Log.Divider();
     }
 
+    private static bool IsSimpleType(Type type)
+    {
+        return type.IsPrimitive || type == typeof(string) || type == typeof(decimal)
+               || type == typeof(float) || type == typeof(double) || type == typeof(bool);
+    }
+    
+    // todo: 没搞好c
+
     private static void SetFeature(Feature feature, string featureName, string valueStr)
     {
-        var prop = FindFeatureProperty(featureName);
+        var parts = featureName.Split('.');
+        object target = feature;
+        PropertyInfo targetProp = null;
 
-        if (prop == null)
+        foreach (var part in parts)
+        {
+            if (target == null) break;
+            targetProp = FindNestedProperty(target.GetType(), part);
+            if (targetProp == null) break;
+            if (part != parts.Last())
+                target = targetProp.GetValue(target);
+        }
+
+        if (targetProp == null)
         {
             ErrorFungame("feature.not_found", featureName);
             return;
@@ -842,13 +868,10 @@ public class ModCommand : ModCommandBase
 
         try
         {
-            var convertedValue = Convert.ChangeType(valueStr, prop.PropertyType);
-            prop.SetValue(feature, convertedValue);
-
-            ApplyFeatureSideEffects(prop, convertedValue);
-
-            var displayName = GetFeatureDisplayName(prop.Name);
-            InfoFungame("feature.set_success", $"{displayName} ({prop.Name})", convertedValue);
+            var convertedValue = Convert.ChangeType(valueStr, targetProp.PropertyType);
+            targetProp.SetValue(target, convertedValue);
+            var displayName = GetFeatureDisplayName(featureName);
+            InfoFungame("feature.set_success", $"{displayName} ({featureName})", convertedValue);
         }
         catch (Exception)
         {
@@ -856,24 +879,15 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    private static void ApplyFeatureSideEffects(PropertyInfo prop, object value)
+    private static PropertyInfo FindNestedProperty(Type type, string name)
     {
-        if (prop.PropertyType == typeof(float)
-            && prop.Name.Equals("Gravity", StringComparison.OrdinalIgnoreCase))
+        foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
-            Physics2D.gravity = new Vector2(0, (float)value);
-        }
-    }
-
-    private static PropertyInfo FindFeatureProperty(string featureName)
-    {
-        foreach (var prop in FeatureProperties)
-        {
-            if (prop.Name.Equals(featureName, StringComparison.OrdinalIgnoreCase))
+            if (prop.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 return prop;
-
-            var displayName = GetFeatureDisplayName(prop.Name);
-            if (displayName.Equals(featureName, StringComparison.OrdinalIgnoreCase))
+            var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
+            if (jsonAttr?.PropertyName != null &&
+                jsonAttr.PropertyName.Equals(name, StringComparison.OrdinalIgnoreCase))
                 return prop;
         }
 
@@ -882,18 +896,55 @@ public class ModCommand : ModCommandBase
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        // Try to get the JsonProperty name for better locale key matching
-        var prop = typeof(Feature).GetProperty(fieldName);
-        var jsonName = prop?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName;
-        var localeKey = jsonName != null
-            ? $"feature.{jsonName}"
-            : $"feature.{fieldName.ToLower()}";
+        if (string.IsNullOrEmpty(fieldName))
+            return fieldName;
 
-        var localized = ModLocale.GetFormat(localeKey);
+        var parts = fieldName.Split('.');
+        string result;
 
-        return localized.StartsWith("feature.", StringComparison.Ordinal)
-            ? jsonName ?? fieldName
-            : localized;
+        if (parts.Length >= 2)
+        {
+            // 两层或更多（只处理前两层）
+            var parentProp = typeof(Feature).GetProperties()
+                .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
+                    .Equals(parts[0], StringComparison.OrdinalIgnoreCase));
+
+            if (parentProp != null)
+            {
+                var parentJson = parentProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ??
+                                 parentProp.Name;
+                var subProp = parentProp.PropertyType.GetProperties()
+                    .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
+                        .Equals(parts[1], StringComparison.OrdinalIgnoreCase));
+                var subJson = subProp?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? parts[1];
+                result = $"{parentJson}.{subJson}";
+            }
+            else
+            {
+                // 父属性不存在，整体回退为小写加下划线
+                result = fieldName.ToLower().Replace(".", "_");
+            }
+        }
+        else
+        {
+            // 单段字段
+            var prop = typeof(Feature).GetProperty(fieldName,
+                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            if (prop != null)
+            {
+                var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name.ToLower();
+                // 判断属性类型名称是否以 "Data" 结尾
+                bool isDataClass = prop.PropertyType.Name.EndsWith("Data", StringComparison.Ordinal);
+                result = isDataClass ? $"{jsonName}_data" : jsonName;
+            }
+            else
+            {
+                // 属性不存在，回退为字段名本身（小写）
+                result = fieldName.ToLower();
+            }
+        }
+
+        return result;
     }
 
     private static bool EnsureWorldLoaded()
@@ -907,7 +958,7 @@ public class ModCommand : ModCommandBase
     {
         try
         {
-            return WorldGeneration.world != null && !WorldGeneration.world.generatingWorld;
+            return WorldGeneration.world && !WorldGeneration.world.generatingWorld;
         }
         catch
         {

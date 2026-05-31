@@ -10,29 +10,52 @@ namespace CustomFungamePack.Lang
         {
             // Feature
             Add("feature.fullbright", "全亮");
-            Add("feature.forgivinglevel", "仁慈关卡");
+            Add("feature.forgiving_level", "仁慈关卡");
             Add("feature.gravity", "重力");
-            Add("feature.jumplimit", "跳跃极限");
-            Add("feature.climblimit", "攀爬极限");
-            Add("feature.mine", "地雷");
-            Add("feature.jump_pad", "弹跳板");
-            Add("feature.turret", "炮塔");
-            Add("feature.sound_cannon", "音波炮");
-            Add("feature.spike_stabber", "尖刺陷阱");
-            Add("feature.geyser", "间歇泉");
-            Add("feature.beartrap", "捕兽夹");
-            Add("feature.spikestabberdata", "尖刺陷阱");
-            Add("feature.geyser", "间歇泉");
-            Add("feature.geyserdata", "间歇泉");
-            Add("feature.beartrap", "捕兽夹");
-            Add("feature.beartrapdata", "捕兽夹");
+            Add("feature.jump_limit", "跳跃极限");
+            Add("feature.climb_limit", "攀爬极限");
+            Add("feature.mine_data", "地雷");
+            Add("feature.jump_pad_data", "弹跳板");
+            Add("feature.turret_data", "炮塔");
+            Add("feature.sound_cannon_data", "音波炮");
+            Add("feature.spike_stabber_data", "尖刺陷阱");
+            Add("feature.geyser_data", "间歇泉");
+            Add("feature.beartrap_data", "捕兽夹");
+
+            // Feature - 子属性（短名称，父级上下文由标题显示）
+            Add("feature.mine.undestroy", "不毁");
+            Add("feature.mine.cooldown", "冷却");
+            Add("feature.jump_pad.cooldown", "冷却");
+            Add("feature.jump_pad.force", "力度");
+            Add("feature.jump_pad.no_light", "无光");
+            Add("feature.turret.cooldown", "冷却");
+            Add("feature.turret.shot_power_multiplier", "射击力度");
+            Add("feature.turret.undestroy", "不毁");
+            Add("feature.turret.no_light", "无光");
+            Add("feature.turret.range", "范围");
+            Add("feature.sound_cannon.cooldown", "冷却");
+            Add("feature.sound_cannon.max_distance", "范围");
+            Add("feature.sound_cannon.charge_time", "充能时间");
+            Add("feature.sound_cannon.undestroy", "不毁");
+            Add("feature.spike_stabber.damage_mult", "伤害倍率");
+            Add("feature.spike_stabber.undestroy", "不毁");
+            Add("feature.spike_stabber.cooldown", "冷却");
+            Add("feature.spike_stabber.no_light", "无光");
+            Add("feature.spike_stabber.sound", "音效");
+            Add("feature.geyser.cooldown", "冷却");
+            Add("feature.geyser.activate_duration", "喷发时长");
+            Add("feature.geyser.no_liquid", "无液体");
+            Add("feature.geyser.rumble_time", "震动时长");
+            Add("feature.geyser.range", "触发范围");
+            Add("feature.beartrap.damage_mult", "伤害倍率");
+            Add("feature.beartrap.undestroy", "不毁");
+            Add("feature.beartrap.cooldown", "冷却");
 
             // Command - Fungame
             Add("command.fungame.description", "Fungame 的相关指令");
             Add("command.fungame.string", "选择功能");
             Add("command.fungame.parameter", "功能参数");
-            Add("command.fungame.help",
-                "可用子命令:\n  " +
+            Add("command.fungame.help", "可用子命令:\n  " +
                 "reload  - 重新加载当前地图\n  " +
                 "info    - 显示地图信息\n  " +
                 "spawn   - 传送回出生点\n  " +
@@ -103,14 +126,15 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.unknown_subcommand", "未知的特性子命令：{0}");
             Add("command.fungame.feature.set_missing_params", "请指定特性名称和值来设置");
             Add("command.fungame.feature.list_header", "当前特性设置：");
-            Add("command.fungame.feature.item", "  {0}: {1}");
+            Add("command.fungame.feature.item", "{0}: {1}");
+            Add("command.fungame.feature.sub_item", "      {0}({1}): {2}");
             Add("command.fungame.feature.get_success", "特性 '{0}' = {1}");
             Add("command.fungame.feature.set_success", "特性 '{0}' 已设置为 {1}");
             Add("command.fungame.feature.not_found", "未找到特性：{0}");
             Add("command.fungame.feature.invalid_value", "{0} 的值无效：{1}");
 
             // Log - Fungame Check
-            Add("log.fungame_check.id_format_warning", "ID格式不正确，将自动修正"); 
+            Add("log.fungame_check.id_format_warning", "ID格式不正确，将自动修正");
             Add("log.fungame_check.author_not_string", "作者元素 {0} 不是字符串，已移除");
             Add("log.fungame_check.author_empty", "作者数组为空，已设置默认值");
             Add("log.fungame_check.version_format_warning", "版本格式'{0}'不正确，将使用默认版本'1.0.0'");
@@ -125,8 +149,7 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.initializing_world", "初始化Fungame地图...");
             Add("log.world_generation.loading_fungame_map", "正在加载Fungame地图: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} 不包含地图数据");
-            Add("log.world_generation.no_content_type",
-                "Fungame '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
+            Add("log.world_generation.no_content_type", "Fungame '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
             Add("log.world_generation.no_commands", "未启用任何 {0}");
             Add("log.world_generation.exited_fungame", "已退出 Fungame");
             Add("log.world_generation.executing_command", "执行 {0}: '{1}'");
@@ -143,11 +166,9 @@ namespace CustomFungamePack.Lang
             Add("log.validation.map_row_not_string", "地图 map 第 {0} 行必须是字符串");
             Add("log.validation.map_item_row_not_array", "地图 items 第 {0} 行必须是数组");
             Add("log.validation.map_item_not_string", "地图 items[{0}][{1}] 必须是字符串");
-            Add("log.validation.multiple_content_types",
-                "不能同时使用多种内容类型（map_data、custom_structures、build_mode_save），只能选择一种");
+            Add("log.validation.multiple_content_types", "不能同时使用多种内容类型（map_data、custom_structures、build_mode_save），只能选择一种");
             Add("log.validation.missing_content_type", "缺少内容类型（map_data、custom_structures 或 build_mode_save）");
-            Add("log.validation.custom_structures_without_mod",
-                "检测到 custom_structures 字段，但未安装自定义结构模组（Custom Structures），请先安装该模组");
+            Add("log.validation.custom_structures_without_mod", "检测到 custom_structures 字段，但未安装自定义结构模组（Custom Structures），请先安装该模组");
             Add("log.validation.features_invalid_type", "features 字段必须是数组或对象");
             Add("log.validation.features_empty", "features 数组为空，将被忽略");
             Add("log.validation.features_element_invalid", "features 第 {0} 个元素格式不正确，已跳过");
@@ -191,8 +212,7 @@ namespace CustomFungamePack.Lang
             Add("log.error.no_fungame_file", "找不到 fungame.json 文件: {0}");
             Add("log.error.no_valid_directories", "没有有效的 Fungame 目录，请检查 Fungames 文件夹");
             Add("log.error.custom_structures_mod_not_loaded", "Fungame '{0}' 需要自定义结构模组，但该模组未加载");
-            Add("log.error.multiple_content_types",
-                "Fungame '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
+            Add("log.error.multiple_content_types", "Fungame '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
 
             // Log - Fungame Load
             Add("log.fungame_load.empty_target_path", "目标路径不能为空");
