@@ -22,7 +22,7 @@ namespace CustomFungamePack.Lang
             Add("feature.geyser_data", "間歇泉");
             Add("feature.beartrap_data", "捕獸夾");
 
-            // Feature - 子屬性（短名稱，父級上下文由標題顯示）
+            // Feature - 子屬性
             Add("feature.mine.undestroy", "不毀");
             Add("feature.mine.cooldown", "冷卻");
             Add("feature.jump_pad.cooldown", "冷卻");
@@ -126,8 +126,8 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.unknown_subcommand", "未知的特性子命令：{0}");
             Add("command.fungame.feature.set_missing_params", "請指定特性名稱和值來設置");
             Add("command.fungame.feature.list_header", "當前特性設置：");
-            Add("command.fungame.feature.item", "  {0}: {1}");
-            Add("command.fungame.feature.sub_item", "      {0}({1}): {2}");
+            Add("command.fungame.feature.item", "    {0}({1}): {2}");
+            Add("command.fungame.feature.parent_item", "    {0}({1}):");
             Add("command.fungame.feature.get_success", "特性 '{0}' = {1}");
             Add("command.fungame.feature.set_success", "特性 '{0}' 已設置為 {1}");
             Add("command.fungame.feature.not_found", "未找到特性：{0}");

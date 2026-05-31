@@ -153,6 +153,15 @@ public class ModCommand : ModCommandBase
         var contextList = new List<string>();
         string subcommand = args[1].ToLower();
 
+        for (int i = 0; i < _cachedFeatureNames.Count; i++)
+        {
+            string name = _cachedFeatureNames[i];
+            if (name.EndsWith("data"))
+            {
+                _cachedFeatureNames[i] = name.Substring(0, name.Length - 4);
+            }
+        }
+
         switch (subcommand)
         {
             case "feature":
@@ -695,11 +704,12 @@ public class ModCommand : ModCommandBase
 
     private static string EncodeBlockIndex(int index)
     {
-        if (index < 10)
-            return ((char)('0' + index)).ToString();
-        if (index < 36)
-            return ((char)('a' + index - 10)).ToString();
-        return ((char)('A' + index - 36)).ToString();
+        return index switch
+        {
+            < 10 => ((char)('0' + index)).ToString(),
+            < 36 => ((char)('a' + index - 10)).ToString(),
+            _ => ((char)('A' + index - 36)).ToString()
+        };
     }
 
     private static void TeleportToWaypointById(List<WaypointData> waypoints, string waypointId)
@@ -818,19 +828,19 @@ public class ModCommand : ModCommandBase
 
             if (value != null && !IsSimpleType(prop.PropertyType))
             {
-                InfoFungame("feature.item", displayName, jsonName);
+                InfoFungame("feature.parent_item", displayName, jsonName);
                 foreach (var subProp in prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (!IsSimpleType(subProp.PropertyType)) continue;
                     var subValue = subProp.GetValue(value);
                     var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
                     var subDisplay = Locale($"feature.{GetFeatureDisplayName($"{jsonName}.{subJson}")}");
-                    InfoFungame("feature.sub_item", subDisplay, subJson, subValue);
+                    InfoFungame("feature.item", $"    {subDisplay}", subJson, subValue);
                 }
             }
             else
             {
-                InfoFungame("feature.item", $"  {displayName} ({jsonName})", value);
+                InfoFungame("feature.item", displayName, jsonName, value);
             }
         }
 
@@ -842,7 +852,7 @@ public class ModCommand : ModCommandBase
         return type.IsPrimitive || type == typeof(string) || type == typeof(decimal)
                || type == typeof(float) || type == typeof(double) || type == typeof(bool);
     }
-    
+
     // todo: 没搞好c
 
     private static void SetFeature(Feature feature, string featureName, string valueStr)
@@ -870,7 +880,7 @@ public class ModCommand : ModCommandBase
         {
             var convertedValue = Convert.ChangeType(valueStr, targetProp.PropertyType);
             targetProp.SetValue(target, convertedValue);
-            var displayName = GetFeatureDisplayName(featureName);
+            var displayName = Locale($"feature.{GetFeatureDisplayName(featureName)}");
             InfoFungame("feature.set_success", $"{displayName} ({featureName})", convertedValue);
         }
         catch (Exception)
@@ -904,7 +914,6 @@ public class ModCommand : ModCommandBase
 
         if (parts.Length >= 2)
         {
-            // 两层或更多（只处理前两层）
             var parentProp = typeof(Feature).GetProperties()
                 .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
                     .Equals(parts[0], StringComparison.OrdinalIgnoreCase));
@@ -917,29 +926,27 @@ public class ModCommand : ModCommandBase
                     .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
                         .Equals(parts[1], StringComparison.OrdinalIgnoreCase));
                 var subJson = subProp?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? parts[1];
+                if (parentJson.EndsWith("data"))
+                    parentJson = parentJson.Substring(0, parentJson.Length - 4);
                 result = $"{parentJson}.{subJson}";
             }
             else
             {
-                // 父属性不存在，整体回退为小写加下划线
                 result = fieldName.ToLower().Replace(".", "_");
             }
         }
         else
         {
-            // 单段字段
             var prop = typeof(Feature).GetProperty(fieldName,
                 BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             if (prop != null)
             {
                 var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name.ToLower();
-                // 判断属性类型名称是否以 "Data" 结尾
                 bool isDataClass = prop.PropertyType.Name.EndsWith("Data", StringComparison.Ordinal);
                 result = isDataClass ? $"{jsonName}_data" : jsonName;
             }
             else
             {
-                // 属性不存在，回退为字段名本身（小写）
                 result = fieldName.ToLower();
             }
         }

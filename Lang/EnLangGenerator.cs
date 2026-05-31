@@ -22,7 +22,7 @@ namespace CustomFungamePack.Lang
             Add("feature.geyser_data", "Geyser");
             Add("feature.beartrap_data", "Bear Trap");
 
-            // Feature - Sub properties (short names, parent context shown by header)
+            // Feature - Child properties
             Add("feature.mine.undestroy", "Undestroy");
             Add("feature.mine.cooldown", "Cooldown");
             Add("feature.jump_pad.cooldown", "Cooldown");
@@ -126,8 +126,8 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.unknown_subcommand", "Unknown feature subcommand: {0}");
             Add("command.fungame.feature.set_missing_params", "Please specify feature name and value to set");
             Add("command.fungame.feature.list_header", "Current feature settings:");
-            Add("command.fungame.feature.item", "  {0} ({1}): {2}");
-            Add("command.fungame.feature.sub_item", "      {0}({1}): {2}");
+            Add("command.fungame.feature.item", "    {0}({1}): {2}");
+            Add("command.fungame.feature.parent_item", "    {0}({1}):");
             Add("command.fungame.feature.get_success", "Feature '{0}' = {1}");
             Add("command.fungame.feature.set_success", "Feature '{0}' set to {1}");
             Add("command.fungame.feature.not_found", "Feature not found: {0}");
