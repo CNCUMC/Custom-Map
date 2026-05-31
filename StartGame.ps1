@@ -28,7 +28,7 @@ $ModDll = [System.IO.Path]::Combine($PSScriptRoot, "bin/Debug/net472", "$ModName
 $targetModFolder = $ModName
 
 # 文档文件列表
-$docFiles = @("README.md", "README_ZH.md", "LICENSE.md", "Cover.png")
+$docFiles = @("README.md", "README_ZH.md", "LICENSE.md", "Covor.png")
 
 # 日志目标路径
 $logDestination = [System.IO.Path]::Combine($PSScriptRoot, "Logs", "$timestamp.log") # 日志目标路径
