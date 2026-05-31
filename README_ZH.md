@@ -85,9 +85,9 @@ Casualties Unknown Demo/
 
 | 键名                  | 类型       | 默认值        | 描述                                      |
 |---------------------|----------|------------|-----------------------------------------|
-| `MoreLogs`          | `bool`   | `false`    | 启用详细日志记录                                |
-| `Start Use Fungame` | `bool`   | `false`    | 开始新游戏时自动加载 Fungame                      |
-| `First Use Fungame` | `string` | `template` | 启用 `Start Use Fungame` 时要加载的 Fungame ID |
+| `more_logs`         | `bool`   | `false`    | 启用详细日志记录                                |
+| `start_use_fungame` | `bool`   | `false`    | 开始新游戏时自动加载 Fungame                      |
+| `first_use_fungame` | `string` | `template` | 启用 `Start Use Fungame` 时要加载的 Fungame ID |
 
 ---
 
@@ -283,7 +283,7 @@ fg save as                     # 按屏幕提示操作
 | `skip_terrain`      | `bool`     | 否                                                       | 跳过地形生成（默认：`true`）                                      |
 | `skip_structures`   | `bool`     | 否                                                       | 跳过结构生成（默认：`true`）                                      |
 | `skip_background`   | `bool`     | 否                                                       | 跳过背景生成（默认：`true`）                                      |
-| `xp`                | `object`   | 否                                                       | 经验值配置（见 [经验值配置](#经验值配置xp-configuration)）                |
+| `xp`                | `object`   | 否                                                       | 经验值配置（见 [经验值配置](#经验值配置xp-configuration)）               |
 | `map_data`          | `object`   | `map_data`/ `custom_structures` / `build_mode_save` 三选一 | 地图数据内容（见 [MapData](#mapdata地图数据)）                      |
 | `custom_structures` | `string`   | `map_data`/ `custom_structures` / `build_mode_save` 三选一 | 自定义结构文件名（见 [CustomStructures](#customstructures自定义结构)） |
 | `build_mode_save`   | `string`   | `map_data`/ `custom_structures` / `build_mode_save` 三选一 | 建筑模式存档文件名（见 [BuildModeSave](#buildmodesave建筑模式存档)）     |
@@ -432,14 +432,15 @@ Fungame 加载时执行游戏控制台命令。
 }
 ```
 
-| 字段          | 类型      | 默认值    | 描述        |
-|-------------|---------|--------|-----------|
-| `str_xp`    | `int`   | `0`    | 力量技能等级    |
-| `res_xp`    | `int`   | `0`    | 智谋技能等级    |
-| `int_xp`    | `int`   | `0`    | 智力技能等级    |
-| `xp_multiple` | `float` | `1.0`  | 经验倍率      |
+| 字段            | 类型      | 默认值   | 描述     |
+|---------------|---------|-------|--------|
+| `str_xp`      | `int`   | `0`   | 力量技能等级 |
+| `res_xp`      | `int`   | `0`   | 智谋技能等级 |
+| `int_xp`      | `int`   | `0`   | 智力技能等级 |
+| `xp_multiple` | `float` | `1.0` | 经验倍率   |
 
-> **注意：** `min_str`/`max_str`、`min_res`/`max_res`、`min_int`/`max_int`（每个等级的经验阈值）和 `exp_str`/`exp_res`/`exp_int`（当前经验值）会根据技能等级自动计算，无需手动指定。
+> **注意：** `min_str`/`max_str`、`min_res`/`max_res`、`min_int`/`max_int`（每个等级的经验阈值）和 `exp_str`/`exp_res`/
+`exp_int`（当前经验值）会根据技能等级自动计算，无需手动指定。
 
 ---
 

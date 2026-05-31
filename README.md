@@ -41,7 +41,9 @@ _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**.
 
 ## Overview
 
-**Custom Fungame Pack** is a BepInEx plugin that introduces a custom map/gamemode system called "Fungame" to Casualties Unknown. It allows players to load, manage, and create custom maps with unique features, waypoints, items, and game logic.
+**Custom Fungame Pack** is a BepInEx plugin that introduces a custom map/gamemode system called "Fungame" to Casualties
+Unknown. It allows players to load, manage, and create custom maps with unique features, waypoints, items, and game
+logic.
 
 ---
 
@@ -82,11 +84,11 @@ Casualties Unknown Demo/
 
 Configure via `BepInEx/config/blackmoss.customfungamepack.cfg`:
 
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `MoreLogs` | `bool` | `false` | Enable verbose logging |
-| `Start Use Fungame` | `bool` | `false` | Automatically load a Fungame on new game start |
-| `First Use Fungame` | `string` | `template` | Fungame ID to load when `Start Use Fungame` is enabled |
+| Key                 | Type     | Default    | Description                                            |
+|---------------------|----------|------------|--------------------------------------------------------|
+| `more_logs`         | `bool`   | `false`    | Enable verbose logging                                 |
+| `start_lse_fungame` | `bool`   | `false`    | Automatically load a Fungame on new game start         |
+| `first_use_fungame` | `string` | `template` | Fungame ID to load when `Start Use Fungame` is enabled |
 
 ---
 
@@ -177,13 +179,13 @@ fg feature set <name> <value>  # Set a feature value
 
 **Available features:**
 
-| Feature | Type | Default | Description |
-|---|---|---|---|
-| `Fullbright` | `bool` | `true` | Enable global brightness |
-| `ForgivingLevel` | `bool` | `false` | Enable forgiving level mode |
-| `Gravity` | `float` | `-9.81` | Custom gravity value |
-| `JumpLimit` | `int` | `0` | Maximum jump count (`0` = unlimited) |
-| `ClimbLimit` | `int` | `0` | Maximum climb count (`0` = unlimited) |
+| Feature          | Type    | Default | Description                           |
+|------------------|---------|---------|---------------------------------------|
+| `Fullbright`     | `bool`  | `true`  | Enable global brightness              |
+| `ForgivingLevel` | `bool`  | `false` | Enable forgiving level mode           |
+| `Gravity`        | `float` | `-9.81` | Custom gravity value                  |
+| `JumpLimit`      | `int`   | `0`     | Maximum jump count (`0` = unlimited)  |
+| `ClimbLimit`     | `int`   | `0`     | Maximum climb count (`0` = unlimited) |
 
 ### fg waypoint
 
@@ -266,27 +268,27 @@ Each Fungame is a folder inside the `Fungames/` directory containing a `fungame.
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | `string` | Yes | Display name |
-| `id` | `string` | Yes | Unique identifier (auto-generated from folder name if omitted) |
-| `version` | `string` | Yes | Version string (default: `1.0.0`) |
-| `author` | `string[]` | Yes | List of authors |
-| `description` | `string` | Yes | Map description |
-| `spawn` | `float[2]` | No | Spawn coordinates `[x, y]` (default: `[0, 0]`) |
-| `x`, `y` | `int` | No | Map position origin (default: `[0, 0]`) |
-| `type` | `string` | No | Scene type: `Debug`, `None`, `Tutorial` (default: `Debug`) |
-| `feature` | `object` | No | Feature overrides (see [Features](#features)) |
-| `waypoints` | `array` | No | List of waypoints (see [Waypoints](#waypoints)) |
-| `items` | `array` | No | Starting items (see [Items](#items)) |
-| `skip_terrain` | `bool` | No | Skip terrain generation (default: `true`) |
-| `skip_structures` | `bool` | No | Skip structure generation (default: `true`) |
-| `skip_background` | `bool` | No | Skip background generation (default: `true`) |
-| `xp` | `object` | No | XP configuration (see [XP Configuration](#xp-configuration)) |
-| `map_data` | `object` | One of `map_data` / `custom_structures` / `build_mode_save` | Map data content (see [MapData](#mapdata)) |
-| `custom_structures` | `string` | One of `map_data` / `custom_structures` / `build_mode_save` | Custom Structures filename (see [CustomStructures](#customstructures)) |
-| `build_mode_save` | `string` | One of `map_data` / `custom_structures` / `build_mode_save` | Build Mode Save filename (see [BuildModeSave](#buildmodesave)) |
-| `command` | `object` | No | Command configuration (see [Commands](#commands)) |
+| Field               | Type       | Required                                                    | Description                                                            |
+|---------------------|------------|-------------------------------------------------------------|------------------------------------------------------------------------|
+| `name`              | `string`   | Yes                                                         | Display name                                                           |
+| `id`                | `string`   | Yes                                                         | Unique identifier (auto-generated from folder name if omitted)         |
+| `version`           | `string`   | Yes                                                         | Version string (default: `1.0.0`)                                      |
+| `author`            | `string[]` | Yes                                                         | List of authors                                                        |
+| `description`       | `string`   | Yes                                                         | Map description                                                        |
+| `spawn`             | `float[2]` | No                                                          | Spawn coordinates `[x, y]` (default: `[0, 0]`)                         |
+| `x`, `y`            | `int`      | No                                                          | Map position origin (default: `[0, 0]`)                                |
+| `type`              | `string`   | No                                                          | Scene type: `Debug`, `None`, `Tutorial` (default: `Debug`)             |
+| `feature`           | `object`   | No                                                          | Feature overrides (see [Features](#features))                          |
+| `waypoints`         | `array`    | No                                                          | List of waypoints (see [Waypoints](#waypoints))                        |
+| `items`             | `array`    | No                                                          | Starting items (see [Items](#items))                                   |
+| `skip_terrain`      | `bool`     | No                                                          | Skip terrain generation (default: `true`)                              |
+| `skip_structures`   | `bool`     | No                                                          | Skip structure generation (default: `true`)                            |
+| `skip_background`   | `bool`     | No                                                          | Skip background generation (default: `true`)                           |
+| `xp`                | `object`   | No                                                          | XP configuration (see [XP Configuration](#xp-configuration))           |
+| `map_data`          | `object`   | One of `map_data` / `custom_structures` / `build_mode_save` | Map data content (see [MapData](#mapdata))                             |
+| `custom_structures` | `string`   | One of `map_data` / `custom_structures` / `build_mode_save` | Custom Structures filename (see [CustomStructures](#customstructures)) |
+| `build_mode_save`   | `string`   | One of `map_data` / `custom_structures` / `build_mode_save` | Build Mode Save filename (see [BuildModeSave](#buildmodesave))         |
+| `command`           | `object`   | No                                                          | Command configuration (see [Commands](#commands))                      |
 
 > **Note:** Only **one** content type (`map_data`, `custom_structures`, or `build_mode_save`) can be used at a time.
 
@@ -343,13 +345,13 @@ Reference a Build Mode save file (`.alexx_BMsave`).
 
 Features modify game behavior while the Fungame is active.
 
-| Feature | Type | Default | Description |
-|---|---|---|---|
-| `Fullbright` | `bool` | `true` | All areas are fully lit |
-| `ForgivingLevel` | `bool` | `false` | Player doesn't lose items on death |
-| `Gravity` | `float` | `-9.81` | Override gravity (negative = downward) |
-| `JumpLimit` | `int` | `0` | Max jumps before touching ground (`0` = unlimited) |
-| `ClimbLimit` | `int` | `0` | Max climbs before touching ground (`0` = unlimited) |
+| Feature          | Type    | Default | Description                                         |
+|------------------|---------|---------|-----------------------------------------------------|
+| `Fullbright`     | `bool`  | `true`  | All areas are fully lit                             |
+| `ForgivingLevel` | `bool`  | `false` | Player doesn't lose items on death                  |
+| `Gravity`        | `float` | `-9.81` | Override gravity (negative = downward)              |
+| `JumpLimit`      | `int`   | `0`     | Max jumps before touching ground (`0` = unlimited)  |
+| `ClimbLimit`     | `int`   | `0`     | Max climbs before touching ground (`0` = unlimited) |
 
 ### Waypoints
 
@@ -410,11 +412,11 @@ Execute game console commands when the Fungame loads.
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `once_commands` | `string[]` | Commands executed once when the Fungame loads |
-| `loop_commands` | `string[]` | Commands executed repeatedly on an interval |
-| `loop_interval` | `float` | Interval in seconds between loop command executions |
+| Field           | Type       | Description                                         |
+|-----------------|------------|-----------------------------------------------------|
+| `once_commands` | `string[]` | Commands executed once when the Fungame loads       |
+| `loop_commands` | `string[]` | Commands executed repeatedly on an interval         |
+| `loop_interval` | `float`    | Interval in seconds between loop command executions |
 
 ### XP Configuration
 
@@ -431,14 +433,16 @@ Configure the player's skill levels and experience when the Fungame loads.
 }
 ```
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `str_xp` | `int` | `0` | Strength skill level |
-| `res_xp` | `int` | `0` | Resourcefulness skill level |
-| `int_xp` | `int` | `0` | Intelligence skill level |
-| `xp_multiple` | `float` | `1.0` | XP gain multiplier |
+| Field         | Type    | Default | Description                 |
+|---------------|---------|---------|-----------------------------|
+| `str_xp`      | `int`   | `0`     | Strength skill level        |
+| `res_xp`      | `int`   | `0`     | Resourcefulness skill level |
+| `int_xp`      | `int`   | `0`     | Intelligence skill level    |
+| `xp_multiple` | `float` | `1.0`   | XP gain multiplier          |
 
-> **Note:** `min_str`/`max_str`, `min_res`/`max_res`, `min_int`/`max_int` (experience thresholds for each level) and `exp_str`/`exp_res`/`exp_int` (current experience points) are automatically calculated based on the skill levels, so they don't need to be specified manually.
+> **Note:** `min_str`/`max_str`, `min_res`/`max_res`, `min_int`/`max_int` (experience thresholds for each level) and
+`exp_str`/`exp_res`/`exp_int` (current experience points) are automatically calculated based on the skill levels, so
+> they don't need to be specified manually.
 
 ---
 
