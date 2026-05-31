@@ -104,10 +104,34 @@ public class ModCommand : ModCommandBase
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var featureNames = FeatureProperties
-            .Select(p => p.Name.ToLowerInvariant())
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var prop in FeatureProperties)
+        {
+            string jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
+            jsonName = jsonName.ToLowerInvariant();
+
+            string baseName = jsonName;
+            if (baseName.EndsWith("data"))
+                baseName = baseName.Substring(0, baseName.Length - 4);
+
+            allNames.Add(baseName);
+
+            if (!IsSimpleType(prop.PropertyType))
+            {
+                foreach (var subProp in prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!IsSimpleType(subProp.PropertyType))
+                        continue;
+
+                    string subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
+                    string combinedPath = $"{baseName}.{subJson}".ToLowerInvariant();
+                    allNames.Add(combinedPath);
+                }
+            }
+        }
+
+        var featureNames = allNames.ToList();
 
         _cachedFeatureNames = featureNames;
         _cachedFungameIds = fungameIds ?? [];
@@ -153,14 +177,14 @@ public class ModCommand : ModCommandBase
         var contextList = new List<string>();
         string subcommand = args[1].ToLower();
 
-        for (int i = 0; i < _cachedFeatureNames.Count; i++)
-        {
-            string name = _cachedFeatureNames[i];
-            if (name.EndsWith("data"))
-            {
-                _cachedFeatureNames[i] = name.Substring(0, name.Length - 4);
-            }
-        }
+        // for (int i = 0; i < _cachedFeatureNames.Count; i++)
+        // {
+        //     string name = _cachedFeatureNames[i];
+        //     if (name.EndsWith("data"))
+        //     {
+        //         _cachedFeatureNames[i] = name.Substring(0, name.Length - 4);
+        //     }
+        // }
 
         switch (subcommand)
         {
@@ -853,8 +877,6 @@ public class ModCommand : ModCommandBase
                || type == typeof(float) || type == typeof(double) || type == typeof(bool);
     }
 
-    // todo: 没搞好c
-
     private static void SetFeature(Feature feature, string featureName, string valueStr)
     {
         var parts = featureName.Split('.');
@@ -926,8 +948,8 @@ public class ModCommand : ModCommandBase
                     .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
                         .Equals(parts[1], StringComparison.OrdinalIgnoreCase));
                 var subJson = subProp?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? parts[1];
-                if (parentJson.EndsWith("data"))
-                    parentJson = parentJson.Substring(0, parentJson.Length - 4);
+                // if (parentJson.EndsWith("data"))
+                //     parentJson = parentJson.Substring(0, parentJson.Length - 4);
                 result = $"{parentJson}.{subJson}";
             }
             else
