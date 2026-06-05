@@ -5,7 +5,6 @@ using System.Linq;
 using BepInEx.Logging;
 using CustomFungamePack.Patch;
 using MossLib.Tool;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -133,130 +132,79 @@ public static class MapLoader
             return;
         }
 
-        var worldY = fungame.Y;
         var blockCount = 0;
-        var itemCount = 0;
         var failCount = 0;
+        const int failLimit = 50;
+
+        var startX = fungame.X;
+        var startY = fungame.Y;
 
         for (int row = 0; row < rowCount; row++)
         {
             var mapRow = mapData.Map[row];
             if (string.IsNullOrEmpty(mapRow))
             {
-                worldY--;
+                startY--;
                 continue;
             }
 
-            var worldX = fungame.X;
+            var worldX = startX;
+            var worldY = startY;
 
-            foreach (var charStr in mapRow.Select(t => t.ToString()))
+            foreach (var t in mapRow)
             {
+                var charStr = t.ToString();
                 if (!mapData.Key.TryGetValue(charStr, out var value))
                 {
                     worldX++;
                     continue;
                 }
 
-                ProcessValue(value, ref worldX, ref worldY, ref blockCount, ref itemCount, ref failCount);
-
+                ProcessValue(value, worldX, worldY, ref blockCount, ref failCount, failLimit);
                 worldX++;
             }
 
-            worldY--;
+            startY--;
         }
 
-        MoreLogs("string_map_applied", blockCount, itemCount, failCount);
+        MoreLogs("string_map_applied", blockCount, 0, failCount);
         PickItems(fungame);
     }
 
-    private static void ProcessValue(object value, ref int worldX, ref int worldY, ref int blockCount,
-        ref int itemCount, ref int failCount)
+    private static void ProcessValue(object value, int x, int y, ref int blockCount, ref int failCount, int failLimit)
     {
+        if (failCount >= failLimit)
+            return;
+
         switch (value)
         {
+            case long longVal when longVal >= 0:
+                PlaceBlock((int)longVal, x, y, ref blockCount, ref failCount);
+                break;
+            case int intVal when intVal >= 0:
+                PlaceBlock(intVal, x, y, ref blockCount, ref failCount);
+                break;
+            case ushort ushortVal:
+                PlaceBlock(ushortVal, x, y, ref blockCount, ref failCount);
+                break;
+            case string stringVal when !string.IsNullOrEmpty(stringVal):
+                PlaceItem(x, y, stringVal);
+                break;
             case JArray jArray:
-            {
-                ProcessListValue(jArray, ref worldX, ref worldY, ref blockCount, ref itemCount, ref failCount);
+                ProcessListValue(jArray, x, y, ref blockCount, ref failCount, failLimit);
                 break;
-            }
-            case long longValue:
-            {
-                PlaceBlock((int)longValue, worldX, worldY, ref blockCount, ref failCount);
-                break;
-            }
-            case int intValue:
-            {
-                PlaceBlock(intValue, worldX, worldY, ref blockCount, ref failCount);
-                break;
-            }
-            case ushort ushortValue:
-            {
-                PlaceBlock(ushortValue, worldX, worldY, ref blockCount, ref failCount);
-                break;
-            }
-            case string stringValue:
-            {
-                PlaceItem(stringValue, worldX, worldY, ref itemCount, ref failCount);
-                break;
-            }
         }
     }
 
-    private static void ProcessListValue(JArray jArray, ref int worldX, ref int worldY, ref int blockCount,
-        ref int itemCount, ref int failCount)
+    private static void ProcessListValue(JArray jArray, int x, int y, ref int blockCount, ref int failCount, int failLimit)
     {
         if (jArray == null || jArray.Count == 0)
-        {
             return;
-        }
-
-        bool hasPlacedBlock = false;
 
         foreach (var token in jArray)
         {
-            switch (token)
-            {
-                case JValue jValue:
-                {
-                    var rawValue = jValue.Value;
-                    switch (rawValue)
-                    {
-                        case long longVal:
-                            if (hasPlacedBlock)
-                            {
-                                Warning("multiple_blocks_in_list", worldX, worldY);
-                            }
-                            else if (longVal >= 0)
-                            {
-                                PlaceBlock((int)longVal, worldX, worldY, ref blockCount, ref failCount);
-                                hasPlacedBlock = true;
-                            }
-
-                            break;
-                        case int intVal:
-                            if (hasPlacedBlock)
-                            {
-                                Warning("multiple_blocks_in_list", worldX, worldY);
-                            }
-                            else if (intVal >= 0)
-                            {
-                                PlaceBlock(intVal, worldX, worldY, ref blockCount, ref failCount);
-                                hasPlacedBlock = true;
-                            }
-
-                            break;
-                        case string stringVal:
-                            if (!string.IsNullOrEmpty(stringVal))
-                            {
-                                PlaceItem(stringVal, worldX, worldY, ref itemCount, ref failCount);
-                            }
-
-                            break;
-                    }
-
-                    break;
-                }
-            }
+            if (token is not JValue jValue) continue;
+            ProcessValue(jValue.Value, x, y, ref blockCount, ref failCount, failLimit);
         }
     }
 
@@ -264,6 +212,9 @@ public static class MapLoader
     {
         try
         {
+            // World.PlaceBlock(int, int, ushort) expects WORLD coordinates (relative to world center).
+            // It internally converts to block array indices via WorldToBlockPos (adds halfWidth/halfHeight).
+            // Do NOT replace with World.FillBlocks() — that takes raw block array indices directly.
             World.PlaceBlock(x, y, (ushort)blockId);
             blockCount++;
         }
@@ -274,17 +225,15 @@ public static class MapLoader
         }
     }
 
-    private static void PlaceItem(string itemId, int x, int y, ref int itemCount, ref int failCount)
+    private static void PlaceItem(int x, int y, string id)
     {
         try
         {
-            World.PlaceItem(x, y, itemId);
-            itemCount++;
+            World.PlaceItem(x, y, id);
         }
         catch (Exception ex)
         {
-            Error("place_failed", x, y, ModLocale.Log("common.item"), itemId, ex.Message);
-            failCount++;
+            Error("place_failed", x, y, ModLocale.Log("common.item"), id, ex.Message);
         }
     }
 
