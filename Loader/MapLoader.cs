@@ -63,31 +63,25 @@ public static class MapLoader
 
     private static void LogFeatureInfo(Fungame fungame)
     {
-        var feature = fungame.Feature;
-
-        if (feature == null)
-        {
-            Warning("no_features_enabled");
-            return;
-        }
+        var settings = fungame.WorldSettings;
 
         var hasAnyFeature = false;
 
-        if (feature.Fullbright)
+        if (settings.Fullbright)
         {
             MoreLogs("feature_enabled", ModLocale.GetFormat("feature.fullbright"));
             hasAnyFeature = true;
         }
 
-        if (feature.ForgivingLevel)
+        if (settings.ForgivingLevel)
         {
             MoreLogs("feature_enabled", ModLocale.GetFormat("feature.forgiving_level"));
             hasAnyFeature = true;
         }
 
-        if (!Mathf.Approximately(feature.Gravity, Physics2D.gravity.y))
+        if (!Mathf.Approximately(settings.Gravity, Physics2D.gravity.y))
         {
-            MoreLogs("feature_enabled_with_value", ModLocale.GetFormat("feature.gravity"), feature.Gravity);
+            MoreLogs("feature_enabled_with_value", ModLocale.GetFormat("feature.gravity"), settings.Gravity);
             hasAnyFeature = true;
         }
 
@@ -398,48 +392,21 @@ public static class MapLoader
             return;
         }
 
-        var jsonPath = Path.Combine(directoryPath, "fungame.json");
-        if (!File.Exists(jsonPath))
+        if (!Directory.Exists(directoryPath))
         {
-            Error("fungame_json_not_found", jsonPath);
+            Error("fungame_json_not_found", directoryPath);
             return;
         }
 
         try
         {
-            var jsonContent = File.ReadAllText(jsonPath);
-            var jsonObject = JObject.Parse(jsonContent);
-
-            NormalizeKey(jsonObject, "Name", "name");
-            NormalizeKey(jsonObject, "Id", "id");
-            NormalizeKey(jsonObject, "Version", "version");
-            NormalizeKey(jsonObject, "Author", "author");
-            NormalizeKey(jsonObject, "Description", "description");
-            NormalizeKey(jsonObject, "Feature", "feature");
-            NormalizeKey(jsonObject, "Waypoints", "waypoints");
-            NormalizeKey(jsonObject, "Items", "items");
-            NormalizeKey(jsonObject, "Spawn", "spawn");
-            NormalizeKey(jsonObject, "X", "x");
-            NormalizeKey(jsonObject, "Y", "y");
-
-            if (jsonObject.ContainsKey("map_data") && jsonObject["map_data"] is JObject mapObj)
-            {
-                if (!mapObj.ContainsKey("map") && mapObj.ContainsKey("Map"))
-                    mapObj["map"] = mapObj["Map"];
-                if (!mapObj.ContainsKey("key") && mapObj.ContainsKey("Key"))
-                    mapObj["key"] = mapObj["Key"];
-            }
-
-            var modifiedJson = jsonObject.ToString(Formatting.None);
-            var reloadedFungame = JsonConvert.DeserializeObject<Fungame>(modifiedJson);
+            var reloadedFungame = FungameDirectoryLoader.LoadFromDirectory(directoryPath);
 
             if (reloadedFungame == null)
             {
                 Error("fungame_deserialize_failed");
                 return;
             }
-
-            reloadedFungame.DirectoryPath = directoryPath;
 
             var index = FungameCheck.Fungames.FindIndex(f => f.Id == fungame.Id);
             if (index >= 0)
@@ -510,7 +477,7 @@ public static class MapLoader
         LogConsole("info.version", fungame.Version);
         LogConsole("info.authors", fungame.Authors);
         LogConsole("info.description", fungame.Description);
-        LogConsole("info.features", fungame.Features);
+        LogConsole("info.features", fungame.ActiveFeatures);
         LogConsole("info.spawn", fungame.SpawnPosition);
         Log.Divider();
         Log.NewLine();

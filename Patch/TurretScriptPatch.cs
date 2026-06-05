@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(TurretScript))]
 public class TurretScriptPatch
 {
-    private static TurretData TurretData => FungameCheck.CurrentFungame?.Feature?.TurretData;
+    private static TurretData TurretData => FungameCheck.CurrentFungame?.TurretData;
 
     private static readonly FieldInfo BuildField = typeof(TurretScript).GetField(
         "build", BindingFlags.NonPublic | BindingFlags.Instance);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(SoundCannon))]
 public class SoundCannonScriptPatch
 {
-    private static SoundCannonData SoundCannonData => FungameCheck.CurrentFungame?.Feature?.SoundCannonData;
+    private static SoundCannonData SoundCannonData => FungameCheck.CurrentFungame?.SoundCannonData;
 
     private static readonly FieldInfo SpentField = typeof(SoundCannon).GetField(
         "spent", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -66,12 +67,10 @@ public class SoundCannonScriptPatch
                 ChargingSince.Remove(__instance);
             }
 
-            if (data.Undestroy && isSpent)
-            {
-                SpentField?.SetValue(__instance, false);
-                ChargeTimeField?.SetValue(__instance, 0f);
-                ChargingSince.Remove(__instance);
-            }
+            if (!data.Undestroy || !isSpent) return;
+            SpentField?.SetValue(__instance, false);
+            ChargeTimeField?.SetValue(__instance, 0f);
+            ChargingSince.Remove(__instance);
         }
         catch
         {

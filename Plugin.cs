@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using CustomFungamePack.Data;
 using CustomFungamePack.Lang;
 using HarmonyLib;
 using MossLib.Constant;
@@ -51,187 +52,190 @@ public class Plugin : BaseUnityPlugin
         Version = Version,
         Author = ["Black_Moss"],
         Description = "a map template",
-        Spawn = [0, 0],
-        X = -68,
-        Y = 62,
-        // Waypoints =
-        // [
-        //     new()
-        //     {
-        //         Id = "default",
-        //         X = 0,
-        //         Y = 0
-        //     }
-        // ],
-        // CommandData = new CommandData
-        // {
-        //     OnceCommands =
-        //     [
-        //         "alert true Start!"
-        //     ],
-        //     LoopCommands =
-        //     [
-        //         "alert false 10s!"
-        //     ],
-        //     LoopIntervai = 0
-        // },
-        Feature = new Feature
-        {
-            MineData = new MineData
-            {
-                Undestroy = true,
-                ExplosionParamsData = new ExplosionParamsData
-                {
-                    Range = 3
-                }
-            },
-            JumpPadData = new JumpPadData
-            {
-                Force = 0.5f,
-                NoLight = true,
-                Cooldown = 0f
-            },
-            TurretData = new TurretData
-            {
-                Cooldown = 0f,
-                NoLight = true
-            },
-            SoundCannonData = new SoundCannonData
-            {
-                MaxDistance = 20,
-                Cooldown = 3,
-                Undestroy = true
-            },
-            SpikeStabberData = new SpikeStabberData
-            {
-                Undestroy = true,
-                NoLight = true,
-                Cooldown = 3
-            },
-            GeyserData = new GeyserData
-            {
-                Cooldown = 1
-            },
-            BearTrapData = new BearTrapData
-            {
-                Undestroy = true,
-                Cooldown = 1
-            }
-        },
-        MapData = new MapData
-        {
-            Map =
-            [
-                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-                "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                   1111111111111111111",
-                "11                                                                                                                   1111111111111111111",
-                "11                                                                                              11111111111111111    11               11",
-                "11                                                                                              11111111111111111                     11",
-                "11                                                                                              11             11                     11",
-                "11                                                                                              11             11                     11",
-                "11                                                                                              11                      p p p p p p p 11",
-                "11                                                                                              11                   1111111111111111111",
-                "11                                                                                              11 b b b b b         1111111111111111111",
-                "11                                                                                              11111111111111111    11t             t1",
-                "11                                                                                              11111111111111111    11               11",
-                "11                                                                                              11111111111111111    11t             t11",
-                "11                                                                                              11iiiiiiiiiiiii11                     11",
-                "11                                                                                              11iiiiiiiiiiiii11                     11",
-                "11                                                                                              11iiiiiiiiiiiii11                     11",
-                "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
-                "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
-                "11                                                                                              11iiiiiiiiiiiii11          11         11",
-                "11                                                                                              11iiiiiiiiiiiii11          11         11",
-                "11                                                                                              11iiiiiigiiiiii11          11         11",
-                "11                                                                                              11111111111111111    11111111         11",
-                "11                                                                                              11111111111111111    11111111         11",
-                "11                                                                                                                                    11",
-                "11                                                                                                                                    11",
-                "11 s                                                                                                                                  11",
-                "11                     l                                                                                                     jjjjjjjjj11",
-                "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
-                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-            ],
-            Key =
-            {
-                { " ", Blocks.Air.Id },
-                { "1", Blocks.SteelTile.Id },
-                { "2", Blocks.HeatResistantAlloy.Id },
-                { "l", "landmine" },
-                { "j", "jumppad" },
-                { "t", "turret" },
-                { "s", "soundcannon" },
-                { "p", "spikestabber" },
-                { "g", "geyser" },
-                { "i", "lifepodpump" },
-                { "b", "beartrap" }
-            }
-        },
-        Items =
+        Levels =
         [
-            new ItemData
+            new LevelData
             {
-                Id = Items.GeoFruit,
-                Slot = Slots.MainHand
-            },
-            new ItemData
-            {
-                Id = Items._9MmRound,
-                Slot = Slots.Mouth
-            },
-            new ItemData
-            {
-                Id = Items._12Gauge,
-                Slot = Slots.UpperBck
-            },
-            new ItemData
-            {
-                Id = Items.Aed,
-                Slot = Slots.MiddleBack
-            },
-            new ItemData
-            {
-                Id = Items.Lrd,
-                Slot = Slots.LowerBack
+                X = -68,
+                Y = 62,
+                Spawn = [0, 0],
+                // Waypoints =
+                // [
+                //     new()
+                //     {
+                //         Id = "default",
+                //         X = 0,
+                //         Y = 0
+                //     }
+                // ],
+                // CommandData = new CommandData
+                // {
+                //     OnceCommands =
+                //     [
+                //         "alert true Start!"
+                //     ],
+                //     LoopCommands =
+                //     [
+                //         "alert false 10s!"
+                //     ],
+                //     LoopIntervai = 0
+                // },
+                MapData = new MapData
+                {
+                    Map =
+                    [
+                        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                        "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                   1111111111111111111",
+                        "11                                                                                                                   1111111111111111111",
+                        "11                                                                                              11111111111111111    11               11",
+                        "11                                                                                              11111111111111111                     11",
+                        "11                                                                                              11             11                     11",
+                        "11                                                                                              11             11                     11",
+                        "11                                                                                              11                      p p p p p p p 11",
+                        "11                                                                                              11                   1111111111111111111",
+                        "11                                                                                              11 b b b b b         1111111111111111111",
+                        "11                                                                                              11111111111111111    11t             t1",
+                        "11                                                                                              11111111111111111    11               11",
+                        "11                                                                                              11111111111111111    11t             t11",
+                        "11                                                                                              11iiiiiiiiiiiii11                     11",
+                        "11                                                                                              11iiiiiiiiiiiii11                     11",
+                        "11                                                                                              11iiiiiiiiiiiii11                     11",
+                        "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
+                        "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
+                        "11                                                                                              11iiiiiiiiiiiii11          11         11",
+                        "11                                                                                              11iiiiiiiiiiiii11          11         11",
+                        "11                                                                                              11iiiigiiiiiiii11          11         11",
+                        "11                                                                                              11111111111111111    11111111         11",
+                        "11                                                                                              11111111111111111    11111111         11",
+                        "11                                                                                                                                    11",
+                        "11                                                                                                                                    11",
+                        "11 s                                                                                                                                  11",
+                        "11                     l                                                                                                     jjjjjjjjj11",
+                        "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
+                        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                    ],
+                    Key =
+                    {
+                        { " ", Blocks.Air.Id },
+                        { "1", Blocks.SteelTile.Id },
+                        { "2", Blocks.HeatResistantAlloy.Id },
+                        { "l", "landmine" },
+                        { "j", "jumppad" },
+                        { "t", "turret" },
+                        { "s", "soundcannon" },
+                        { "p", "spikestabber" },
+                        { "g", "geyser" },
+                        { "i", "lifepodpump" },
+                        { "b", "beartrap" }
+                    }
+                },
+                Items =
+                [
+                    new ItemData
+                    {
+                        Id = Items.GeoFruit,
+                        Slot = Slots.MainHand
+                    },
+                    new ItemData
+                    {
+                        Id = Items._9MmRound,
+                        Slot = Slots.Mouth
+                    },
+                    new ItemData
+                    {
+                        Id = Items._12Gauge,
+                        Slot = Slots.UpperBck
+                    },
+                    new ItemData
+                    {
+                        Id = Items.Aed,
+                        Slot = Slots.MiddleBack
+                    },
+                    new ItemData
+                    {
+                        Id = Items.Lrd,
+                        Slot = Slots.LowerBack
+                    }
+                ]
             }
-        ]
+        ],
+        MineData = new MineData
+        {
+            Undestroy = true,
+            ExplosionParamsData = new ExplosionParamsData
+            {
+                Range = 3
+            }
+        },
+        JumpPadData = new JumpPadData
+        {
+            Force = 0.5f,
+            NoLight = true,
+            Cooldown = 0f
+        },
+        TurretData = new TurretData
+        {
+            Cooldown = 0f,
+            NoLight = true
+        },
+        SoundCannonData = new SoundCannonData
+        {
+            MaxDistance = 20,
+            Cooldown = 3,
+            Undestroy = true
+        },
+        SpikeStabberData = new SpikeStabberData
+        {
+            Undestroy = true,
+            NoLight = true,
+            Cooldown = 3
+        },
+        GeyserData = new GeyserData
+        {
+            Cooldown = 1
+        },
+        BearTrapData = new BearTrapData
+        {
+            Undestroy = true,
+            Cooldown = 1
+        }
     };
 
     private ConfigEntry<T> RegisterConfig<T>(string key, T defaultValue)

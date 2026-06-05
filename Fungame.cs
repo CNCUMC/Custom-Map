@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using JetBrains.Annotations;
+using CustomFungamePack.Data;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -19,273 +17,128 @@ public class Fungame
     [JsonProperty("version")] public string Version { get; set; }
     [JsonProperty("author")] public List<string> Author { get; set; }
     [JsonProperty("description")] public string Description { get; set; }
-    [JsonProperty("feature")] public Feature Feature { get; set; } = new();
-    [JsonProperty("waypoints")] public List<WaypointData> Waypoints { get; set; } = [];
-    [JsonProperty("items")] public List<ItemData> Items { get; set; } = [];
-    [JsonProperty("spawn")] public float[] Spawn { get; set; } = [0, 0];
-    [JsonProperty("x")] public int X { get; set; }
-    [JsonProperty("y")] public int Y { get; set; }
-    [JsonProperty("xp")] public XpData XpData { get; set; } = new();
 
-    [JsonProperty("type")]
-    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-    public WorldGeneration.OverrideSceneType Type { get; set; } = WorldGeneration.OverrideSceneType.Debug;
-
-    [JsonIgnore] public Vector2 MapPosition => new(X, Y);
-
-    [JsonProperty("map_data", NullValueHandling = NullValueHandling.Ignore)]
-    public MapData MapData { get; set; }
-
-    [JsonProperty("command", NullValueHandling = NullValueHandling.Ignore)]
-    public CommandData CommandData { get; set; }
-
-    [JsonProperty("waypoint", NullValueHandling = NullValueHandling.Ignore)]
-    public WaypointData WaypointData { get; set; }
-
-    [JsonProperty("custom_structures", NullValueHandling = NullValueHandling.Ignore)]
-    public string CustomStructures;
-
-    [JsonProperty("build_mode_save", NullValueHandling = NullValueHandling.Ignore)]
-    public string BuildModeSave;
-
-    [JsonProperty("skip_terrain")] public bool SkipTerrain { get; set; } = true;
-    [JsonProperty("skip_structures")] public bool SkipStructures { get; set; } = true;
-    [JsonProperty("skip_background")] public bool SkipBackground { get; set; } = true;
+    // ===== 运行时属性（从目录结构加载，不序列化到 fungame.json） =====
 
     [JsonIgnore] public string DirectoryPath { get; set; }
+
+    [JsonIgnore] public List<LevelData> Levels { get; set; } = [];
+
+    [JsonIgnore] public WorldSettingsData WorldSettings { get; set; } = new();
+
+    [JsonIgnore] public CommandData CommandData { get; set; }
+
+    [JsonIgnore] public XpData XpData { get; set; } = new();
+
+    // Feature 数据对象（从 feature/world/*.json 和 feature/player/*.json 加载）
+    [JsonIgnore] public MineData MineData { get; set; }
+    [JsonIgnore] public JumpPadData JumpPadData { get; set; }
+    [JsonIgnore] public TurretData TurretData { get; set; }
+    [JsonIgnore] public SoundCannonData SoundCannonData { get; set; }
+    [JsonIgnore] public SpikeStabberData SpikeStabberData { get; set; }
+    [JsonIgnore] public GeyserData GeyserData { get; set; }
+    [JsonIgnore] public BearTrapData BearTrapData { get; set; }
+
+    // ===== 便捷属性 =====
+
+    [JsonIgnore]
+    public LevelData CurrentLevel => Levels.FirstOrDefault();
+
+    [JsonIgnore]
+    public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
+
+    [JsonIgnore]
+    public Vector2 SpawnPosition => CurrentLevel is { Spawn: { Length: >= 2 } s }
+        ? new Vector2(s[0], s[1])
+        : Vector2.zero;
 
     [JsonIgnore]
     public string Authors => Author is { Count: > 0 }
         ? string.Join(", ", Author)
         : "Unknown";
 
+    // ===== 兼容属性（指向 CurrentLevel，过渡期使用） =====
+
     [JsonIgnore]
-    public string Features => Feature != null
-        ? string.Join(", ", typeof(Feature).GetProperties().Select(prop =>
+    public MapData MapData => CurrentLevel?.MapData;
+
+    [JsonIgnore]
+    public string CustomStructures => CurrentLevel?.CustomStructures;
+
+    [JsonIgnore]
+    public string BuildModeSave => CurrentLevel?.BuildModeSave;
+
+    [JsonIgnore]
+    public float[] Spawn => CurrentLevel?.Spawn;
+
+    [JsonIgnore]
+    public List<ItemData> Items => CurrentLevel?.Items;
+
+    [JsonIgnore]
+    public List<WaypointData> Waypoints => CurrentLevel?.Waypoints;
+
+    [JsonIgnore]
+    public int X => CurrentLevel?.X ?? 0;
+
+    [JsonIgnore]
+    public int Y => CurrentLevel?.Y ?? 0;
+
+    [JsonIgnore]
+    public bool SkipTerrain => WorldSettings?.SkipTerrain ?? true;
+
+    [JsonIgnore]
+    public bool SkipStructures => WorldSettings?.SkipStructures ?? true;
+
+    [JsonIgnore]
+    public bool SkipBackground => WorldSettings?.SkipBackground ?? true;
+
+    [JsonIgnore]
+    public WorldGeneration.OverrideSceneType Type => CurrentLevel?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
+
+    // 旧 Feature 类属性（通过 WorldSettings 访问）
+    // 这些由消费者代码直接使用 CurrentFungame.WorldSettings.xxx 或 Fungame.WorldSettings.xxx
+
+    /// <summary>
+    /// 获取所有启用的 Feature 描述字符串（用于日志显示）
+    /// </summary>
+    [JsonIgnore]
+    public string ActiveFeatures
+    {
+        get
         {
-            var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
-            var name = jsonAttr?.PropertyName ?? prop.Name;
-            var value = prop.GetValue(Feature);
-            var displayValue = value is not null and not string
-                ? value.ToString()
-                : value ?? "null";
-            return $"{name}={displayValue}";
-        }))
-        : "None";
+            var items = new List<string>();
 
-    [JsonIgnore]
-    public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;
-}
+            if (WorldSettings?.Fullbright == true)
+                items.Add("fullbright");
 
-[UsedImplicitly]
-public class MapData
-{
-    [JsonProperty("map")] public string[] Map { get; set; } = [];
-    [JsonProperty("key")] public Dictionary<string, object> Key { get; set; } = new();
-}
+            if (WorldSettings?.ForgivingLevel == true)
+                items.Add("forgiving_level");
 
-[UsedImplicitly]
-public class Feature
-{
-    [JsonProperty("fullbright")] public bool Fullbright { get; set; } = true;
-    [JsonProperty("forgiving_level")] public bool ForgivingLevel { get; set; }
-    [JsonProperty("gravity")] public float Gravity { get; set; } = Physics2D.gravity.y;
-    [JsonProperty("jump_limit")] public int JumpLimit { get; set; }
-    [JsonProperty("climb_limit")] public int ClimbLimit { get; set; }
-    [JsonProperty("mine")] public MineData MineData { get; set; }
-    [JsonProperty("jump_pad")] public JumpPadData JumpPadData { get; set; }
-    [JsonProperty("turret")] public TurretData TurretData { get; set; }
-    [JsonProperty("sound_cannon")] public SoundCannonData SoundCannonData { get; set; }
-    [JsonProperty("spike_stabber")] public SpikeStabberData SpikeStabberData { get; set; }
-    [JsonProperty("geyser")] public GeyserData GeyserData { get; set; }
-    [JsonProperty("beartrap")] public BearTrapData BearTrapData { get; set; }
-}
+            if (WorldSettings?.Gravity != Physics2D.gravity.y)
+                items.Add($"gravity={WorldSettings?.Gravity}");
 
-[UsedImplicitly]
-public class JumpPadData
-{
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 15f;
-    [JsonProperty("no_light")] public bool NoLight { get; set; }
-    [JsonProperty("force")] public float Force { get; set; } = 1f;
-}
+            if (MineData != null)
+                items.Add("mine");
 
-[UsedImplicitly]
-public class TurretData
-{
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 15f;
+            if (JumpPadData != null)
+                items.Add("jump_pad");
 
-    [JsonProperty("shot_power_multiplier")]
-    public float ShotPowerMultiplier { get; set; } = 1f;
+            if (TurretData != null)
+                items.Add("turret");
 
-    [JsonProperty("range")] public float Range { get; set; } = 100f;
-    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-    [JsonProperty("no_light")] public bool NoLight { get; set; }
-    [JsonProperty("explosion_params")] public ExplosionParamsData ExplosionParamsData { get; set; }
-}
+            if (SoundCannonData != null)
+                items.Add("sound_cannon");
 
-[UsedImplicitly]
-public class SoundCannonData
-{
-    [JsonProperty("max_distance")] public float MaxDistance { get; set; } = 50f;
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 5f;
-    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-}
+            if (SpikeStabberData != null)
+                items.Add("spike_stabber");
 
-[UsedImplicitly]
-public class SpikeStabberData
-{
-    [JsonProperty("damage_mult")] public float DamageMult { get; set; } = 1f;
-    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-    [JsonProperty("no_light")] public bool NoLight { get; set; }
-    [JsonProperty("sound")] public string Sound { get; set; }
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 5f;
-}
+            if (GeyserData != null)
+                items.Add("geyser");
 
-[UsedImplicitly]
-public class GeyserData
-{
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 10f;
-    [JsonProperty("activate_duration")] public float ActivateDuration { get; set; } = 4.5f;
-    [JsonProperty("rumble_time")] public float RumbleTime { get; set; } = 1f;
-    [JsonProperty("range")] public float Range { get; set; } = 64f;
-    [JsonProperty("no_liquid")] public bool NoLiquid { get; set; }
-}
+            if (BearTrapData != null)
+                items.Add("beartrap");
 
-[UsedImplicitly]
-public class BearTrapData
-{
-    [JsonProperty("damage_mult")] public float DamageMult { get; set; } = 1f;
-    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 5f;
-}
-
-[UsedImplicitly]
-public class MineData
-{
-    [JsonProperty("undestroy")] public bool Undestroy { get; set; }
-
-    [JsonProperty("explosion_params")] public ExplosionParamsData ExplosionParamsData { get; set; }
-
-    [JsonProperty("cooldown")] public float Cooldown { get; set; } = 0.8f;
-}
-
-[UsedImplicitly]
-public class ExplosionParamsData
-{
-    private static readonly Lazy<ExplosionParams> DefaultExplosionParams = new(() => new ExplosionParams());
-
-    [JsonProperty("muscle_damage")] public RangeF MuscleDamage { get; set; }
-    [JsonProperty("skin_damage")] public RangeF SkinDamage { get; set; }
-    [JsonProperty("skin_damage_chance")] public float SkinDamageChance { get; set; }
-    [JsonProperty("bone_break_chance")] public float BoneBreakChance { get; set; }
-    [JsonProperty("dislocation_chance")] public float DislocationChance { get; set; }
-    [JsonProperty("disfigure_chance")] public float DisfigureChance { get; set; }
-    [JsonProperty("bleed_chance")] public float BleedChance { get; set; }
-    [JsonProperty("bleed_amount")] public RangeF BleedAmount { get; set; }
-    [JsonProperty("structural_damage")] public float StructuralDamage { get; set; }
-    [JsonProperty("range")] public float Range { get; set; }
-    [JsonProperty("velocity")] public float Velocity { get; set; }
-    [JsonProperty("shrapnel_chance")] public float ShrapnelChance { get; set; }
-    [JsonProperty("sound")] public string Sound { get; set; }
-
-    public ExplosionParamsData()
-    {
-        var defaults = DefaultExplosionParams.Value;
-        MuscleDamage = defaults.muscleDamage;
-        SkinDamage = defaults.skinDamage;
-        SkinDamageChance = defaults.skinDamageChance;
-        BoneBreakChance = defaults.boneBreakChance;
-        DislocationChance = defaults.dislocationChance;
-        DisfigureChance = defaults.disfigureChance;
-        BleedChance = defaults.bleedChance;
-        BleedAmount = defaults.bleedAmount;
-        StructuralDamage = defaults.structuralDamage;
-        Range = defaults.range;
-        Velocity = defaults.velocity;
-        ShrapnelChance = defaults.shrapnelChance;
-        Sound = defaults.sound;
-    }
-}
-
-[UsedImplicitly]
-public class CommandData
-{
-    [JsonProperty("once_commands")] public List<string> OnceCommands { get; set; }
-    [JsonProperty("loop_commands")] public List<string> LoopCommands { get; set; }
-    [JsonProperty("loop_interval")] public float LoopInterval { get; set; }
-}
-
-[UsedImplicitly]
-public class WaypointData
-{
-    [JsonProperty("id")] public string Id { get; set; }
-
-    [JsonIgnore] public Vector2 Position => new(X, Y);
-
-    [JsonProperty("x")] public float X { get; set; }
-    [JsonProperty("y")] public float Y { get; set; }
-}
-
-[UsedImplicitly]
-public class ItemData
-{
-    [JsonProperty("id")] public string Id { get; set; }
-    [JsonProperty("slot")] public int Slot { get; set; }
-    [JsonProperty("force")] public bool Force { get; set; }
-}
-
-[UsedImplicitly]
-public class XpData
-{
-    private readonly int[] _base = Skills.BaseSkills(0);
-
-    [JsonProperty("str_xp")] public int StrXp { get; set; }
-    [JsonProperty("res_xp")] public int ResXp { get; set; }
-    [JsonProperty("int_xp")] public int IntXp { get; set; }
-
-    [JsonProperty("exp_str")] public float ExpStr { get; set; }
-    [JsonProperty("exp_res")] public float ExpRes { get; set; }
-    [JsonProperty("exp_int")] public float ExpInt { get; set; }
-
-    [JsonProperty("min_str")] public int MinStr { get; set; }
-    [JsonProperty("max_str")] public int MaxStr { get; set; }
-
-    [JsonProperty("min_res")] public int MinRes { get; set; }
-    [JsonProperty("max_res")] public int MaxRes { get; set; }
-
-    [JsonProperty("min_int")] public int MinInt { get; set; }
-    [JsonProperty("max_int")] public int MaxInt { get; set; }
-    
-    public XpData()
-    {
-        ResetToDefaults();
-    }
-
-    private void ResetToDefaults()
-    {
-        StrXp = _base[0];
-        ResXp = _base[1];
-        IntXp = _base[2];
-        RecalculateMinMax();
-    }
-
-    private void RecalculateMinMax()
-    {
-        MinStr = Skills.GetExperienceForLevel(StrXp);
-        MaxStr = Skills.GetExperienceForLevel(StrXp + 1);
-        MinRes = Skills.GetExperienceForLevel(ResXp);
-        MaxRes = Skills.GetExperienceForLevel(ResXp + 1);
-        MinInt = Skills.GetExperienceForLevel(IntXp);
-        MaxInt = Skills.GetExperienceForLevel(IntXp + 1);
-
-        ExpStr = MinStr;
-        ExpRes = MinRes;
-        ExpInt = MinInt;
-    }
-
-    [OnDeserialized]
-    private void OnDeserialized(StreamingContext context)
-    {
-        RecalculateMinMax();
+            return items.Count > 0 ? string.Join(", ", items) : "None";
+        }
     }
 }

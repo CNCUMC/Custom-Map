@@ -255,6 +255,7 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.world_not_loaded", "未加载世界");
             Add("log.mod_command.no_waypoints", "当前 Fungame 未定义路径点");
             Add("log.mod_command.exit_no_target", "请指定退出目标: none (原版) 或 tutorial (教程关)");
+            Add("log.mod_command.register_failed", "注册自定义指令失败: {0}\n{1}");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "正在加载自定义结构: {0}");
@@ -276,6 +277,21 @@ namespace CustomFungamePack.Lang
             // Log - Map Loader (Build Mode)
             Add("log.map_loader.build_mode_save_applied", "Build Mode 存档应用完成: {0} 个方块, {1} 个液体, {2} 个背景, 失败 {3} 个");
             Add("log.map_loader.not_found_buildmode_save", "未找到 Build Mode 存档文件");
+
+            // Log - Fungame Directory Loader
+            Add("log.loader.directory_not_found", "找不到目录: {0}");
+            Add("log.loader.fungame_json_not_found", "在 {0} 中找不到 fungame.json");
+            Add("log.loader.fungame_json_failed", "反序列化 fungame.json 失败: {0}");
+            Add("log.loader.success", "成功加载 Fungame: {0} (ID: {1}, 版本: {2})");
+            Add("log.loader.failed", "从 {0} 加载 Fungame 失败: {1}");
+            Add("log.loader.level_dir_not_found", "找不到关卡目录: {0}");
+            Add("log.loader.no_level_files", "在 {0} 中未找到关卡文件");
+            Add("log.loader.loaded_level", "已加载关卡: {0}");
+            Add("log.loader.failed_to_load_level", "加载关卡文件 {0} 失败: {1}");
+            Add("log.loader.no_world_settings", "未找到世界设置，使用默认值");
+            Add("log.loader.missing_type", "{0} 缺少 'type' 属性，期望值 '{1}'");
+            Add("log.loader.type_mismatch", "{0} 类型不匹配: 期望 '{1}'，实际 '{2}'");
+            Add("log.loader.failed_to_load_file", "加载 {0} 失败: {1}");
         }
     }
 }

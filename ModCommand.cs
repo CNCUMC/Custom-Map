@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
+using CustomFungamePack.Data;
 using CustomFungamePack.Loader;
 using CustomFungamePack.Patch;
 using HarmonyLib;
 using MossLib.Base;
 using MossLib.Tool;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,9 +23,6 @@ public class ModCommand : ModCommandBase
 {
     private new static readonly ManualLogSource Logger = Plugin.Logger;
     private const string LocaleKeyPre = "mod_command.";
-
-    private static readonly PropertyInfo[] FeatureProperties =
-        typeof(Feature).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
     private static bool _autofillRegistered;
     private static List<string> _cachedFeatureNames = [];
@@ -83,7 +82,7 @@ public class ModCommand : ModCommandBase
         }
         catch (Exception ex)
         {
-            Plugin.Logger.LogError($"Failed to register custom commands: {ex.Message}\n{ex.StackTrace}");
+            Error("register_failed", ex.Message, ex.StackTrace);
         }
     }
 
@@ -108,41 +107,43 @@ public class ModCommand : ModCommandBase
 
         var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var prop in FeatureProperties)
-        {
-            string jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
-            jsonName = jsonName.ToLowerInvariant();
+        // WorldSettings features (scalar)
+        allNames.Add("fullbright");
+        allNames.Add("forgiving_level");
+        allNames.Add("gravity");
+        allNames.Add("jump_limit");
+        allNames.Add("climb_limit");
+        allNames.Add("skip_terrain");
+        allNames.Add("skip_structures");
+        allNames.Add("skip_background");
 
-            string baseName = jsonName;
-            if (baseName.EndsWith("data"))
-                baseName = baseName.Substring(0, baseName.Length - 4);
-
-            allNames.Add(baseName);
-
-            if (!IsSimpleType(prop.PropertyType))
-            {
-                foreach (var subProp in prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (!IsSimpleType(subProp.PropertyType))
-                        continue;
-
-                    string subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
-                    string combinedPath = $"{baseName}.{subJson}".ToLowerInvariant();
-                    allNames.Add(combinedPath);
-                }
-            }
-        }
+        // Feature data objects and their sub-properties
+        AddFeatureSubProperties<MineData>("mine", allNames);
+        AddFeatureSubProperties<JumpPadData>("jump_pad", allNames);
+        AddFeatureSubProperties<TurretData>("turret", allNames);
+        AddFeatureSubProperties<SoundCannonData>("sound_cannon", allNames);
+        AddFeatureSubProperties<SpikeStabberData>("spike_stabber", allNames);
+        AddFeatureSubProperties<GeyserData>("geyser", allNames);
+        AddFeatureSubProperties<BearTrapData>("beartrap", allNames);
 
         var featureNames = allNames.ToList();
 
         _cachedFeatureNames = featureNames;
         _cachedFungameIds = fungameIds ?? [];
 
-        if (fungameIds is not { Count: > 0 } && featureNames.Count == 0)
-        {
-        }
-
         _autofillRegistered = true;
+    }
+
+    private static void AddFeatureSubProperties<T>(string baseName, HashSet<string> names)
+    {
+        names.Add(baseName);
+        foreach (var subProp in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (!IsSimpleType(subProp.PropertyType))
+                continue;
+            string subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
+            names.Add($"{baseName}.{subJson}".ToLowerInvariant());
+        }
     }
 
     [HarmonyPatch("HandleDescriptionText")]
@@ -440,33 +441,16 @@ public class ModCommand : ModCommandBase
 
         try
         {
-            var jsonPath = Path.Combine(directoryPath, "fungame.json");
-
             if (args.Length is 4 or 5)
             {
+                var jsonPath = Path.Combine(directoryPath, "fungame.json");
                 SaveAreaAsMapData(fungame, jsonPath, args[2], args[3]);
                 return;
             }
 
-            using (FileStream output = new(jsonPath, FileMode.Create))
-            using (StreamWriter streamWriter = new(output))
-            using (JsonTextWriter jsonWriter = new(streamWriter))
-            {
-                jsonWriter.Formatting = Formatting.Indented;
+            FungameDirectoryLoader.SaveToDirectory(fungame);
 
-                var serializer = new JsonSerializer
-                {
-                    Formatting = Formatting.Indented,
-                    NullValueHandling = NullValueHandling.Ignore
-                };
-                serializer.Serialize(jsonWriter, fungame);
-
-                jsonWriter.Flush();
-                streamWriter.Flush();
-                output.Flush();
-            }
-
-            InfoFungame("save.success", fungame.Name, jsonPath);
+            InfoFungame("save.success", fungame.Name, directoryPath);
         }
         catch (Exception ex)
         {
@@ -515,7 +499,7 @@ public class ModCommand : ModCommandBase
 
         TipFungame("save.as.start_position");
 
-        var waiter1 = Key.WaitForLeftClick();
+        var waiter1 = new LeftClickYieldInstruction();
         yield return waiter1;
         var startPos = waiter1.Result;
 
@@ -523,7 +507,7 @@ public class ModCommand : ModCommandBase
 
         TipFungame("save.as.end_position");
 
-        var waiter2 = Key.WaitForLeftClick();
+        var waiter2 = new LeftClickYieldInstruction();
         yield return waiter2;
         var endPos = waiter2.Result;
 
@@ -733,17 +717,54 @@ public class ModCommand : ModCommandBase
             keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
         }
 
-        fungame.MapData = new MapData
-        {
-            Map = mapRows,
-            Key = keyDict
-        };
-        fungame.CustomStructures = null;
-        fungame.BuildModeSave = null;
+        var directoryPath = Path.GetDirectoryName(jsonPath);
+        var levelDir = Path.Combine(directoryPath, "level");
+        Directory.CreateDirectory(levelDir);
+        var levelPath = Path.Combine(levelDir, "l1.json");
 
-        var json = JsonConvert.SerializeObject(fungame, Formatting.Indented,
-            new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-        File.WriteAllText(jsonPath, json);
+        // Update or create level data
+        var levelData = fungame.CurrentLevel != null
+            ? new LevelData
+            {
+                X = fungame.CurrentLevel.X,
+                Y = fungame.CurrentLevel.Y,
+                Spawn = fungame.CurrentLevel.Spawn,
+                MapData = new MapData { Map = mapRows, Key = keyDict },
+                CustomStructures = null,
+                BuildModeSave = null,
+                SceneType = fungame.CurrentLevel.SceneType,
+                Items = fungame.CurrentLevel.Items
+            }
+            : new LevelData
+            {
+                X = cMinX,
+                Y = cMinY,
+                MapData = new MapData { Map = mapRows, Key = keyDict }
+            };
+
+        // Write level file with type field
+        var levelObject = JObject.FromObject(levelData, new JsonSerializer
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
+        });
+        levelObject["type"] = "level.l1";
+        File.WriteAllText(levelPath, levelObject.ToString(Formatting.Indented));
+
+        // Write fungame.json (metadata only) with type field
+        var metaObject = new JObject
+        {
+            ["type"] = "meta.fungame",
+            ["name"] = fungame.Name,
+            ["id"] = fungame.Id,
+            ["version"] = fungame.Version,
+            ["author"] = fungame.Author != null ? JToken.FromObject(fungame.Author) : JValue.CreateNull(),
+            ["description"] = fungame.Description
+        };
+        File.WriteAllText(jsonPath, metaObject.ToString(Formatting.Indented));
+
+        // Save all other data (WorldSettings, features, xp, commands) to the target directory
+        FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
 
         InfoFungame("save.area_success",
             cMinX, cMinY, cMaxX, cMaxY,
@@ -851,9 +872,6 @@ public class ModCommand : ModCommandBase
         if (fungame.Waypoints is { Count: > 0 })
             return fungame.Waypoints;
 
-        if (fungame.WaypointData != null)
-            return [fungame.WaypointData];
-
         return [];
     }
 
@@ -881,7 +899,7 @@ public class ModCommand : ModCommandBase
     private static void HandleFeature(string[] args)
     {
         var fungame = FungameCheck.CurrentFungame;
-        if (fungame?.Feature == null)
+        if (fungame == null)
         {
             Error("no_fungame");
             return;
@@ -891,10 +909,10 @@ public class ModCommand : ModCommandBase
         {
             case < 3:
                 InfoFungame("help");
-                ListFeatures(fungame.Feature);
+                ListFeatures(fungame);
                 return;
             case >= 4:
-                SetFeature(fungame.Feature, args[2], args[3]);
+                SetFeature(fungame, args[2], args[3]);
                 break;
             default:
                 InfoFungame("feature.set_missing_params");
@@ -902,32 +920,56 @@ public class ModCommand : ModCommandBase
         }
     }
 
-    private static void ListFeatures(Feature feature)
+    private static void ListFeatures(Fungame fungame)
     {
         Log.Divider();
         InfoFungame("feature.list_header");
 
-        foreach (var prop in FeatureProperties)
+        // List WorldSettings features
+        var settings = fungame.WorldSettings;
+        if (settings != null)
         {
-            var value = prop.GetValue(feature);
-            var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
-            var displayName = Locale($"feature.{GetFeatureDisplayName(prop.Name)}");
-
-            if (value != null && !IsSimpleType(prop.PropertyType))
+            InfoFungame("feature.category", "WorldSettings");
+            foreach (var prop in typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                InfoFungame("feature.parent_item", displayName, jsonName);
-                foreach (var subProp in prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (!IsSimpleType(subProp.PropertyType)) continue;
-                    var subValue = subProp.GetValue(value);
-                    var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
-                    var subDisplay = Locale($"feature.{GetFeatureDisplayName($"{jsonName}.{subJson}")}");
-                    InfoFungame("feature.item", $"    {subDisplay}", subJson, subValue);
-                }
-            }
-            else
-            {
+                if (!IsSimpleType(prop.PropertyType)) continue;
+                var value = prop.GetValue(settings);
+                var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
+                var displayName = Locale($"feature.{GetFeatureDisplayName(jsonName)}");
                 InfoFungame("feature.item", displayName, jsonName, value);
+            }
+        }
+
+        // List feature data objects (MineData, JumpPadData, etc.)
+        var featureDataTypes = new Dictionary<string, object>
+        {
+            ["mine"] = fungame.MineData,
+            ["jump_pad"] = fungame.JumpPadData,
+            ["turret"] = fungame.TurretData,
+            ["sound_cannon"] = fungame.SoundCannonData,
+            ["spike_stabber"] = fungame.SpikeStabberData,
+            ["geyser"] = fungame.GeyserData,
+            ["beartrap"] = fungame.BearTrapData
+        };
+
+        foreach (var kvp in featureDataTypes)
+        {
+            var value = kvp.Value;
+            var displayName = Locale($"feature.{GetFeatureDisplayName(kvp.Key)}");
+            if (value == null)
+            {
+                InfoFungame("feature.item", displayName, kvp.Key, "null");
+                continue;
+            }
+
+            InfoFungame("feature.parent_item", displayName, kvp.Key);
+            foreach (var subProp in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!IsSimpleType(subProp.PropertyType)) continue;
+                var subValue = subProp.GetValue(value);
+                var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
+                var subDisplay = Locale($"feature.{GetFeatureDisplayName($"{kvp.Key}.{subJson}")}");
+                InfoFungame("feature.item", $"    {subDisplay}", subJson, subValue);
             }
         }
 
@@ -940,25 +982,79 @@ public class ModCommand : ModCommandBase
                || type == typeof(float) || type == typeof(double) || type == typeof(bool);
     }
 
-    private static void SetFeature(Feature feature, string featureName, string valueStr)
+    private static void SetFeature(Fungame fungame, string featureName, string valueStr)
     {
         var parts = featureName.Split('.');
-        object target = feature;
-        PropertyInfo targetProp = null;
+        
+        // Resolve the target object and property
+        object target;
+        PropertyInfo targetProp;
 
-        foreach (var part in parts)
+        if (parts.Length == 1)
         {
-            if (target == null) break;
-            targetProp = FindNestedProperty(target.GetType(), part);
-            if (targetProp == null) break;
-            if (part != parts.Last())
-                target = targetProp.GetValue(target);
+            // Try WorldSettings first
+            targetProp = FindNestedProperty(typeof(WorldSettingsData), parts[0]);
+            if (targetProp != null)
+            {
+                target = fungame.WorldSettings;
+            }
+            else
+            {
+                // Try direct feature data object (mine, jump_pad, etc.)
+                var dataProp = FindFungameFeatureProperty(parts[0]);
+                if (dataProp == null)
+                {
+                    ErrorFungame("feature.not_found", featureName);
+                    return;
+                }
+                
+                // For data objects (non-simple type), toggle creation/null
+                if (!IsSimpleType(dataProp.PropertyType))
+                {
+                    var current = dataProp.GetValue(fungame);
+                    if (current == null)
+                    {
+                        // Create new instance
+                        var instance = Activator.CreateInstance(dataProp.PropertyType);
+                        dataProp.SetValue(fungame, instance);
+                        InfoFungame("feature.set_success", featureName, "enabled");
+                    }
+                    else
+                    {
+                        dataProp.SetValue(fungame, null);
+                        InfoFungame("feature.set_success", featureName, "disabled");
+                    }
+                    return;
+                }
+                
+                target = fungame;
+                targetProp = dataProp;
+            }
         }
-
-        if (targetProp == null)
+        else
         {
-            ErrorFungame("feature.not_found", featureName);
-            return;
+            // multi-part: e.g. "mine.undestroy" or "fullbright"
+            // First part is the feature name (mine, jump_pad, etc. or world setting)
+            var dataProp = FindFungameFeatureProperty(parts[0]);
+            if (dataProp == null)
+            {
+                ErrorFungame("feature.not_found", featureName);
+                return;
+            }
+
+            target = dataProp.GetValue(fungame);
+            if (target == null)
+            {
+                ErrorFungame("feature.not_found", featureName);
+                return;
+            }
+
+            targetProp = FindNestedProperty(target.GetType(), parts[1]);
+            if (targetProp == null)
+            {
+                ErrorFungame("feature.not_found", featureName);
+                return;
+            }
         }
 
         try
@@ -972,6 +1068,32 @@ public class ModCommand : ModCommandBase
         {
             ErrorFungame("feature.invalid_value", featureName, valueStr);
         }
+    }
+
+    private static PropertyInfo FindFungameFeatureProperty(string name)
+    {
+        var propName = name switch
+        {
+            "mine" => "MineData",
+            "jump_pad" => "JumpPadData",
+            "turret" => "TurretData",
+            "sound_cannon" => "SoundCannonData",
+            "spike_stabber" => "SpikeStabberData",
+            "geyser" => "GeyserData",
+            "beartrap" => "BearTrapData",
+            "fullbright" => "Fullbright",
+            "forgiving_level" => "ForgivingLevel",
+            "gravity" => "Gravity",
+            "jump_limit" => "JumpLimit",
+            "climb_limit" => "ClimbLimit",
+            "skip_terrain" => "SkipTerrain",
+            "skip_structures" => "SkipStructures",
+            "skip_background" => "SkipBackground",
+            _ => null
+        };
+
+        if (propName == null) return null;
+        return typeof(Fungame).GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
     }
 
     private static PropertyInfo FindNestedProperty(Type type, string name)
@@ -994,49 +1116,9 @@ public class ModCommand : ModCommandBase
         if (string.IsNullOrEmpty(fieldName))
             return fieldName;
 
-        var parts = fieldName.Split('.');
-        string result;
-
-        if (parts.Length >= 2)
-        {
-            var parentProp = typeof(Feature).GetProperties()
-                .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
-                    .Equals(parts[0], StringComparison.OrdinalIgnoreCase));
-
-            if (parentProp != null)
-            {
-                var parentJson = parentProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ??
-                                 parentProp.Name;
-                var subProp = parentProp.PropertyType.GetProperties()
-                    .FirstOrDefault(p => (p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? p.Name)
-                        .Equals(parts[1], StringComparison.OrdinalIgnoreCase));
-                var subJson = subProp?.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? parts[1];
-                // if (parentJson.EndsWith("data"))
-                //     parentJson = parentJson.Substring(0, parentJson.Length - 4);
-                result = $"{parentJson}.{subJson}";
-            }
-            else
-            {
-                result = fieldName.ToLower().Replace(".", "_");
-            }
-        }
-        else
-        {
-            var prop = typeof(Feature).GetProperty(fieldName,
-                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (prop != null)
-            {
-                var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name.ToLower();
-                bool isDataClass = prop.PropertyType.Name.EndsWith("Data", StringComparison.Ordinal);
-                result = isDataClass ? $"{jsonName}_data" : jsonName;
-            }
-            else
-            {
-                result = fieldName.ToLower();
-            }
-        }
-
-        return result;
+        // Simply return the lowercase field name with underscores
+        // The locale system will handle the rest
+        return fieldName.ToLowerInvariant();
     }
 
     private static bool EnsureWorldLoaded()
@@ -1172,5 +1254,38 @@ public class ModCommand : ModCommandBase
     {
         var message = ModLocale.Log($"{LocaleKeyPre}{key}", args);
         Log.Warning(message, Logger);
+    }
+
+    /// <summary>
+    /// 自定义等待左键点击的 YieldInstruction，避免使用 MossLib.Tool.Key.WaitForLeftClick()
+    /// 因为 Key.IsKeyDown() 内部引用的 KeyBinds 类型在某些游戏版本中无法加载（TypeLoadException）
+    /// </summary>
+    private sealed class LeftClickYieldInstruction : CustomYieldInstruction
+    {
+        private bool _clicked;
+
+        public Vector2 Result { get; private set; }
+
+        public override bool keepWaiting
+        {
+            get
+            {
+                if (_clicked)
+                    return false;
+
+                if (!Input.GetMouseButtonDown(0))
+                    return true;
+
+                var camera = Camera.main;
+                if (camera != null)
+                {
+                    var worldPos = camera.ScreenToWorldPoint(Input.mousePosition);
+                    Result = new Vector2(worldPos.x, worldPos.y);
+                }
+
+                _clicked = true;
+                return false;
+            }
+        }
     }
 }

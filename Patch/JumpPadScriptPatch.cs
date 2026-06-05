@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -8,7 +9,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(JumpPadScript))]
 public class JumpPadScriptPatch
 {
-    private static JumpPadData JumpPadData => FungameCheck.CurrentFungame?.Feature?.JumpPadData;
+    private static JumpPadData JumpPadData => FungameCheck.CurrentFungame?.JumpPadData;
 
     private static readonly FieldInfo CooldownField = typeof(JumpPadScript).GetField(
         "cooldown",

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using MossLib.Tool;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(SpikeStabberScript))]
 public class SpikeStabberScriptPatch
 {
-    private static SpikeStabberData SpikeStabberData => FungameCheck.CurrentFungame?.Feature?.SpikeStabberData;
+    private static SpikeStabberData SpikeStabberData => FungameCheck.CurrentFungame?.SpikeStabberData;
 
     private static readonly FieldInfo LightField = typeof(SpikeStabberScript).GetField(
         "light", BindingFlags.NonPublic | BindingFlags.Instance);

@@ -1,0 +1,38 @@
+using System.Collections.Generic;
+using CustomFungamePack.Loader;
+using Newtonsoft.Json;
+using UnityEngine;
+
+namespace CustomFungamePack.Data;
+
+public class LevelData
+{
+    [JsonProperty("map_data", NullValueHandling = NullValueHandling.Ignore)]
+    public MapData MapData { get; set; }
+
+    [JsonProperty("custom_structures", NullValueHandling = NullValueHandling.Ignore)]
+    public string CustomStructures { get; set; }
+
+    [JsonProperty("build_mode_save", NullValueHandling = NullValueHandling.Ignore)]
+    public string BuildModeSave { get; set; }
+
+    [JsonProperty("type")]
+    public string Type { get; set; }
+
+    [JsonProperty("scene_type")]
+    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public WorldGeneration.OverrideSceneType SceneType { get; set; } = WorldGeneration.OverrideSceneType.Debug;
+
+    [JsonProperty("spawn")] public float[] Spawn { get; set; } = [0, 0];
+
+    [JsonProperty("x")] public int X { get; set; }
+
+    [JsonProperty("y")] public int Y { get; set; }
+
+    [JsonProperty("waypoints")] public List<WaypointData> Waypoints { get; set; } = [];
+
+    [JsonProperty("items")] public List<ItemData> Items { get; set; } = [];
+
+    [JsonIgnore]
+    public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;
+}

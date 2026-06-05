@@ -104,23 +104,26 @@ public static class WorldGenerationPatch
     {
         if (CurrentFungame == null) return;
 
-        var features = CurrentFungame.Feature;
-        if (features.ForgivingLevel)
+        var settings = CurrentFungame.WorldSettings;
+        if (settings == null) return;
+
+        if (settings.ForgivingLevel)
         {
             var mapBottom = -WorldGeneration.halfHeight + 10;
             var mapTop = WorldGeneration.halfHeight - 10;
 
             var main = PlayerCamera.main;
-            if (main.body.transform.position.y <= mapBottom
-                || main.transform.position.y <= mapBottom)
+            if (main != null && main.body != null
+                && (main.body.transform.position.y <= mapBottom
+                    || main.transform.position.y <= mapBottom))
             {
                 Player.Tp(new Vector2(main.transform.position.x, mapTop));
             }
         }
 
-        Physics2D.gravity = new Vector2(0, features.Gravity);
-        if (CurrentFungame.Feature.Fullbright)
-            GameConsole.Instance.fullBright = CurrentFungame.Feature.Fullbright;
+        Physics2D.gravity = new Vector2(0, settings.Gravity);
+        if (settings.Fullbright && GameConsole.Instance != null)
+            GameConsole.Instance.fullBright = settings.Fullbright;
 
         HandleLoopCommands();
     }
@@ -135,7 +138,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldCreateBackground()
     {
-        if (CurrentFungame == null || !CurrentFungame.SkipBackground) return true;
+        if (CurrentFungame is not { SkipBackground: true }) return true;
         MoreLogs("skip_generation", ModLocale.Log("common.background"));
         return false;
     }
@@ -186,27 +189,16 @@ public static class WorldGenerationPatch
         bool hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
         bool hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
 
-        int contentTypeCount = (hasMapData ? 1 : 0)
-                               + (hasCustomStructures ? 1 : 0)
-                               + (hasBuildModeSave ? 1 : 0);
-
-        if (contentTypeCount > 1)
-        {
-            Error("multiple_content_types", fungame.Name);
-            return;
-        }
-
-        if (contentTypeCount == 0)
-        {
-            Warning("no_content_type", fungame.Name);
-            return;
-        }
-
+        // 新版结构支持所有内容类型共存，按顺序执行：
+        // 1. map_data (字符串地图)
+        // 2. custom_structures (自定义结构)
+        // 3. build_mode_save (建造模式存档)
         if (hasMapData)
         {
             SpawnMap(fungame);
         }
-        else if (hasCustomStructures)
+
+        if (hasCustomStructures)
         {
             bool hasCustomStructuresMod = Type.GetType(
                 "Custom_Structures.Plugin, Custom Structures") != null;
@@ -219,9 +211,15 @@ public static class WorldGenerationPatch
                 Error("custom_structures_mod_not_loaded", fungame.Name);
             }
         }
-        else if (hasBuildModeSave)
+
+        if (hasBuildModeSave)
         {
             BuildModeSaveLoader.SpawnBuildModeSave(fungame);
+        }
+
+        if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
+        {
+            Warning("no_content_type", fungame.Name);
         }
     }
 

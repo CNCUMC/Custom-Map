@@ -255,6 +255,7 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.world_not_loaded", "World not loaded");
             Add("log.mod_command.no_waypoints", "No waypoints defined in current Fungame");
             Add("log.mod_command.exit_no_target", "Please specify exit target: none (vanilla) or tutorial");
+            Add("log.mod_command.register_failed", "Failed to register custom commands: {0}\n{1}");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "Loading custom structure: {0}");
@@ -276,6 +277,21 @@ namespace CustomFungamePack.Lang
             // Log - Map Loader (Build Mode)
             Add("log.map_loader.build_mode_save_applied", "Build Mode save applied: {0} blocks, {1} liquids, {2} backgrounds, {3} failed");
             Add("log.map_loader.not_found_buildmode_save", "Build Mode save file not found");
+
+            // Log - Fungame Directory Loader
+            Add("log.loader.directory_not_found", "Directory not found: {0}");
+            Add("log.loader.fungame_json_not_found", "fungame.json not found in: {0}");
+            Add("log.loader.fungame_json_failed", "Failed to deserialize fungame.json: {0}");
+            Add("log.loader.success", "Successfully loaded Fungame: {0} (ID: {1}, Version: {2})");
+            Add("log.loader.failed", "Failed to load Fungame from {0}: {1}");
+            Add("log.loader.level_dir_not_found", "Level directory not found: {0}");
+            Add("log.loader.no_level_files", "No level files found in: {0}");
+            Add("log.loader.loaded_level", "Loaded level: {0}");
+            Add("log.loader.failed_to_load_level", "Failed to load level file {0}: {1}");
+            Add("log.loader.no_world_settings", "No world settings found, using defaults");
+            Add("log.loader.missing_type", "Missing 'type' property in {0}, expected '{1}'");
+            Add("log.loader.type_mismatch", "Type mismatch in {0}: expected '{1}', got '{2}'");
+            Add("log.loader.failed_to_load_file", "Failed to load {0}: {1}");
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
-using MossLib.Tool;
+using UnityEngine;
 
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(Body))]
 public static class BodyPatch
 {
-    private static Feature Feature => FungameCheck.CurrentFungame?.Feature;
+    private static WorldSettingsData WorldSettings => FungameCheck.CurrentFungame?.WorldSettings;
 
     private static readonly FieldInfo JumpCooldownField = typeof(Body).GetField(
         "jumpCooldown",
@@ -17,11 +18,13 @@ public static class BodyPatch
         "firstWallJump",
         BindingFlags.NonPublic | BindingFlags.Instance);
 
-    private static bool IsPatchActive => Feature != null
+    private static bool IsPatchActive => WorldSettings != null
                                          && JumpCooldownField != null
                                          && FirstWallJumpField != null;
 
-    private static readonly bool JumpKey = Key.IsKeyDown("jump");
+    // 注意: 不直接使用 MossLib.Tool.Key.IsKeyDown("jump")
+    // 因为 MossLib 内部引用的 KeyBinds 类型在某些游戏版本中无法加载（TypeLoadException）
+    private static bool JumpKey => Input.GetKeyDown(KeyCode.Space);
 
     private static int _jumpCount;
     private static int _climbCount;
@@ -50,7 +53,7 @@ public static class BodyPatch
             return;
 
         // 没按跳 到头了
-        if (!JumpKey || _jumpCount >= Feature.JumpLimit)
+        if (!JumpKey || _jumpCount >= WorldSettings.JumpLimit)
             return;
 
         // 恢复
@@ -69,7 +72,7 @@ public static class BodyPatch
         }
 
         // 没按跳 到头了
-        if (!JumpKey || _climbCount >= Feature.ClimbLimit)
+        if (!JumpKey || _climbCount >= WorldSettings.ClimbLimit)
             return;
 
         // 恢复

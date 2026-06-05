@@ -1,4 +1,5 @@
 using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(GeyserScript))]
 public class GeyserScriptPatch
 {
-    private static GeyserData GeyserData => FungameCheck.CurrentFungame?.Feature?.GeyserData;
+    private static GeyserData GeyserData => FungameCheck.CurrentFungame?.GeyserData;
 
     private static readonly FieldInfo ActivateTimeField = typeof(GeyserScript).GetField(
         "activateTime", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -50,11 +51,9 @@ public class GeyserScriptPatch
             if (elapsed >= data.ActivateDuration && elapsed < 4.5f)
                 ActivateTimeField?.SetValue(__instance, Time.time - 5f);
 
-            if (data.NoLiquid && elapsed < 4.5f)
-            {
-                var targetTime = Time.time - 10f;
-                ActivateTimeField?.SetValue(__instance, targetTime);
-            }
+            if (!data.NoLiquid || !(elapsed < 4.5f)) return;
+            var targetTime = Time.time - 10f;
+            ActivateTimeField?.SetValue(__instance, targetTime);
         }
         catch
         {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(BearTrap))]
 public class BearTrapScriptPatch
 {
-    private static BearTrapData BearTrapData => FungameCheck.CurrentFungame?.Feature?.BearTrapData;
+    private static BearTrapData BearTrapData => FungameCheck.CurrentFungame?.BearTrapData;
 
     private static readonly FieldInfo ActivatedField = typeof(BearTrap).GetField(
         "activated", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -93,11 +94,9 @@ public class BearTrapScriptPatch
             return false;
         }
 
-        if (undestroy)
-        {
-            HandleReTrigger(__instance, other, data);
-            LastTriggerTime[__instance] = now;
-        }
+        if (!undestroy) return false;
+        HandleReTrigger(__instance, other, data);
+        LastTriggerTime[__instance] = now;
 
         return false;
     }

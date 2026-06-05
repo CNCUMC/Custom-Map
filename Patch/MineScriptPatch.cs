@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using CustomFungamePack.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -8,9 +9,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(MineScript))]
 public class MineScriptPatch
 {
-    private static Feature Feature => FungameCheck.CurrentFungame?.Feature;
-
-    private static MineData MineData => Feature?.MineData;
+    private static MineData MineData => FungameCheck.CurrentFungame?.MineData;
 
     private static readonly FieldInfo PressedField = typeof(MineScript).GetField(
         "pressed",
