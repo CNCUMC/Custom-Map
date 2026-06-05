@@ -7,7 +7,7 @@ namespace CustomFungamePack.Data.Feature.World;
 public class WorldSettingsData
 {
     [JsonProperty("type")] public string Type { get; set; }
-    [JsonProperty("fullbright")] public bool Fullbright { get; set; } = true;
+    [JsonProperty("full_bright")] public bool FullBright { get; set; } = true;
     [JsonProperty("forgiving_level")] public bool ForgivingLevel { get; set; }
     [JsonProperty("gravity")] public float Gravity { get; set; } = Physics2D.gravity.y;
     [JsonProperty("jump_limit")] public int JumpLimit { get; set; }

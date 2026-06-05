@@ -106,17 +106,18 @@ public class ModCommand : ModCommandBase
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // WorldSettings features (scalar)
-        allNames.Add("fullbright");
-        allNames.Add("forgiving_level");
-        allNames.Add("gravity");
-        allNames.Add("jump_limit");
-        allNames.Add("climb_limit");
-        allNames.Add("skip_terrain");
-        allNames.Add("skip_structures");
-        allNames.Add("skip_background");
+        var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // WorldSettings features (scalar)
+            "full_bright",
+            "forgiving_level",
+            "gravity",
+            "jump_limit",
+            "climb_limit",
+            "skip_terrain",
+            "skip_structures",
+            "skip_background"
+        };
 
         // Feature data objects and their sub-properties
         AddFeatureSubProperties<MineData>("mine", allNames);
@@ -689,11 +690,9 @@ public class ModCommand : ModCommandBase
 
                 blockIds[x][y] = id;
 
-                if (id > 0 && !blockToChar.ContainsKey(id))
-                {
-                    blockToChar[id] = EncodeBlockIndex(uniqueBlockIds.Count);
-                    uniqueBlockIds.Add(id);
-                }
+                if (id <= 0 || blockToChar.ContainsKey(id)) continue;
+                blockToChar[id] = EncodeBlockIndex(uniqueBlockIds.Count);
+                uniqueBlockIds.Add(id);
             }
         }
 
@@ -764,7 +763,6 @@ public class ModCommand : ModCommandBase
         };
         File.WriteAllText(jsonPath, metaObject.ToString(Formatting.Indented));
 
-        // Save all other data (WorldSettings, features, xp, commands) to the target directory
         FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
 
         InfoFungame("save.area_success",
@@ -1082,7 +1080,7 @@ public class ModCommand : ModCommandBase
             "spike_stabber" => "SpikeStabberData",
             "geyser" => "GeyserData",
             "beartrap" => "BearTrapData",
-            "fullbright" => "Fullbright",
+            "full_bright" => "FullBright",
             "forgiving_level" => "ForgivingLevel",
             "gravity" => "Gravity",
             "jump_limit" => "JumpLimit",
@@ -1093,8 +1091,9 @@ public class ModCommand : ModCommandBase
             _ => null
         };
 
-        if (propName == null) return null;
-        return typeof(Fungame).GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
+        return propName == null 
+            ? null 
+            : typeof(Fungame).GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
     }
 
     private static PropertyInfo FindNestedProperty(Type type, string name)
@@ -1114,12 +1113,8 @@ public class ModCommand : ModCommandBase
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        if (string.IsNullOrEmpty(fieldName))
-            return fieldName;
-
-        // Simply return the lowercase field name with underscores
-        // The locale system will handle the rest
-        return fieldName.ToLowerInvariant();
+        return string.IsNullOrEmpty(fieldName) ? fieldName :
+            fieldName.ToLowerInvariant();
     }
 
     private static bool EnsureWorldLoaded()

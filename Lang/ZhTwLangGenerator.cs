@@ -15,8 +15,9 @@ namespace CustomFungamePack.Lang
             Add("config.start_game_use_fungame.description", "開啟新遊戲時使用選中的 Fungame");
             Add("config.first_use_fungame.name", "首選 Fungame");
             Add("config.first_use_fungame.description", "開始新遊戲時使用的 Fungame ID。需要啟用“開始遊戲使用 Fungame”");
+            
             // Feature
-            Add("feature.fullbright", "全亮");
+            Add("feature.full_bright", "全亮");
             Add("feature.forgiving_level", "仁慈關卡");
             Add("feature.gravity", "重力");
             Add("feature.jump_limit", "跳躍極限");
@@ -115,6 +116,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.config.item", " {0}({1}): {2}");
             Add("command.fungame.config.item_description", " {0}");
             Add("command.fungame.config.set_success", "配置 '{0}' 已設定為 {1}");
+            Add("command.fungame.config.set_failed", "設定配置 '{0}' 失敗: {1}");
             Add("command.fungame.config.not_found", "未找到設定：{0}");
             Add("command.fungame.config.invalid_value", "{0} 的值無效：{1}");
             
@@ -173,6 +175,10 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.start_game_fungame", "開始遊戲時自動使用配置的 Fungame: {0} (ID: {1})");
             Add("log.world_generation.start_game_fungame_not_found", "未找到配置的 Fungame (ID: {0})，將使用默認");
             Add("log.world_generation.no_fungame_selected", "未選擇 Fungame，生成原版世界");
+            Add("log.world_generation.applying_settings_overrides", "正在應用 Settings 覆蓋，共 {0} 項");
+            Add("log.world_generation.settings_override_not_found", "未找到 Settings 覆蓋項: {0}");
+            Add("log.world_generation.settings_override_applied", "已應用 Settings 覆蓋: {0} = {1}");
+            Add("log.world_generation.settings_override_failed", "應用 Settings 覆蓋失敗: {0}");
 
             // Log - Validation
             Add("log.validation.map_invalid_type", "map 字段格式不正確");
@@ -223,6 +229,13 @@ namespace CustomFungamePack.Lang
             Add("log.map_loader.feature_enabled", "已啟用 {0}");
             Add("log.map_loader.feature_enabled_with_value", "已啟用 {0}: {1}");
             Add("log.map_loader.skip_generation", "已跳過 {0} 生成");
+            Add("log.map_loader.no_directory_path", "Fungame 目錄路徑為空");
+            Add("log.map_loader.fungame_json_not_found", "在 {0} 中找不到 fungame.json");
+            Add("log.map_loader.fungame_deserialize_failed", "反序列化 Fungame 失敗");
+            Add("log.map_loader.fungame_reloaded_from_disk", "已從磁碟重新加載 Fungame: {0}");
+            Add("log.map_loader.fungame_reload_failed", "重新加載 Fungame 失敗: {0}");
+            Add("log.map_loader.validation.no_data", "{0} 中沒有 {1} 數據");
+            Add("log.map_loader.validation.row_data_empty", "{0} 行數據為空");
 
             // Log - Error
             Add("log.error.no_fungame_file", "找不到 fungame.json 文件: {0}");
@@ -254,6 +267,8 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.world_not_loaded", "未加載世界");
             Add("log.mod_command.no_waypoints", "當前 Fungame 未定義路徑點");
             Add("log.mod_command.exit_no_target", "請指定退出目標: none (原版) 或 tutorial (教程關)");
+            Add("log.mod_command.register_failed", "註冊自定義指令失敗: {0}\n{1}");
+            Add("log.mod_command.no_fungame", "當前沒有可用的 Fungame");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "正在加載自定義結構: {0}");
@@ -275,6 +290,21 @@ namespace CustomFungamePack.Lang
             // Log - Map Loader (Build Mode)
             Add("log.map_loader.build_mode_save_applied", "Build Mode 存檔應用完成: {0} 個方塊, {1} 個液體, {2} 個背景, 失敗 {3} 個");
             Add("log.map_loader.not_found_buildmode_save", "未找到 Build Mode 存檔文件");
+
+            // Log - Fungame Directory Loader
+            Add("log.loader.directory_not_found", "找不到目錄: {0}");
+            Add("log.loader.fungame_json_not_found", "在 {0} 中找不到 fungame.json");
+            Add("log.loader.fungame_json_failed", "反序列化 fungame.json 失敗: {0}");
+            Add("log.loader.success", "成功加載 Fungame: {0} (ID: {1}, 版本: {2})");
+            Add("log.loader.failed", "從 {0} 加載 Fungame 失敗: {1}");
+            Add("log.loader.level_dir_not_found", "找不到關卡目錄: {0}");
+            Add("log.loader.no_level_files", "在 {0} 中未找到關卡文件");
+            Add("log.loader.loaded_level", "已加載關卡: {0}");
+            Add("log.loader.failed_to_load_level", "加載關卡文件 {0} 失敗: {1}");
+            Add("log.loader.no_world_settings", "未找到世界設置，使用默認值");
+            Add("log.loader.missing_type", "{0} 缺少 'type' 屬性，期望值 '{1}'");
+            Add("log.loader.type_mismatch", "{0} 類型不匹配: 期望 '{1}'，實際 '{2}'");
+            Add("log.loader.failed_to_load_file", "加載 {0} 失敗: {1}");
         }
     }
 }

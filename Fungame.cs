@@ -97,12 +97,6 @@ public class Fungame
     [JsonIgnore]
     public WorldGeneration.OverrideSceneType Type => CurrentLevel?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
 
-    // 旧 Feature 类属性（通过 WorldSettings 访问）
-    // 这些由消费者代码直接使用 CurrentFungame.WorldSettings.xxx 或 Fungame.WorldSettings.xxx
-
-    /// <summary>
-    /// 获取所有启用的 Feature 描述字符串（用于日志显示）
-    /// </summary>
     [JsonIgnore]
     public string ActiveFeatures
     {
@@ -110,8 +104,8 @@ public class Fungame
         {
             var items = new List<string>();
 
-            if (WorldSettings?.Fullbright == true)
-                items.Add("fullbright");
+            if (WorldSettings?.FullBright == true)
+                items.Add("full_bright");
 
             if (WorldSettings?.ForgivingLevel == true)
                 items.Add("forgiving_level");

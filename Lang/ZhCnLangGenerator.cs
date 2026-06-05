@@ -17,7 +17,7 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.description", "开始新游戏时使用的 Fungame ID。需要启用“开始游戏使用 Fungame”");
             
             // Feature
-            Add("feature.fullbright", "全亮");
+            Add("feature.full_bright", "全亮");
             Add("feature.forgiving_level", "仁慈关卡");
             Add("feature.gravity", "重力");
             Add("feature.jump_limit", "跳跃极限");
@@ -116,6 +116,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.config.item", "    {0}({1}): {2}");
             Add("command.fungame.config.item_description", "        {0}");
             Add("command.fungame.config.set_success", "配置 '{0}' 已设置为 {1}");
+            Add("command.fungame.config.set_failed", "设置配置 '{0}' 失败: {1}");
             Add("command.fungame.config.not_found", "未找到配置：{0}");
             Add("command.fungame.config.invalid_value", "{0} 的值无效：{1}");
             
@@ -174,6 +175,10 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.start_game_fungame", "开始游戏时自动使用配置的 Fungame: {0} (ID: {1})");
             Add("log.world_generation.start_game_fungame_not_found", "未找到配置的 Fungame (ID: {0})，将使用默认");
             Add("log.world_generation.no_fungame_selected", "未选择 Fungame，生成原版世界");
+            Add("log.world_generation.applying_settings_overrides", "正在应用 Settings 覆盖，共 {0} 项");
+            Add("log.world_generation.settings_override_not_found", "未找到 Settings 覆盖项: {0}");
+            Add("log.world_generation.settings_override_applied", "已应用 Settings 覆盖: {0} = {1}");
+            Add("log.world_generation.settings_override_failed", "应用 Settings 覆盖失败: {0}");
 
             // Log - Validation
             Add("log.validation.map_invalid_type", "map 字段格式不正确");
@@ -224,6 +229,13 @@ namespace CustomFungamePack.Lang
             Add("log.map_loader.feature_enabled", "已启用 {0}");
             Add("log.map_loader.feature_enabled_with_value", "已启用 {0}: {1}");
             Add("log.map_loader.skip_generation", "已跳过 {0} 生成");
+            Add("log.map_loader.no_directory_path", "Fungame 目录路径为空");
+            Add("log.map_loader.fungame_json_not_found", "在 {0} 中找不到 fungame.json");
+            Add("log.map_loader.fungame_deserialize_failed", "反序列化 Fungame 失败");
+            Add("log.map_loader.fungame_reloaded_from_disk", "已从磁盘重新加载 Fungame: {0}");
+            Add("log.map_loader.fungame_reload_failed", "重新加载 Fungame 失败: {0}");
+            Add("log.map_loader.validation.no_data", "{0} 中没有 {1} 数据");
+            Add("log.map_loader.validation.row_data_empty", "{0} 行数据为空");
 
             // Log - Error
             Add("log.error.no_fungame_file", "找不到 fungame.json 文件: {0}");
@@ -256,6 +268,7 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.no_waypoints", "当前 Fungame 未定义路径点");
             Add("log.mod_command.exit_no_target", "请指定退出目标: none (原版) 或 tutorial (教程关)");
             Add("log.mod_command.register_failed", "注册自定义指令失败: {0}\n{1}");
+            Add("log.mod_command.no_fungame", "当前没有可用的 Fungame");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "正在加载自定义结构: {0}");

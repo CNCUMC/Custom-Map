@@ -66,9 +66,9 @@ public static class MapLoader
 
         var hasAnyFeature = false;
 
-        if (settings.Fullbright)
+        if (settings.FullBright)
         {
-            MoreLogs("feature_enabled", ModLocale.GetFormat("feature.fullbright"));
+            MoreLogs("feature_enabled", ModLocale.GetFormat("feature.full_bright"));
             hasAnyFeature = true;
         }
 

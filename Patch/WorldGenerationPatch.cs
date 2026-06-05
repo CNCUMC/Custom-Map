@@ -121,8 +121,8 @@ public static class WorldGenerationPatch
         }
 
         Physics2D.gravity = new Vector2(0, settings.Gravity);
-        if (settings.Fullbright && GameConsole.Instance != null)
-            GameConsole.Instance.fullBright = settings.Fullbright;
+        if (settings.FullBright && GameConsole.Instance != null)
+            GameConsole.Instance.fullBright = settings.FullBright;
 
         HandleLoopCommands();
     }
@@ -184,7 +184,6 @@ public static class WorldGenerationPatch
             return;
         }
 
-        // Apply game settings overrides before loading content
         if (fungame.WorldSettings?.SettingsOverrides is { Count: > 0 } overrides)
         {
             MoreLogs("applying_settings_overrides", $"count={overrides.Count}");

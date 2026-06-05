@@ -17,7 +17,7 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.description", "The Fungame ID to use when starting a new game. Requires 'Start Use Fungame' to be enabled.");
             
             // Feature
-            Add("feature.fullbright", "Fullbright");
+            Add("feature.full_bright", "Full Bright");
             Add("feature.forgiving_level", "Forgiving Level");
             Add("feature.gravity", "Gravity");
             Add("feature.jump_limit", "Jump Limit");
@@ -116,6 +116,7 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.config.item", " {0}({1}): {2}");
             Add("command.fungame.config.item_description", " {0}");
             Add("command.fungame.config.set_success", "Configuration '{0}' has been set to {1}");
+            Add("command.fungame.config.set_failed", "Failed to set configuration '{0}': {1}");
             Add("command.fungame.config.not_found", "Configuration not found: {0}");
             Add("command.fungame.config.invalid_value", "The value of {0} is invalid: {1}");
 
@@ -174,6 +175,10 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.start_game_fungame", "Starting game with configured Fungame: {0} (ID: {1})");
             Add("log.world_generation.start_game_fungame_not_found", "Configured Fungame (ID: {0}) not found, using default");
             Add("log.world_generation.no_fungame_selected", "No Fungame selected, generating vanilla world");
+            Add("log.world_generation.applying_settings_overrides", "Applying settings overrides, count={0}");
+            Add("log.world_generation.settings_override_not_found", "Settings override not found: {0}");
+            Add("log.world_generation.settings_override_applied", "Applied settings override: {0} = {1}");
+            Add("log.world_generation.settings_override_failed", "Failed to apply settings override: {0}");
 
             // Log - Validation
             Add("log.validation.map_invalid_type", "map field format is incorrect");
@@ -224,6 +229,13 @@ namespace CustomFungamePack.Lang
             Add("log.map_loader.feature_enabled", "{0} enabled");
             Add("log.map_loader.feature_enabled_with_value", "{0} enabled: {1}");
             Add("log.map_loader.skip_generation", "Skipped {0} generation");
+            Add("log.map_loader.no_directory_path", "Fungame directory path is null or empty");
+            Add("log.map_loader.fungame_json_not_found", "fungame.json not found in: {0}");
+            Add("log.map_loader.fungame_deserialize_failed", "Failed to deserialize Fungame from disk");
+            Add("log.map_loader.fungame_reloaded_from_disk", "Reloaded Fungame from disk: {0}");
+            Add("log.map_loader.fungame_reload_failed", "Failed to reload Fungame from disk: {0}");
+            Add("log.map_loader.validation.no_data", "No {1} data in {0}");
+            Add("log.map_loader.validation.row_data_empty", "{0} row data is empty");
 
             // Log - Error
             Add("log.error.no_fungame_file", "Cannot find fungame.json file: {0}");
@@ -256,6 +268,7 @@ namespace CustomFungamePack.Lang
             Add("log.mod_command.no_waypoints", "No waypoints defined in current Fungame");
             Add("log.mod_command.exit_no_target", "Please specify exit target: none (vanilla) or tutorial");
             Add("log.mod_command.register_failed", "Failed to register custom commands: {0}\n{1}");
+            Add("log.mod_command.no_fungame", "No Fungame available");
 
             // Log - Custom Structures Loader
             Add("log.custom_structures_loader.loading", "Loading custom structure: {0}");
