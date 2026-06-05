@@ -93,13 +93,9 @@ public static class WorldGenerationPatch
         }
     }
 
-    /// <summary>
-    /// 当使用 MapData 类型 Fungame 时，抑制 Custom Structures 模组的自动生成，
-    /// 防止其在地图生成过程中随机放置自定义结构，干扰 MapData 的地图块。
-    /// </summary>
     private static void SuppressCustomStructuresForMapData()
     {
-        Loader.CustomStructuresLoader.SuppressAutoGeneration();
+        CustomStructuresLoader.SuppressAutoGeneration();
     }
 
     [HarmonyPatch("Update")]
@@ -309,8 +305,6 @@ public static class WorldGenerationPatch
         __instance.maxINT = xpData.MaxInt;
         __instance.maxRES = xpData.MaxRes;
         __instance.maxSTR = xpData.MaxStr;
-
-        Skills.xpGainMult = xpData.XpMultiple;
     }
 
     private static void MoreLogs(string key, params object[] args)

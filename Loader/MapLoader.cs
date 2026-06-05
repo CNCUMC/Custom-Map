@@ -195,6 +195,11 @@ public static class MapLoader
                 PlaceBlock(intValue, worldX, worldY, ref blockCount, ref failCount);
                 break;
             }
+            case ushort ushortValue:
+            {
+                PlaceBlock(ushortValue, worldX, worldY, ref blockCount, ref failCount);
+                break;
+            }
             case string stringValue:
             {
                 PlaceItem(stringValue, worldX, worldY, ref itemCount, ref failCount);

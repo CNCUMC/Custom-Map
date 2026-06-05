@@ -74,16 +74,7 @@ public class Fungame
         : "None";
 
     [JsonIgnore]
-    public Vector2 SpawnPosition
-    {
-        get
-        {
-            if (Spawn is { Length: >= 2 })
-                return new Vector2(Spawn[0], Spawn[1]);
-
-            return Vector2.zero;
-        }
-    }
+    public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;
 }
 
 [UsedImplicitly]
@@ -99,8 +90,8 @@ public class Feature
     [JsonProperty("fullbright")] public bool Fullbright { get; set; } = true;
     [JsonProperty("forgiving_level")] public bool ForgivingLevel { get; set; }
     [JsonProperty("gravity")] public float Gravity { get; set; } = Physics2D.gravity.y;
-    [JsonProperty("jump_limit")] public int JumpLimit { get; set; } = 0;
-    [JsonProperty("climb_limit")] public int ClimbLimit { get; set; } = 0;
+    [JsonProperty("jump_limit")] public int JumpLimit { get; set; }
+    [JsonProperty("climb_limit")] public int ClimbLimit { get; set; }
     [JsonProperty("mine")] public MineData MineData { get; set; }
     [JsonProperty("jump_pad")] public JumpPadData JumpPadData { get; set; }
     [JsonProperty("turret")] public TurretData TurretData { get; set; }
@@ -264,9 +255,7 @@ public class XpData
 
     [JsonProperty("min_int")] public int MinInt { get; set; }
     [JsonProperty("max_int")] public int MaxInt { get; set; }
-
-    [JsonProperty("xp_multiple")] public float XpMultiple { get; set; } = 1f;
-
+    
     public XpData()
     {
         ResetToDefaults();

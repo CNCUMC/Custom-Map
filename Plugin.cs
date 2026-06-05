@@ -4,17 +4,18 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using CustomFungamePack.Lang;
 using HarmonyLib;
+using MossLib.Constant;
 using MossLib.Tool;
 
 namespace CustomFungamePack;
 
 [BepInPlugin(Guid, Name, Version)]
-[BepInDependency("blackmoss.mosslib")]
+[BepInDependency("ExplosiveHydra.MossLib")]
 public class Plugin : BaseUnityPlugin
 {
-    public const string Guid = "blackmoss.customfungamepack";
+    public const string Guid = "ExplosiveHydra.CustomFungamePack";
     public const string Name = "Custom Fungame Pack";
-    public const string Version = "1.0.0";
+    public const string Version = "1.1.0";
 
     internal new static ManualLogSource Logger;
     private readonly Harmony _harmony = new(Guid);
@@ -37,12 +38,9 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll();
         FungameCheck.Initialize();
 
-        MoreLogs = RegisterConfig("more_logs", false,
-            ConfigLocale("more_logs.description"));
-        StartGameUseFungame = RegisterConfig("start_game_use_fungame", false,
-            ConfigLocale("start_game_use_fungame.description"));
-        FirstUseFungame = RegisterConfig("first_use_fungame", TemplateFungame.Id,
-            ConfigLocale("first_use_fungame.description"));
+        MoreLogs = RegisterConfig("more_logs", false);
+        StartGameUseFungame = RegisterConfig("start_game_use_fungame", false);
+        FirstUseFungame = RegisterConfig("first_use_fungame", TemplateFungame.Id);
         ModConfigs.ReloadConfigs();
     }
 
@@ -174,14 +172,14 @@ public class Plugin : BaseUnityPlugin
                 "11                                                                                              11111111111111111    11t             t1",
                 "11                                                                                              11111111111111111    11               11",
                 "11                                                                                              11111111111111111    11t             t11",
-                "11                                                                                              11             11                     11",
-                "11                                                                                              11i i i i i i i11                     11",
-                "11                                                                                              11             11                     11",
-                "11                                                                                              11i i i i i i i11          1111111111111",
-                "11                                                                                              11             11          1111111111111",
-                "11                                                                                              11i i i i i i i11          11         11",
-                "11                                                                                              11             11          11         11",
-                "11                                                                                              11i i i g i i i11          11         11",
+                "11                                                                                              11iiiiiiiiiiiii11                     11",
+                "11                                                                                              11iiiiiiiiiiiii11                     11",
+                "11                                                                                              11iiiiiiiiiiiii11                     11",
+                "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
+                "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
+                "11                                                                                              11iiiiiiiiiiiii11          11         11",
+                "11                                                                                              11iiiiiiiiiiiii11          11         11",
+                "11                                                                                              11iiiiiigiiiiii11          11         11",
                 "11                                                                                              11111111111111111    11111111         11",
                 "11                                                                                              11111111111111111    11111111         11",
                 "11                                                                                                                                    11",
@@ -193,9 +191,9 @@ public class Plugin : BaseUnityPlugin
             ],
             Key =
             {
-                { " ", 0 },
-                { "1", 6 },
-                { "2", 10 },
+                { " ", Blocks.Air.Id },
+                { "1", Blocks.SteelTile.Id },
+                { "2", Blocks.HeatResistantAlloy.Id },
                 { "l", "landmine" },
                 { "j", "jumppad" },
                 { "t", "turret" },
@@ -210,35 +208,35 @@ public class Plugin : BaseUnityPlugin
         [
             new ItemData
             {
-                Id = "geofruit",
-                Slot = 0
+                Id = Items.GeoFruit,
+                Slot = Slots.MainHand
             },
             new ItemData
             {
-                Id = "geofruit",
-                Slot = 2
+                Id = Items._9MmRound,
+                Slot = Slots.Mouth
             },
             new ItemData
             {
-                Id = "geofruit",
-                Slot = 3
+                Id = Items._12Gauge,
+                Slot = Slots.UpperBck
             },
             new ItemData
             {
-                Id = "geofruit",
-                Slot = 4
+                Id = Items.Aed,
+                Slot = Slots.MiddleBack
             },
             new ItemData
             {
-                Id = "geofruit",
-                Slot = 5
+                Id = Items.Lrd,
+                Slot = Slots.LowerBack
             }
         ]
     };
 
-    private ConfigEntry<T> RegisterConfig<T>(string key, T defaultValue, string description)
+    private ConfigEntry<T> RegisterConfig<T>(string key, T defaultValue)
     {
-        var entry = Config.Bind("General", key, defaultValue, description);
+        var entry = Config.Bind("General", key, defaultValue, ConfigLocale($"{key}.description"));
         ConfigRegistry[key] = entry;
         return entry;
     }
