@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
 using CustomFungamePack.Data;
+using CustomFungamePack.Data.Feature.World;
 using CustomFungamePack.Loader;
 using CustomFungamePack.Patch;
 using HarmonyLib;

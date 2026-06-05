@@ -376,6 +376,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Feature\" />
+  </ItemGroup>
+
   <Target Name="CopyOutputDllsToPluginsFolder" AfterTargets="AfterBuild" Condition="'$(RequiredFilesToCopy)'!=''">
     <MakeDir Directories="$(BepInExDir)/plugins/$(PluginDirName)" />
     <CombinePath BasePath="$(OutDir)" Paths="$(RequiredFilesToCopy)">

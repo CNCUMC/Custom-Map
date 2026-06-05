@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace CustomFungamePack.Data;
+namespace CustomFungamePack.Data.Feature.World;
 
 [UsedImplicitly]
 public class ItemData

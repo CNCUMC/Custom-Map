@@ -3,6 +3,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using CustomFungamePack.Data;
+using CustomFungamePack.Data.Feature.World;
 using CustomFungamePack.Lang;
 using HarmonyLib;
 using MossLib.Constant;

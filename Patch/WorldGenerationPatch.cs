@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using CustomFungamePack.Loader;
@@ -102,9 +103,7 @@ public static class WorldGenerationPatch
     [HarmonyPostfix]
     private static void Update()
     {
-        if (CurrentFungame == null) return;
-
-        var settings = CurrentFungame.WorldSettings;
+        var settings = CurrentFungame?.WorldSettings;
         if (settings == null) return;
 
         if (settings.ForgivingLevel)
@@ -114,8 +113,8 @@ public static class WorldGenerationPatch
 
             var main = PlayerCamera.main;
             if (main != null && main.body != null
-                && (main.body.transform.position.y <= mapBottom
-                    || main.transform.position.y <= mapBottom))
+                             && (main.body.transform.position.y <= mapBottom
+                                 || main.transform.position.y <= mapBottom))
             {
                 Player.Tp(new Vector2(main.transform.position.x, mapTop));
             }
@@ -147,7 +146,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateStructures()
     {
-        if (CurrentFungame == null || !CurrentFungame.SkipStructures) return true;
+        if (CurrentFungame is not { SkipStructures: true }) return true;
         MoreLogs("skip_generation", ModLocale.Log("common.structure"));
         return false;
     }
@@ -156,7 +155,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateTerrain()
     {
-        if (CurrentFungame == null || !CurrentFungame.SkipTerrain) return true;
+        if (CurrentFungame is not { SkipTerrain: true }) return true;
         MoreLogs("skip_generation", ModLocale.Log("common.terrain"));
         return false;
     }
@@ -185,14 +184,18 @@ public static class WorldGenerationPatch
             return;
         }
 
+        // Apply game settings overrides before loading content
+        if (fungame.WorldSettings?.SettingsOverrides is { Count: > 0 } overrides)
+        {
+            MoreLogs("applying_settings_overrides", $"count={overrides.Count}");
+            ApplySettingsOverrides(overrides);
+        }
+
         bool hasMapData = fungame.MapData != null;
         bool hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
         bool hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
 
-        // 新版结构支持所有内容类型共存，按顺序执行：
-        // 1. map_data (字符串地图)
-        // 2. custom_structures (自定义结构)
-        // 3. build_mode_save (建造模式存档)
+        // 支持所有内容类型共存 按顺序执行
         if (hasMapData)
         {
             SpawnMap(fungame);
@@ -303,6 +306,33 @@ public static class WorldGenerationPatch
         __instance.maxINT = xpData.MaxInt;
         __instance.maxRES = xpData.MaxRes;
         __instance.maxSTR = xpData.MaxStr;
+    }
+
+    private static void ApplySettingsOverrides(Dictionary<string, object> overrides)
+    {
+        Settings.EnsureLoaded();
+        var allSettings = Settings.GetAllSettings();
+        foreach (var kvp in overrides)
+        {
+            var setting = allSettings.Find(s =>
+                string.Equals(s.name, kvp.Key, StringComparison.OrdinalIgnoreCase));
+            if (setting == null)
+            {
+                MoreLogs("settings_override_not_found", kvp.Key);
+                continue;
+            }
+
+            try
+            {
+                setting.SetValue(kvp.Value);
+                setting.Apply();
+                MoreLogs("settings_override_applied", kvp.Key, kvp.Value);
+            }
+            catch (Exception ex)
+            {
+                Warning("settings_override_failed", $"key={kvp.Key} error={ex.Message}");
+            }
+        }
     }
 
     private static void MoreLogs(string key, params object[] args)

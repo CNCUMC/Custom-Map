@@ -1,25 +1,19 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace CustomFungamePack.Data;
+namespace CustomFungamePack.Data.Feature.World;
 
 public class WorldSettingsData
 {
     [JsonProperty("type")] public string Type { get; set; }
-
     [JsonProperty("fullbright")] public bool Fullbright { get; set; } = true;
-
     [JsonProperty("forgiving_level")] public bool ForgivingLevel { get; set; }
-
     [JsonProperty("gravity")] public float Gravity { get; set; } = Physics2D.gravity.y;
-
     [JsonProperty("jump_limit")] public int JumpLimit { get; set; }
-
     [JsonProperty("climb_limit")] public int ClimbLimit { get; set; }
-
     [JsonProperty("skip_terrain")] public bool SkipTerrain { get; set; } = true;
-
     [JsonProperty("skip_structures")] public bool SkipStructures { get; set; } = true;
-
     [JsonProperty("skip_background")] public bool SkipBackground { get; set; } = true;
+    [JsonProperty("settings_overrides")] public Dictionary<string, object> SettingsOverrides { get; set; }
 }

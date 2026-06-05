@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using CustomFungamePack.Data;
+using CustomFungamePack.Data.Feature.World;
 using HarmonyLib;
+using MossLib.Constant;
 using UnityEngine;
 
 namespace CustomFungamePack.Patch;
@@ -22,9 +24,7 @@ public static class BodyPatch
                                          && JumpCooldownField != null
                                          && FirstWallJumpField != null;
 
-    // 注意: 不直接使用 MossLib.Tool.Key.IsKeyDown("jump")
-    // 因为 MossLib 内部引用的 KeyBinds 类型在某些游戏版本中无法加载（TypeLoadException）
-    private static bool JumpKey => Input.GetKeyDown(KeyCode.Space);
+    private static bool JumpKey => Input.GetKeyDown(Keys.Jump);
 
     private static int _jumpCount;
     private static int _climbCount;

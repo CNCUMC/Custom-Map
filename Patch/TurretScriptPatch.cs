@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using CustomFungamePack.Data;
+using CustomFungamePack.Data.Feature.World;
 using HarmonyLib;
 using UnityEngine;
 

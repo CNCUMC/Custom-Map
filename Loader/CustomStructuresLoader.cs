@@ -19,11 +19,6 @@ public static class CustomStructuresLoader
     private static readonly ManualLogSource Logger = Plugin.Logger;
     private const string CustomStructuresGuid = "com.Jimmyking.morestructures";
 
-    /// <summary>
-    /// 当使用 MapData 类型 Fungame 时，抑制 Custom Structures 模组的自动生成。
-    /// 该模组有自己的 Harmony 补丁，会在世界生成时自动放置已注册的结构。
-    /// 通过清除其结构注册表来防止其自动生成干扰 MapData 的地图块。
-    /// </summary>
     public static void SuppressAutoGeneration()
     {
         try
@@ -187,10 +182,9 @@ public static class CustomStructuresLoader
         }
 
         Match match = V1NameRegex.Match(text);
-        if (match.Success)
-            return match.Groups[1].Value;
-
-        return Path.GetFileNameWithoutExtension(fileName);
+        return match.Success
+            ? match.Groups[1].Value 
+            : Path.GetFileNameWithoutExtension(fileName);
     }
 
     private static void MoreInfo(string key, params object[] args)

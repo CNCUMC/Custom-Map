@@ -2,7 +2,7 @@ using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace CustomFungamePack.Data;
+namespace CustomFungamePack.Data.Feature.Player;
 
 [UsedImplicitly]
 public class XpData
