@@ -4,7 +4,7 @@
 
 # Custom Fungame Pack
 
-[GitHub](https://github.com/Black-Moss/Custom-Fungame-Pack) / [NexusMods](https://www.nexusmods.com/games/scavprototype/mods/131)
+[GitHub](https://github.com/Explosive-Hydra/Custom-Fungame-Pack) / [NexusMods](https://www.nexusmods.com/games/scavprototype/mods/131)
 
 _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**._
 
@@ -27,7 +27,8 @@ _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**.
     - [fg save](#fg-save)
     - [fg save as](#fg-save-as)
 - [Creating a Fungame](#creating-a-fungame)
-    - [Fungame JSON Format](#fungame-json-format)
+    - [Fungame Directory Structure](#fungame-directory-structure)
+    - [Fungame JSON](#fungame-json)
     - [Content Types](#content-types)
         - [MapData](#mapdata)
         - [CustomStructures](#customstructures)
@@ -35,6 +36,7 @@ _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**.
     - [Features](#features)
     - [Commands](#commands)
     - [XP Configuration](#xp-configuration)
+    - [Localization](#localization)
 - [Project Structure](#project-structure)
 
 ---
@@ -50,11 +52,11 @@ logic.
 ## Installation
 
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx) for Casualties Unknown.
-2. Install [Moss Lib](https://github.com/Black-Moss/Moss-Lib).
-3. Download the latest release from the [Releases](https://github.com/Black-Moss/Custom-Fungame-Pack/releases) page.
+2. Install [Moss Lib](https://github.com/Explosive-Hydra/Moss-Lib).
+3. Download the latest release from the [Releases](https://github.com/Explosive-Hydra/Custom-Fungame-Pack/releases) page.
 4. Extract the downloaded archive and place the entire `Custom Fungame Pack` folder into your `BepInEx/plugins/` folder.
 5. Create a `Fungames/` folder in your game's root directory (next to `CasualtiesUnknown.exe`).
-6. Place your Fungame folders inside `Fungames/` (each containing a `fungame.json`).
+6. Place your Fungame folders inside `Fungames/` (see [Fungame Directory Structure](#fungame-directory-structure)).
 
 ### Folder Structure
 
@@ -65,16 +67,22 @@ Casualties Unknown Demo/
 │       ├── Moss Lib
 │       │   └── Moss Lib.dll
 │       └── Custom Fungame Pack
-│           ├── Lang/
+│           ├── Lang/                  # Auto-generated locale files
 │           ├── CustomFungamePack.dll
 │           ├── LICENSE.md
 │           ├── README.md
 │           └── README_ZH.md
-├── Fungames/
+├── Fungames/                          # User-created Fungames
 │   ├── MyCustomMap/
-│   │   └── fungame.json
+│   │   ├── fungame.json               # Metadata (id, author, version)
+│   │   ├── level/                     # Level data files
+│   │   ├── world/                     # World feature files
+│   │   ├── player/                    # Player feature files
+│   │   └── lang/                      # Localized name/description
 │   └── AnotherMap/
-│       └── fungame.json
+│       ├── fungame.json
+│       ├── level/
+│       └── lang/
 └── CasualtiesUnknown.exe
 ```
 
@@ -87,7 +95,7 @@ Configure via `BepInEx/config/blackmoss.customfungamepack.cfg`:
 | Key                 | Type     | Default    | Description                                            |
 |---------------------|----------|------------|--------------------------------------------------------|
 | `more_logs`         | `bool`   | `false`    | Enable verbose logging                                 |
-| `start_lse_fungame` | `bool`   | `false`    | Automatically load a Fungame on new game start         |
+| `start_use_fungame` | `bool`   | `false`    | Automatically load a Fungame on new game start         |
 | `first_use_fungame` | `string` | `template` | Fungame ID to load when `Start Use Fungame` is enabled |
 
 ---
@@ -216,83 +224,68 @@ fg save as                     # Follow on-screen prompts
 
 ## Creating a Fungame
 
-Each Fungame is a folder inside the `Fungames/` directory containing a `fungame.json` file.
+Each Fungame is a folder inside the `Fungames/` directory.
 
-### Fungame JSON Format
+### Fungame Directory Structure
+
+A Fungame directory can contain the following files and subdirectories:
+
+```
+MyCustomMap/
+├── fungame.json              # Metadata (required)
+├── level/                    # Level data files
+│   ├── level1.json           # First level (auto-generated)
+│   └── level2.json           # Additional levels
+├── world/                    # World feature data
+│   ├── settings.json         # World settings (Fullbright, Gravity, etc.)
+│   ├── mine.json             # Mine feature
+│   ├── jump_pad.json         # Jump pad feature
+│   ├── turret.json           # Turret feature
+│   ├── sound_cannon.json     # Sound cannon feature
+│   ├── spike_stabber.json    # Spike stabber feature
+│   ├── geyser.json           # Geyser feature
+│   └── beartrap.json         # Bear trap feature
+├── player/                   # Player feature data
+│   └── xp.json               # XP configuration
+├── command.json              # Console commands
+└── lang/                     # Localization files
+    ├── zh-CN.json            # Simplified Chinese
+    ├── EN.json               # English
+    └── ZhTw.json             # Traditional Chinese
+```
+
+> Most files are auto-generated when using `fg save as`. You only need to manually create `fungame.json`.
+
+### Fungame JSON
+
+The `fungame.json` file contains metadata. Note that `name` and `description` are stored in per-Fungame
+localization files under the `lang/` directory, not in this JSON.
 
 ```json
 {
-  "name": "My Custom Map",
   "id": "my_custom_map",
   "version": "1.0.0",
   "author": [
     "YourName"
   ],
-  "description": "A cool custom map",
-  "spawn": [
-    0,
-    0
-  ],
-  "x": -68,
-  "y": 62,
-  "type": "Debug",
-  "feature": {
-    "Fullbright": true,
-    "ForgivingLevel": false,
-    "Gravity": -9.81,
-    "JumpLimit": 0,
-    "ClimbLimit": 0
-  },
-  "waypoints": [
-    {
-      "id": "center",
-      "x": 0,
-      "y": 0
-    }
-  ],
-  "items": [
-    {
-      "id": "rifle",
-      "slot": 0,
-      "force": true
-    }
-  ],
-  "skip_terrain": true,
-  "skip_structures": true,
-  "skip_background": true,
-  "map_data": {},
-  "command": {},
-  "custom_structures": "filename.json",
-  "build_mode_save": "filename.bms",
-  "xp": {}
+  "type": "fungame"
 }
 ```
 
-| Field               | Type       | Required                                                    | Description                                                            |
-|---------------------|------------|-------------------------------------------------------------|------------------------------------------------------------------------|
-| `name`              | `string`   | Yes                                                         | Display name                                                           |
-| `id`                | `string`   | Yes                                                         | Unique identifier (auto-generated from folder name if omitted)         |
-| `version`           | `string`   | Yes                                                         | Version string (default: `1.0.0`)                                      |
-| `author`            | `string[]` | Yes                                                         | List of authors                                                        |
-| `description`       | `string`   | Yes                                                         | Map description                                                        |
-| `spawn`             | `float[2]` | No                                                          | Spawn coordinates `[x, y]` (default: `[0, 0]`)                         |
-| `x`, `y`            | `int`      | No                                                          | Map position origin (default: `[0, 0]`)                                |
-| `type`              | `string`   | No                                                          | Scene type: `Debug`, `None`, `Tutorial` (default: `Debug`)             |
-| `feature`           | `object`   | No                                                          | Feature overrides (see [Features](#features))                          |
-| `waypoints`         | `array`    | No                                                          | List of waypoints (see [Waypoints](#waypoints))                        |
-| `items`             | `array`    | No                                                          | Starting items (see [Items](#items))                                   |
-| `skip_terrain`      | `bool`     | No                                                          | Skip terrain generation (default: `true`)                              |
-| `skip_structures`   | `bool`     | No                                                          | Skip structure generation (default: `true`)                            |
-| `skip_background`   | `bool`     | No                                                          | Skip background generation (default: `true`)                           |
-| `xp`                | `object`   | No                                                          | XP configuration (see [XP Configuration](#xp-configuration))           |
-| `map_data`          | `object`   | One of `map_data` / `custom_structures` / `build_mode_save` | Map data content (see [MapData](#mapdata))                             |
-| `custom_structures` | `string`   | One of `map_data` / `custom_structures` / `build_mode_save` | Custom Structures filename (see [CustomStructures](#customstructures)) |
-| `build_mode_save`   | `string`   | One of `map_data` / `custom_structures` / `build_mode_save` | Build Mode Save filename (see [BuildModeSave](#buildmodesave))         |
-| `command`           | `object`   | No                                                          | Command configuration (see [Commands](#commands))                      |
+| Field     | Type       | Required | Description                                                     |
+|-----------|------------|----------|-----------------------------------------------------------------|
+| `id`      | `string`   | No       | Unique identifier (auto-generated from folder name if omitted)  |
+| `version` | `string`   | No       | Version string (default: `1.0.0`)                               |
+| `author`  | `string[]` | No       | List of authors (default: `["Unknown"]`)                        |
+| `type`    | `string`   | No       | Always `"fungame"` for validation                               |
 
-> **Note:** Only **one** content type (`map_data`, `custom_structures`, or `build_mode_save`) can be used at a time.
+> **Localization:** The display `name` and `description` are read from `lang/{currentLocale}.json` under the
+> key `fungame.name` and `fungame.description`. If no locale file exists, the Fungame object's raw property values are
+> used as fallback.
 
 ### Content Types
+
+Each Fungame's level can have one of three content types.
 
 #### MapData
 
@@ -444,28 +437,89 @@ Configure the player's skill levels and experience when the Fungame loads.
 `exp_str`/`exp_res`/`exp_int` (current experience points) are automatically calculated based on the skill levels, so
 > they don't need to be specified manually.
 
+### Localization
+
+Each Fungame can have localized name and description text in its own `lang/` directory.
+
+The locale file follows this format:
+
+```json
+{
+  "fungame": {
+    "name": "My Custom Map",
+    "description": "A cool custom map"
+  }
+}
+```
+
+The file name must match the game's current locale setting (e.g., `zh-CN.json` for Simplified Chinese,
+`EN.json` for English). The game's current language is determined by `PlayerPrefs.GetString("locale", "EN")`.
+
+When displaying a Fungame's name or description, the system:
+1. Reads from `{FungameDir}/lang/{currentLocale}.json` → `fungame.name` / `fungame.description`
+2. Falls back to the raw `Name` / `Description` property on the Fungame object if no localized text is found
+
+> **Note:** The `author` field is NOT localized—it is always read from `fungame.json`.
+
 ---
 
 ## Project Structure
 
 ```
 CustomFungamePack/
-├── Plugin.cs                    # Main plugin entry point (BepInEx)
-├── Configs.cs                   # Static config accessors
-├── ModLocale.cs                 # Localization wrapper
-├── Fungame.cs                   # Fungame data model
-├── FungameCheck.cs              # Fungame directory scanner & validator
-├── ModCommand.cs                # fg command handler
-├── WorldGenerationPatch.cs      # Harmony patches for world generation
-├── BodyPatch.cs                 # Harmony patches for player body
+├── Plugin.cs                       # Main plugin entry point (BepInEx)
+├── ModConfigs.cs                   # Static config accessors
+├── ModLocale.cs                    # Plugin-wide localization (ModLocaleBase)
+├── ModCommand.cs                   # fg console command handler
+├── Fungame.cs                      # Fungame data model
+├── FungameCheck.cs                 # Fungame directory scanner & initializer
+├── FungameLocale.cs                # Per-Fungame localization helper
+├── Data/
+│   ├── CommandData.cs              # Command configuration model
+│   ├── MapData.cs                  # Map data model (grid + key)
+│   ├── SpikeStabberData.cs         # Spike stabber feature data
+│   ├── WaypointData.cs             # Waypoint data
+│   └── Feature/
+│       ├── Player/
+│       │   └── XpData.cs           # XP configuration model
+│       └── World/
+│           ├── BearTrapData.cs     # Bear trap feature data
+│           ├── ExplosionParamsData.cs
+│           ├── GeyserData.cs       # Geyser feature data
+│           ├── ItemData.cs         # Starting item data
+│           ├── JumpPadData.cs      # Jump pad feature data
+│           ├── LevelData.cs        # Level data model (core)
+│           ├── MineData.cs         # Mine feature data
+│           ├── SoundCannonData.cs  # Sound cannon feature data
+│           ├── TurretData.cs       # Turret feature data
+│           └── WorldSettingsData.cs # World settings (Fullbright, Gravity, etc.)
 ├── Lang/
-│   ├── EnLangGenerator.cs       # English locale generator
-│   ├── ZhCnLangGenerator.cs     # Simplified Chinese locale generator
-│   └── ZhTwLangGenerator.cs     # Traditional Chinese locale generator
-└── Loader/
-    ├── MapLoader.cs             # Fungame map data loader
-    ├── CustomStructuresLoader.cs # Custom Structures loader
-    └── BuildModeSaveLoader.cs   # Build Mode Save loader
+│   ├── EnLangGenerator.cs          # English locale file generator
+│   ├── ZhCnLangGenerator.cs        # Simplified Chinese locale file generator
+│   └── ZhTwLangGenerator.cs        # Traditional Chinese locale file generator
+├── Loader/
+│   ├── BuildModeSaveLoader.cs      # Build Mode Save loader (soft dependency)
+│   ├── CustomStructuresLoader.cs   # Custom Structures loader (soft dependency)
+│   ├── FungameDirectoryLoader.cs   # Fungame directory serialization (load/save)
+│   └── MapLoader.cs                # Map data parser & block placer
+├── Patch/
+│   ├── BearTrapScriptPatch.cs      # Bear trap Harmony patches
+│   ├── BodyPatch.cs                # Player body Harmony patches (multi-jump, multi-climb)
+│   ├── GeyserScriptPatch.cs        # Geyser Harmony patches
+│   ├── JumpPadScriptPatch.cs       # Jump pad Harmony patches
+│   ├── MineScriptPatch.cs          # Mine Harmony patches
+│   ├── SoundCannonScriptPatch.cs   # Sound cannon Harmony patches
+│   ├── SpikeStabberScriptPatch.cs  # Spike stabber Harmony patches
+│   ├── TurretScriptPatch.cs        # Turret Harmony patches
+│   └── WorldGenerationPatch.cs     # World generation Harmony patches (core)
+├── Logo.png                        # Plugin logo
+├── Covor.png                       # Cover image
+├── CustomFungamePack.csproj        # Project file
+├── LICENSE.md                      # GNU General Public License v3.0
+├── README.md                       # English documentation
+├── README_ZH.md                    # Chinese documentation
+├── StartGame.ps1                   # Game launcher PowerShell script
+└── .gitignore
 ```
 
 ---
