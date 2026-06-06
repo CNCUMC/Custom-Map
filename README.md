@@ -4,7 +4,7 @@
 
 # Custom Fungame Pack
 
-[GitHub](https://github.com/Explosive-Hydra/Custom-Fungame-Pack) / [NexusMods](https://www.nexusmods.com/games/scavprototype/mods/131)
+[GitHub](https://github.com/Explosive-Hydra/Custom-Fungame-Pack) / [NexusMods](https://www.nexusmods.com/scavprototype/mods/131)
 
 _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**._
 
