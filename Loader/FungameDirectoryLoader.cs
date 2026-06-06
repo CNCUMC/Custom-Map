@@ -143,7 +143,18 @@ public static class FungameDirectoryLoader
             fungame.Id = dirName.ToLowerInvariant();
 
         var fungameJsonPath = Path.Combine(directoryPath, "fungame.json");
+
+        // 保存原始值，写入 fungame.json 时不包含 name/description（它们只存在 lang 文件中）
+        var originalName = fungame.Name;
+        var originalDescription = fungame.Description;
+        fungame.Name = null;
+        fungame.Description = null;
+
         SaveJsonWithTypeCheck(fungameJsonPath, fungame, "fungame");
+
+        // 恢复原始值，后续 SaveToCurrentLang 需要使用它们
+        fungame.Name = originalName;
+        fungame.Description = originalDescription;
 
         if (fungame.Levels is { Count: > 0 })
         {
@@ -178,8 +189,12 @@ public static class FungameDirectoryLoader
         if (fungame.XpData != null)
             SaveFeatureFileToDisk(directoryPath, "player", "xp.json", fungame.XpData, "feature.player.xp");
 
+        Plugin.Logger?.LogInfo($"[FungameDirectoryLoader.Debug] SaveToDirectory calling SaveToCurrentLang: dir={directoryPath}, Name={fungame.Name}, Id={fungame.Id}");
+
         // 将 name/description/author 写入当前语言的 lang 文件
-        FungameLocale.SaveToCurrentLang(fungame);
+        FungameLocale.SaveToCurrentLang(fungame, directoryPath);
+
+        Plugin.Logger?.LogInfo($"[FungameDirectoryLoader.Debug] SaveToDirectory after SaveToCurrentLang, CommandData is null? {fungame.CommandData == null}");
 
         if (fungame.CommandData == null) return;
         var commandPath = Path.Combine(directoryPath, "command.json");

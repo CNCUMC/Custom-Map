@@ -40,15 +40,11 @@ public static class FungameLocale
     }
 
     /// <summary>
-    /// 获取本地化的作者字符串。
-    /// 优先从 <c>{DirectoryPath}/lang/{currentLang}.json</c> 读取 <c>fungame.author</c> 键，
-    /// 若不存在则返回 <see cref="Fungame.Authors"/> 原始值。
+    /// 获取作者字符串（来自 Fungame 对象，不经过本地化）。
     /// </summary>
     public static string GetAuthor(Fungame fungame)
     {
-        if (fungame == null) return string.Empty;
-        var localized = ReadFromFungameLang(fungame, "author");
-        return localized ?? fungame.Authors ?? string.Empty;
+        return fungame?.Authors ?? string.Empty;
     }
 
     /// <summary>
@@ -101,17 +97,25 @@ public static class FungameLocale
     /// 将 Fungame 的 name/description/author 写入当前语言的 lang 文件。
     /// 文件路径为 <c>{fungame.DirectoryPath}/lang/{currentLang}.json</c>，键名为 <c>fungame.{key}</c>。
     /// </summary>
-    public static void SaveToCurrentLang(Fungame fungame)
+    public static void SaveToCurrentLang(Fungame fungame, string directoryPath = null)
     {
-        if (fungame == null || string.IsNullOrEmpty(fungame.DirectoryPath))
+        var saveDir = directoryPath ?? fungame?.DirectoryPath;
+        if (fungame == null || string.IsNullOrEmpty(saveDir))
+        {
+            Plugin.Logger?.LogInfo($"[FungameLocale.Debug] SaveToCurrentLang skipped: fungame={(fungame == null ? "null" : $"DirectoryPath={fungame.DirectoryPath}")}, directoryPath={directoryPath}");
             return;
+        }
+
+        Plugin.Logger?.LogInfo($"[FungameLocale.Debug] SaveToCurrentLang start: saveDir={saveDir}, Name={fungame.Name}, Desc={fungame.Description}");
 
         try
         {
             var currentLang = PlayerPrefs.GetString("locale", "EN");
-            var langDir = Path.Combine(fungame.DirectoryPath, "lang");
+            var langDir = Path.Combine(saveDir, "lang");
+            Plugin.Logger?.LogInfo($"[FungameLocale.Debug] Creating lang dir: {langDir}");
             Directory.CreateDirectory(langDir);
             var langFile = Path.Combine(langDir, $"{currentLang}.json");
+            Plugin.Logger?.LogInfo($"[FungameLocale.Debug] Lang file path: {langFile}");
 
             JObject langJson;
             if (File.Exists(langFile))
@@ -140,8 +144,6 @@ public static class FungameLocale
                 fungameObj["name"] = fungame.Name;
             if (!string.IsNullOrEmpty(fungame.Description))
                 fungameObj["description"] = fungame.Description;
-            if (fungame.Author is { Count: > 0 })
-                fungameObj["author"] = fungame.Authors;
 
             var jsonContent = JsonConvert.SerializeObject(langJson, Formatting.Indented);
             File.WriteAllText(langFile, jsonContent + Environment.NewLine);

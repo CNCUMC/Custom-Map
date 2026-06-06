@@ -451,7 +451,7 @@ public class ModCommand : ModCommandBase
 
             // fg save / fg save XXX
             FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
-            FungameLocale.SaveToCurrentLang(fungame);
+            FungameLocale.SaveToCurrentLang(fungame, directoryPath);
 
             InfoFungame("save.success", FungameLocale.GetName(fungame), directoryPath);
         }
@@ -743,7 +743,7 @@ public class ModCommand : ModCommandBase
         FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
 
         // 将名字/描述/作者写入当前语言文件
-        FungameLocale.SaveToCurrentLang(fungame);
+        FungameLocale.SaveToCurrentLang(fungame, directoryPath);
 
         InfoFungame("save.area_success",
             cMinX, cMinY, cMaxX, cMaxY,
