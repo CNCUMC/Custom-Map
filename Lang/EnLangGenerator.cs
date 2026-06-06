@@ -16,6 +16,11 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.name", "First use fungame");
             Add("config.first_use_fungame.description", "The Fungame ID to use when starting a new game. Requires 'Start Use Fungame' to be enabled.");
             
+            // Fungame Format
+            Add("format.name_version", "{0} v{1}");
+            Add("format.author", "by {0}");
+            Add("format.features", "Features: {0}");
+            
             // Feature
             Add("feature.full_bright", "Full Bright");
             Add("feature.forgiving_level", "Forgiving Level");

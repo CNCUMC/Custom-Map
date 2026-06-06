@@ -15,7 +15,7 @@ namespace CustomFungamePack;
 [BepInDependency("ExplosiveHydra.MossLib")]
 public class Plugin : BaseUnityPlugin
 {
-    public const string Guid = "ExplosiveHydra.CustomFungamePack";
+    public const string Guid = "org.explosivehydra.customfungamepack";
     public const string Name = "Custom Fungame Pack";
     public const string Version = "1.1.1";
 
@@ -53,6 +53,14 @@ public class Plugin : BaseUnityPlugin
         Version = Version,
         Author = ["Black_Moss"],
         Description = "a map template",
+        CommandData = new CommandData
+        {
+            LoopCommands =
+            [
+                "heal"
+            ],
+            LoopInterval = 10
+        },
         Levels =
         [
             new LevelData
@@ -69,18 +77,6 @@ public class Plugin : BaseUnityPlugin
                 //         Y = 0
                 //     }
                 // ],
-                // CommandData = new CommandData
-                // {
-                //     OnceCommands =
-                //     [
-                //         "alert true Start!"
-                //     ],
-                //     LoopCommands =
-                //     [
-                //         "alert false 10s!"
-                //     ],
-                //     LoopIntervai = 0
-                // },
                 MapData = new MapData
                 {
                     Map =
@@ -276,6 +272,7 @@ public class Plugin : BaseUnityPlugin
     {
         return Locale($"config.{key}");
     }
+
     private static string Locale(string key)
     {
         return ModLocale.GetFormat(key);

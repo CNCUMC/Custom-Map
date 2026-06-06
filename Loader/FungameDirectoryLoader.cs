@@ -23,7 +23,7 @@ public static class FungameDirectoryLoader
 
         try
         {
-            var fungame = LoadJsonWithTypeCheck<Fungame>(fungameJsonPath, "meta.fungame");
+            var fungame = LoadJsonWithTypeCheck<Fungame>(fungameJsonPath, "fungame");
             if (fungame == null)
                 return null;
 
@@ -137,19 +137,30 @@ public static class FungameDirectoryLoader
         if (string.IsNullOrEmpty(directoryPath))
             return;
 
+        // 如果 Id 为空，从目录名补全（小写）
+        var dirName = Path.GetFileName(directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        if (string.IsNullOrEmpty(fungame.Id))
+            fungame.Id = dirName.ToLowerInvariant();
+
         var fungameJsonPath = Path.Combine(directoryPath, "fungame.json");
-        SaveJsonWithTypeCheck(fungameJsonPath, fungame, "meta.fungame");
+        SaveJsonWithTypeCheck(fungameJsonPath, fungame, "fungame");
 
         if (fungame.Levels is { Count: > 0 })
         {
             var levelDir = Path.Combine(directoryPath, "level");
             Directory.CreateDirectory(levelDir);
 
+            // 清理旧的关卡文件，防止重复
+            foreach (var oldFile in Directory.GetFiles(levelDir, "*.json"))
+            {
+                try { File.Delete(oldFile); }
+                catch { /* ignore */ }
+            }
+
             for (var i = 0; i < fungame.Levels.Count; i++)
             {
                 var levelPath = Path.Combine(levelDir, $"level{i + 1}.json");
-                var expectedType = $"level.level{i + 1}";
-                SaveJsonWithTypeCheck(levelPath, fungame.Levels[i], expectedType);
+                SaveJsonWithTypeCheck(levelPath, fungame.Levels[i], "level");
             }
         }
 
@@ -166,6 +177,9 @@ public static class FungameDirectoryLoader
 
         if (fungame.XpData != null)
             SaveFeatureFileToDisk(directoryPath, "player", "xp.json", fungame.XpData, "feature.player.xp");
+
+        // 将 name/description/author 写入当前语言的 lang 文件
+        FungameLocale.SaveToCurrentLang(fungame);
 
         if (fungame.CommandData == null) return;
         var commandPath = Path.Combine(directoryPath, "command.json");

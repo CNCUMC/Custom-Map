@@ -16,6 +16,11 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.name", "首选 Fungame");
             Add("config.first_use_fungame.description", "开始新游戏时使用的 Fungame ID。需要启用“开始游戏使用 Fungame”");
             
+            // Fungame Format
+            Add("format.name_version", "{0} v{1}");
+            Add("format.author", "作者: {0}");
+            Add("format.features", "特性: {0}");
+            
             // Feature
             Add("feature.full_bright", "全亮");
             Add("feature.forgiving_level", "仁慈关卡");

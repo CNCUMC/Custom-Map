@@ -7,7 +7,7 @@ namespace CustomFungamePack.Data.Feature.Player;
 [UsedImplicitly]
 public class XpData
 {
-    [JsonProperty("type")] public string Type { get; set; }
+    [JsonProperty("type")] public string Type { get; internal set; }
 
     private readonly int[] _base = Skills.BaseSkills(0);
 

@@ -445,18 +445,19 @@ public class ModCommand : ModCommandBase
         {
             if (args.Length is 4 or 5)
             {
-                var jsonPath = Path.Combine(directoryPath, "fungame.json");
-                SaveAreaAsMapData(fungame, jsonPath, args[2], args[3]);
+                SaveAreaAsMapData(fungame, directoryPath, args[2], args[3]);
                 return;
             }
 
-            FungameDirectoryLoader.SaveToDirectory(fungame);
+            // fg save / fg save XXX
+            FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
+            FungameLocale.SaveToCurrentLang(fungame);
 
-            InfoFungame("save.success", fungame.Name, directoryPath);
+            InfoFungame("save.success", FungameLocale.GetName(fungame), directoryPath);
         }
         catch (Exception ex)
         {
-            ErrorFungame("save.failed", fungame.Name, ex.Message);
+            ErrorFungame("save.failed", FungameLocale.GetName(fungame), ex.Message);
         }
     }
 
@@ -513,11 +514,10 @@ public class ModCommand : ModCommandBase
         yield return waiter2;
         var endPos = waiter2.Result;
 
-        var jsonPath = Path.Combine(directoryPath, "fungame.json");
         var startStr = $"{startPos.x},{startPos.y}";
         var endStr = $"{endPos.x},{endPos.y}";
 
-        SaveAreaAsMapData(fungame, jsonPath, startStr, endStr);
+        SaveAreaAsMapData(fungame, directoryPath, startStr, endStr);
     }
 
     private static string ResolveTargetPath(string targetName)
@@ -628,7 +628,7 @@ public class ModCommand : ModCommandBase
         };
     }
 
-    private static void SaveAreaAsMapData(Fungame fungame, string jsonPath, string startStr, string endStr)
+    private static void SaveAreaAsMapData(Fungame fungame, string directoryPath, string startStr, string endStr)
     {
         if (!EnsureWorldLoaded()) return;
 
@@ -717,13 +717,8 @@ public class ModCommand : ModCommandBase
             keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
         }
 
-        var directoryPath = Path.GetDirectoryName(jsonPath);
-        var levelDir = Path.Combine(directoryPath, "level");
-        Directory.CreateDirectory(levelDir);
-        var levelPath = Path.Combine(levelDir, "l1.json");
-
-        // Update or create level data
-        var levelData = fungame.CurrentLevel != null
+        // Create new level data from scanned blocks, attach to fungame
+        var newLevel = fungame.CurrentLevel != null
             ? new LevelData
             {
                 X = fungame.CurrentLevel.X,
@@ -742,32 +737,17 @@ public class ModCommand : ModCommandBase
                 MapData = new MapData { Map = mapRows, Key = keyDict }
             };
 
-        // Write level file with type field
-        var levelObject = JObject.FromObject(levelData, new JsonSerializer
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            Formatting = Formatting.Indented
-        });
-        levelObject["type"] = "level.l1";
-        File.WriteAllText(levelPath, levelObject.ToString(Formatting.Indented));
+        fungame.Levels = [newLevel];
 
-        // Write fungame.json (metadata only) with type field
-        var metaObject = new JObject
-        {
-            ["type"] = "meta.fungame",
-            ["name"] = fungame.Name,
-            ["id"] = fungame.Id,
-            ["version"] = fungame.Version,
-            ["author"] = fungame.Author != null ? JToken.FromObject(fungame.Author) : JValue.CreateNull(),
-            ["description"] = fungame.Description
-        };
-        File.WriteAllText(jsonPath, metaObject.ToString(Formatting.Indented));
-
+        // Delegate all file writing to SaveToDirectory (handles cleanup, defaults, naming)
         FungameDirectoryLoader.SaveToDirectory(fungame, directoryPath);
+
+        // 将名字/描述/作者写入当前语言文件
+        FungameLocale.SaveToCurrentLang(fungame);
 
         InfoFungame("save.area_success",
             cMinX, cMinY, cMaxX, cMaxY,
-            regionW, regionH, uniqueBlockIds.Count, jsonPath);
+            regionW, regionH, uniqueBlockIds.Count, directoryPath);
     }
 
     private static void HandleExit(string[] args)
@@ -1178,7 +1158,7 @@ public class ModCommand : ModCommandBase
 
         WorldGenerationPatch.CurrentFungame = fungame;
 
-        InfoFungame("select.success", fungame.Name, fungame.Id);
+        InfoFungame("select.success", FungameLocale.GetName(fungame), fungame.Id);
 
         if (HasWorldLoaded())
         {
@@ -1186,7 +1166,7 @@ public class ModCommand : ModCommandBase
             MapLoader.LogMapInfo();
         }
         else
-            InfoFungame("select.without_world", fungame.Name);
+            InfoFungame("select.without_world", FungameLocale.GetName(fungame));
     }
 
     private static void CheckArg(string[] args, int index)

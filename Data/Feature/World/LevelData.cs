@@ -9,7 +9,7 @@ public class LevelData
     [JsonProperty("map_data", NullValueHandling = NullValueHandling.Ignore)] public MapData MapData { get; set; }
     [JsonProperty("custom_structures", NullValueHandling = NullValueHandling.Ignore)] public string CustomStructures { get; set; }
     [JsonProperty("build_mode_save", NullValueHandling = NullValueHandling.Ignore)] public string BuildModeSave { get; set; }
-    [JsonProperty("type")] public string Type { get; set; }
+    [JsonProperty("type")] public string Type { get; internal set; }
     [JsonProperty("scene_type")]
     [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))] public WorldGeneration.OverrideSceneType SceneType { get; set; } = WorldGeneration.OverrideSceneType.Debug;
     [JsonProperty("spawn")] public float[] Spawn { get; set; } = [0, 0];

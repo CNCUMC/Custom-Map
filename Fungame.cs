@@ -20,8 +20,6 @@ public class Fungame
     [JsonProperty("author")] public List<string> Author { get; set; }
     [JsonProperty("description")] public string Description { get; set; }
 
-    // ===== 运行时属性（从目录结构加载，不序列化到 fungame.json） =====
-
     [JsonIgnore] public string DirectoryPath { get; set; }
 
     [JsonIgnore] public List<LevelData> Levels { get; set; } = [];
@@ -32,7 +30,6 @@ public class Fungame
 
     [JsonIgnore] public XpData XpData { get; set; } = new();
 
-    // Feature 数据对象（从 feature/world/*.json 和 feature/player/*.json 加载）
     [JsonIgnore] public MineData MineData { get; set; }
     [JsonIgnore] public JumpPadData JumpPadData { get; set; }
     [JsonIgnore] public TurretData TurretData { get; set; }
@@ -41,13 +38,9 @@ public class Fungame
     [JsonIgnore] public GeyserData GeyserData { get; set; }
     [JsonIgnore] public BearTrapData BearTrapData { get; set; }
 
-    // ===== 便捷属性 =====
+    [JsonIgnore] public LevelData CurrentLevel => Levels.FirstOrDefault();
 
-    [JsonIgnore]
-    public LevelData CurrentLevel => Levels.FirstOrDefault();
-
-    [JsonIgnore]
-    public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
+    [JsonIgnore] public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
 
     [JsonIgnore]
     public Vector2 SpawnPosition => CurrentLevel is { Spawn: { Length: >= 2 } s }
@@ -58,41 +51,18 @@ public class Fungame
     public string Authors => Author is { Count: > 0 }
         ? string.Join(", ", Author)
         : "Unknown";
-
-    // ===== 兼容属性（指向 CurrentLevel，过渡期使用） =====
-
-    [JsonIgnore]
-    public MapData MapData => CurrentLevel?.MapData;
-
-    [JsonIgnore]
-    public string CustomStructures => CurrentLevel?.CustomStructures;
-
-    [JsonIgnore]
-    public string BuildModeSave => CurrentLevel?.BuildModeSave;
-
-    [JsonIgnore]
-    public float[] Spawn => CurrentLevel?.Spawn;
-
-    [JsonIgnore]
-    public List<ItemData> Items => CurrentLevel?.Items;
-
-    [JsonIgnore]
-    public List<WaypointData> Waypoints => CurrentLevel?.Waypoints;
-
-    [JsonIgnore]
-    public int X => CurrentLevel?.X ?? 0;
-
-    [JsonIgnore]
-    public int Y => CurrentLevel?.Y ?? 0;
-
-    [JsonIgnore]
-    public bool SkipTerrain => WorldSettings?.SkipTerrain ?? true;
-
-    [JsonIgnore]
-    public bool SkipStructures => WorldSettings?.SkipStructures ?? true;
-
-    [JsonIgnore]
-    public bool SkipBackground => WorldSettings?.SkipBackground ?? true;
+    
+    [JsonIgnore] public MapData MapData => CurrentLevel?.MapData;
+    [JsonIgnore] public string CustomStructures => CurrentLevel?.CustomStructures;
+    [JsonIgnore] public string BuildModeSave => CurrentLevel?.BuildModeSave;
+    [JsonIgnore] public float[] Spawn => CurrentLevel?.Spawn;
+    [JsonIgnore] public List<ItemData> Items => CurrentLevel?.Items;
+    [JsonIgnore] public List<WaypointData> Waypoints => CurrentLevel?.Waypoints;
+    [JsonIgnore] public int X => CurrentLevel?.X ?? 0;
+    [JsonIgnore] public int Y => CurrentLevel?.Y ?? 0;
+    [JsonIgnore] public bool SkipTerrain => WorldSettings?.SkipTerrain ?? true;
+    [JsonIgnore] public bool SkipStructures => WorldSettings?.SkipStructures ?? true;
+    [JsonIgnore] public bool SkipBackground => WorldSettings?.SkipBackground ?? true;
 
     [JsonIgnore]
     public WorldGeneration.OverrideSceneType Type => CurrentLevel?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;

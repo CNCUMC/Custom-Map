@@ -421,11 +421,11 @@ public static class MapLoader
         }
 
         Log.Divider();
-        LogConsole("info.name", fungame.Name);
+        LogConsole("info.name", FungameLocale.GetName(fungame));
         LogConsole("info.id", fungame.Id);
         LogConsole("info.version", fungame.Version);
-        LogConsole("info.authors", fungame.Authors);
-        LogConsole("info.description", fungame.Description);
+        LogConsole("info.authors", FungameLocale.GetAuthor(fungame));
+        LogConsole("info.description", FungameLocale.GetDescription(fungame));
         LogConsole("info.features", fungame.ActiveFeatures);
         LogConsole("info.spawn", fungame.SpawnPosition);
         Log.Divider();

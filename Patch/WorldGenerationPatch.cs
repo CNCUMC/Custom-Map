@@ -61,7 +61,7 @@ public static class WorldGenerationPatch
 
                 if (fungame != null)
                 {
-                    Info("start_game_fungame", fungame.Name, fungame.Id);
+                    Info("start_game_fungame", FungameLocale.GetName(fungame), fungame.Id);
                 }
                 else
                 {
@@ -210,7 +210,7 @@ public static class WorldGenerationPatch
             }
             else
             {
-                Error("custom_structures_mod_not_loaded", fungame.Name);
+                Error("custom_structures_mod_not_loaded", FungameLocale.GetName(fungame));
             }
         }
 
@@ -221,20 +221,21 @@ public static class WorldGenerationPatch
 
         if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
         {
-            Warning("no_content_type", fungame.Name);
+            Warning("no_content_type", FungameLocale.GetName(fungame));
         }
     }
 
     private static void SpawnMap(Fungame fungame)
     {
-        MoreLogs("loading_fungame_map", fungame.Name);
-        WorldGeneration.loadingText.text = Locale("loading_fungame_map", fungame.Name);
+        var localizedName = FungameLocale.GetName(fungame);
+        MoreLogs("loading_fungame_map", localizedName);
+        WorldGeneration.loadingText.text = Locale("loading_fungame_map", localizedName);
         MapLoader.LoadAndApplyMapFromFungame(fungame);
         ExecuteCommands(fungame);
 
-        string modInfo = $"{fungame.Name} v{fungame.Version}";
-        string authorInfo = $"by {fungame.Authors}";
-        string description = fungame.Description;
+        var modInfo = FungameLocale.GetFormattedNameVersion(fungame);
+        var authorInfo = FungameLocale.GetFormattedAuthor(fungame);
+        var description = FungameLocale.GetDescription(fungame);
 
         Player.Alert($"{modInfo}\n{authorInfo}", true);
         Player.Alert(description, false, 6f);
