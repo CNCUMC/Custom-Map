@@ -12,7 +12,7 @@ using MossLib.Tool;
 namespace CustomFungamePack;
 
 [BepInPlugin(Guid, Name, Version)]
-[BepInDependency("ExplosiveHydra.MossLib")]
+[BepInDependency("org.explosivehydra.mosslib")]
 public class Plugin : BaseUnityPlugin
 {
     public const string Guid = "org.explosivehydra.customfungamepack";

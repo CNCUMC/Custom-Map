@@ -26,26 +26,44 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference
+            Include="BepInEx.AssemblyPublicizer.MSBuild"
+            Version="0.4.2"
+            PrivateAssets="all"
+    />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" IncludeAssets="compile" />
+    <PackageReference Include="Lib.Harmony" Version="2.4.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference
+            Include="Microsoft.NETFramework.ReferenceAssemblies"
+            Version="1.0.2"
+            PrivateAssets="all"
+    />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\core\BepInEx.dll</HintPath>
+    <Reference Include="com.lachee.discordrpc.runtime">
+      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\com.lachee.discordrpc.runtime.dll</HintPath>
     </Reference>
-    <Reference Include="BuildMod">
-      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\BuildMod.dll</HintPath>
+    <Reference Include="DiscordRPC">
+      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\DiscordRPC.dll</HintPath>
     </Reference>
-    <Reference Include="Custom Structures">
-      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\CustomStructures\Custom Structures.dll</HintPath>
+    <Reference Include="Microsoft.Win32.Registry">
+      <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\Microsoft.Win32.Registry.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Security">
       <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\Mono.Security.dll</HintPath>
     </Reference>
     <Reference Include="MossLib">
-      <HintPath>..\Moss-Lib\bin\Debug\net472\MossLib.dll</HintPath>
+      <HintPath>..\Moss-Lib\obj\Debug\net472\MossLib.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\netstandard.dll</HintPath>
@@ -377,8 +395,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Feature\" />
+    <Folder Include="obj\" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <RequiredFilesToCopy>
+      $(AssemblyName).dll;
+    </RequiredFilesToCopy>
+
+    <RequiredFoldersToCopy>
+    </RequiredFoldersToCopy>
+  </PropertyGroup>
 
   <Target Name="CopyOutputDllsToPluginsFolder" AfterTargets="AfterBuild" Condition="'$(RequiredFilesToCopy)'!=''">
     <MakeDir Directories="$(BepInExDir)/plugins/$(PluginDirName)" />
@@ -386,8 +413,8 @@
       <Output TaskParameter="CombinedPaths" ItemName="RequiredFilesToCopy_Combined" />
     </CombinePath>
     <Copy
-      SourceFiles="@(RequiredFilesToCopy_Combined)"
-      DestinationFolder="$(BepInExDir)/plugins/$(PluginDirName)"
+            SourceFiles="@(RequiredFilesToCopy_Combined)"
+            DestinationFolder="$(BepInExDir)/plugins/$(PluginDirName)"
     />
   </Target>
 
@@ -397,8 +424,8 @@
       <FilesToCopy Include="%(RequiredFolders.Identity)/**/*" />
     </ItemGroup>
     <Copy
-      SourceFiles="@(FilesToCopy)"
-      DestinationFiles="@(FilesToCopy->'$(BepInExDir)/plugins/$(PluginDirName)/%(Identity)')"
+            SourceFiles="@(FilesToCopy)"
+            DestinationFiles="@(FilesToCopy->'$(BepInExDir)/plugins/$(PluginDirName)/%(Identity)')"
     />
   </Target>
 </Project>
