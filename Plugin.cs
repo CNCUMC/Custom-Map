@@ -18,7 +18,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string Guid = "org.explosivehydra.customfungamepack";
     public const string Name = "Custom Fungame Pack";
-    public const string Version = "1.1.2";
+    public const string Version = "1.0.2";
 
     internal new static ManualLogSource Logger;
     private readonly Harmony _harmony = new(Guid);
