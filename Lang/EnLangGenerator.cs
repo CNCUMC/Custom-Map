@@ -15,6 +15,8 @@ namespace CustomFungamePack.Lang
             Add("config.start_game_use_fungame.description", "Use the selected Fungame when starting a new game.");
             Add("config.first_use_fungame.name", "First use fungame");
             Add("config.first_use_fungame.description", "The Fungame ID to use when starting a new game. Requires 'Start Use Fungame' to be enabled.");
+            Add("config.progress_update_interval.name", "Progress update interval");
+            Add("config.progress_update_interval.description", "Number of blocks between progress text updates during map generation. Lower values update more frequently but may impact performance.");
             
             // Fungame Format
             Add("format.author", "by {0}");

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
@@ -23,7 +24,7 @@ public static class WorldGenerationPatch
     internal static int TotalBlocks;
 
     private static string _generationPhase = "";
-    private static bool _isSpawningMap;
+    internal static bool _isSpawningMap;
     private static bool _hasShownFungameLoading;
 
     public static WorldGeneration.OverrideSceneType? ExitTargetScene;
@@ -177,7 +178,10 @@ public static class WorldGenerationPatch
         if (_isSpawningMap && TotalBlocks > 0)
         {
             var total = SuccessCount + FailCount;
-            var pct = Mathf.Clamp((int)((float)total / TotalBlocks * 100f), 0, 100);
+            // 安全保护：当 total==0 时强制 pct=0，防止 TotalBlocks 尚未设置时除零导致 NaN→100
+            var pct = total > 0
+                ? Mathf.Clamp((int)((float)total / TotalBlocks * 100f), 0, 100)
+                : 0;
             text = Locale("phase.placing_blocks", name, SuccessCount, FailCount, TotalBlocks, pct);
         }
         else
@@ -249,13 +253,20 @@ public static class WorldGenerationPatch
     }
 
     [HarmonyPatch("FinishWorldGeneration")]
-    [HarmonyPostfix]
-    public static void InitializationWorld()
+    [HarmonyPrefix]
+    public static bool InitializationWorld(WorldGeneration __instance)
+    {
+        // 阻塞原始 FinishWorldGeneration 协程，改用我们自己的协程
+        // 这样可以在方块放置过程中 yield 让 Unity 渲染进度文本
+        __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
+        return false;
+    }
+
+    private static IEnumerator ContentLoadingCoroutine(WorldGeneration instance)
     {
         if (_hasShownFungameLoading)
         {
-            // 如果是通过 StartFungameLoading 启动的，此时 _loading 已经为 true
-            // 但 FinishWorldGeneration 结束后我们需要继续执行内容加载
+            // 通过 StartFungameLoading 启动的，_loading 已经是 true
         }
         else
         {
@@ -267,7 +278,7 @@ public static class WorldGenerationPatch
             ExitTargetScene = null;
             _loading = false;
             Info("exited_fungame");
-            return;
+            yield break;
         }
 
         var fungame = FungameCheck.CurrentFungame;
@@ -279,7 +290,7 @@ public static class WorldGenerationPatch
                 Warning("no_fungame_selected");
             else
                 Error("no_valid_directories");
-            return;
+            yield break;
         }
 
         // 应用设置覆盖
@@ -294,14 +305,38 @@ public static class WorldGenerationPatch
         var hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
         var hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
 
-        // 支持所有内容类型共存 按顺序执行
+        // 支持所有内容类型共存，按顺序执行
         if (hasMapData)
         {
+            // 提前计算 TotalBlocks，确保第一次 RefreshLoadingText 就能显示正确百分比
+            var mapData = fungame.MapData;
+            if (mapData?.Map is { Length: > 0 })
+            {
+                TotalBlocks = mapData.Map
+                    .Where(row => !string.IsNullOrEmpty(row))
+                    .Sum(row => row.Count(c => c != ' '));
+            }
+
             SetPhase("spawning_map");
             _isSpawningMap = true;
-            RefreshLoadingText(); // 立即显示阶段文本（Update 不会在此帧触发）
-            SpawnMap(fungame);
+            RefreshLoadingText(); // 此时 TotalBlocks 已设置，显示 0%
+
+            // 异步加载地图：每30个方块 yield 一次，让 Unity 渲染进度文本
+            yield return MapLoader.LoadAndApplyMapFromFungameAsync(fungame);
+
             _isSpawningMap = false;
+
+            // 地图加载完成后执行启动命令和提示（仍在加载界面下）
+            ExecuteCommands(fungame);
+
+            var modInfo = FungameLocale.GetFormattedNameVersion(fungame);
+            var authorInfo = FungameLocale.GetFormattedAuthor(fungame);
+            var description = FungameLocale.GetDescription(fungame);
+
+            Player.Alert($"{modInfo}\n{authorInfo}", true);
+            Player.Alert(description, false, 6f);
+            MapLoader.LogMapInfo();
+            Player.Tp(fungame.SpawnPosition);
         }
 
         if (hasCustomStructures)
@@ -330,22 +365,27 @@ public static class WorldGenerationPatch
             Warning("no_content_type", FungameLocale.GetName(fungame));
         }
 
+        // === 复用原始 FinishWorldGeneration 的清理逻辑 ===
+        GlobalDark.main.Darken();
+        yield return new WaitUntil(() => !GlobalDark.main.IsDarkening());
+
+        // 应用层修饰（原始逻辑中仅在 biomeOverride == None 时调用）
+        instance.ApplyLayerModifiers();
+
+        // 标记世界生成完成（必要：游戏检查此标志判断世界是否可交互）
+        instance.generatingWorld = false;
+
+        // 强制刷新全部方块视觉（确保我们放置的方块正确渲染）
+        instance.UpdateWorld();
+
+        // 停用所有块、更新可见性
+        instance.DisableAllChunks();
+        instance.UpdateChunkVisibility();
+
+        // 隐藏加载界面
+        instance.loadingObject.SetActive(false);
+
         _loading = false;
-    }
-
-    private static void SpawnMap(Fungame fungame)
-    {
-        MapLoader.LoadAndApplyMapFromFungame(fungame);
-        ExecuteCommands(fungame);
-
-        var modInfo = FungameLocale.GetFormattedNameVersion(fungame);
-        var authorInfo = FungameLocale.GetFormattedAuthor(fungame);
-        var description = FungameLocale.GetDescription(fungame);
-
-        Player.Alert($"{modInfo}\n{authorInfo}", true);
-        Player.Alert(description, false, 6f);
-        MapLoader.LogMapInfo();
-        Player.Tp(fungame.SpawnPosition);
     }
 
     private static void ExecuteCommands(Fungame fungame)

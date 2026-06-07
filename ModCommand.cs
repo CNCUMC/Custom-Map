@@ -133,7 +133,7 @@ public class ModCommand : ModCommandBase
             if (subProp.Name == "Type") continue;
             if (!IsSimpleType(subProp.PropertyType))
                 continue;
-            string subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
+            var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
             names.Add($"{baseName}.{subJson}".ToLowerInvariant());
         }
     }
@@ -157,7 +157,7 @@ public class ModCommand : ModCommandBase
         if (args == null || args.Length < 2)
             return;
 
-        string cmdName = args[0];
+        var cmdName = args[0];
         if (cmdName != "fungame" && cmdName != "fg")
             return;
 
@@ -165,12 +165,12 @@ public class ModCommand : ModCommandBase
         if (cmd?.argAutofill == null)
             return;
 
-        int key = args.Length - 2;
+        var key = args.Length - 2;
         if (key != 1)
             return;
 
         var contextList = new List<string>();
-        string subcommand = args[1].ToLower();
+        var subcommand = args[1].ToLower();
 
         switch (subcommand)
         {
@@ -268,7 +268,7 @@ public class ModCommand : ModCommandBase
             return;
         }
 
-        string configName = args[2];
+        var configName = args[2];
         if (!Plugin.HasConfig(configName))
         {
             ErrorFungame("config.not_found", configName);
@@ -277,10 +277,10 @@ public class ModCommand : ModCommandBase
 
         if (args.Length == 3)
         {
-            object current = Plugin.GetConfigValue(configName);
+            var current = Plugin.GetConfigValue(configName);
             if (current is bool boolVal)
             {
-                bool newVal = !boolVal;
+                var newVal = !boolVal;
                 Plugin.SetConfigValue(configName, newVal);
                 InfoFungame("config.set_success", configName, newVal);
             }
@@ -288,6 +288,7 @@ public class ModCommand : ModCommandBase
             {
                 ErrorFungame("config.invalid_value", configName, args[3]);
             }
+
             return;
         }
 
@@ -301,6 +302,7 @@ public class ModCommand : ModCommandBase
             ErrorFungame("config.set_failed", configName, newValue);
         }
     }
+
     private static void ListConfig()
     {
         Log.Divider();
@@ -308,10 +310,10 @@ public class ModCommand : ModCommandBase
 
         foreach (var kvp in Plugin.ConfigRegistry)
         {
-            string key = kvp.Key;
-            object value = kvp.Value.BoxedValue;
-            string displayName = Locale($"config.{key}.name");
-            string description = Locale($"config.{key}.description");
+            var key = kvp.Key;
+            var value = kvp.Value.BoxedValue;
+            var displayName = Locale($"config.{key}.name");
+            var description = Locale($"config.{key}.description");
 
             Log.Info($"    {displayName}({key}): {value}", Logger);
 
@@ -323,6 +325,7 @@ public class ModCommand : ModCommandBase
 
         Log.Divider();
     }
+
     private static void HandleWaypoint(string[] args)
     {
         if (!EnsureWorldLoaded()) return;
@@ -601,21 +604,19 @@ public class ModCommand : ModCommandBase
         var folderName =
             Path.GetFileName(targetPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
-        if (string.IsNullOrWhiteSpace(folderName))
-        {
-            Logger.LogWarning(ModLocale.Log("fungame_load.no_folder_name", targetPath));
-            return null;
-        }
+        if (!string.IsNullOrWhiteSpace(folderName))
+            return new Fungame
+            {
+                Name = folderName,
+                Id = folderName.ToLowerInvariant(),
+                Version = DefaultVersion,
+                Author = DefaultAuthor,
+                Description = Fungame("save.as.default_description"),
+                DirectoryPath = targetPath
+            };
+        Logger.LogWarning(ModLocale.Log("fungame_load.no_folder_name", targetPath));
+        return null;
 
-        return new Fungame
-        {
-            Name = folderName,
-            Id = folderName.ToLowerInvariant(),
-            Version = DefaultVersion,
-            Author = DefaultAuthor,
-            Description = Fungame("save.as.default_description"),
-            DirectoryPath = targetPath
-        };
     }
 
     private static void SaveAreaAsMapData(Fungame fungame, string directoryPath, string startStr, string endStr)
@@ -636,21 +637,21 @@ public class ModCommand : ModCommandBase
         }
 
         var world = WorldGeneration.world;
-        Vector2Int blockA = world.WorldToBlockPos(new Vector2(wx1, wy1));
-        Vector2Int blockB = world.WorldToBlockPos(new Vector2(wx2, wy2));
+        var blockA = world.WorldToBlockPos(new Vector2(wx1, wy1));
+        var blockB = world.WorldToBlockPos(new Vector2(wx2, wy2));
 
-        int minX = Mathf.Min(blockA.x, blockB.x);
-        int maxX = Mathf.Max(blockA.x, blockB.x);
-        int minY = Mathf.Min(blockA.y, blockB.y);
-        int maxY = Mathf.Max(blockA.y, blockB.y);
+        var minX = Mathf.Min(blockA.x, blockB.x);
+        var maxX = Mathf.Max(blockA.x, blockB.x);
+        var minY = Mathf.Min(blockA.y, blockB.y);
+        var maxY = Mathf.Max(blockA.y, blockB.y);
 
-        int cMinX = Mathf.Clamp(minX, 0, (int)world.width - 1);
-        int cMaxX = Mathf.Clamp(maxX, 0, (int)world.width - 1);
-        int cMinY = Mathf.Clamp(minY, 0, (int)world.height - 1);
-        int cMaxY = Mathf.Clamp(maxY, 0, (int)world.height - 1);
+        var cMinX = Mathf.Clamp(minX, 0, (int)world.width - 1);
+        var cMaxX = Mathf.Clamp(maxX, 0, (int)world.width - 1);
+        var cMinY = Mathf.Clamp(minY, 0, (int)world.height - 1);
+        var cMaxY = Mathf.Clamp(maxY, 0, (int)world.height - 1);
 
-        int regionW = cMaxX - cMinX + 1;
-        int regionH = cMaxY - cMinY + 1;
+        var regionW = cMaxX - cMinX + 1;
+        var regionH = cMaxY - cMinY + 1;
 
         if (regionW <= 0 || regionH <= 0)
         {
@@ -659,7 +660,7 @@ public class ModCommand : ModCommandBase
         }
 
         var blockIds = new ushort[regionW][];
-        for (int index = 0; index < regionW; index++)
+        for (var index = 0; index < regionW; index++)
         {
             blockIds[index] = new ushort[regionH];
         }
@@ -670,13 +671,13 @@ public class ModCommand : ModCommandBase
         uniqueBlockIds.Add(0);
         blockToChar[0] = "0";
 
-        for (int x = 0; x < regionW; x++)
+        for (var x = 0; x < regionW; x++)
         {
-            for (int y = 0; y < regionH; y++)
+            for (var y = 0; y < regionH; y++)
             {
-                int bx = cMinX + x;
-                int by = cMaxY - y;
-                ushort id = world.GetBlock(new Vector2Int(bx, by));
+                var bx = cMinX + x;
+                var by = cMaxY - y;
+                var id = world.GetBlock(new Vector2Int(bx, by));
 
                 blockIds[x][y] = id;
 
@@ -687,12 +688,12 @@ public class ModCommand : ModCommandBase
         }
 
         var mapRows = new string[regionH];
-        for (int y = 0; y < regionH; y++)
+        for (var y = 0; y < regionH; y++)
         {
             var chars = new char[regionW];
-            for (int x = 0; x < regionW; x++)
+            for (var x = 0; x < regionW; x++)
             {
-                ushort id = blockIds[x][y];
+                var id = blockIds[x][y];
                 chars[x] = blockToChar.TryGetValue(id, out string ch)
                     ? ch[0]
                     : '0';
@@ -702,7 +703,7 @@ public class ModCommand : ModCommandBase
         }
 
         var keyDict = new Dictionary<string, object>();
-        for (int i = 0; i < uniqueBlockIds.Count; i++)
+        for (var i = 0; i < uniqueBlockIds.Count; i++)
         {
             keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
         }
@@ -799,7 +800,7 @@ public class ModCommand : ModCommandBase
 
         WaypointData target;
 
-        if (int.TryParse(waypointId, out int index))
+        if (int.TryParse(waypointId, out var index))
         {
             if (index < 1 || index > waypoints.Count)
             {
@@ -838,10 +839,9 @@ public class ModCommand : ModCommandBase
 
     private static List<WaypointData> GetWaypoints(Fungame fungame)
     {
-        if (fungame.Waypoints is { Count: > 0 })
-            return fungame.Waypoints;
-
-        return [];
+        return fungame.Waypoints is { Count: > 0 }
+            ? fungame.Waypoints
+            : [];
     }
 
     private static void ListWaypoints(List<WaypointData> waypoints)
@@ -855,7 +855,7 @@ public class ModCommand : ModCommandBase
         Log.Divider();
         InfoFungame("waypoint.list_header", waypoints.Count);
 
-        for (int i = 0; i < waypoints.Count; i++)
+        for (var i = 0; i < waypoints.Count; i++)
         {
             var wp = waypoints[i];
             if (wp != null)
@@ -950,14 +950,18 @@ public class ModCommand : ModCommandBase
 
     private static bool IsSimpleType(Type type)
     {
-        return type.IsPrimitive || type == typeof(string) || type == typeof(decimal)
-               || type == typeof(float) || type == typeof(double) || type == typeof(bool);
+        return type.IsPrimitive 
+               || type == typeof(string)
+               || type == typeof(decimal)
+               || type == typeof(float)
+               || type == typeof(double)
+               || type == typeof(bool);
     }
 
     private static void SetFeature(Fungame fungame, string featureName, string valueStr)
     {
         var parts = featureName.Split('.');
-        
+
         // Resolve the target object and property
         object target;
         PropertyInfo targetProp;
@@ -971,7 +975,7 @@ public class ModCommand : ModCommandBase
                 ErrorFungame("feature.not_found", featureName);
                 return;
             }
-            
+
             // For data objects (non-simple type), toggle creation/null
             if (!IsSimpleType(dataProp.PropertyType))
             {
@@ -988,9 +992,10 @@ public class ModCommand : ModCommandBase
                     dataProp.SetValue(fungame, null);
                     InfoFungame("feature.set_success", featureName, "disabled");
                 }
+
                 return;
             }
-            
+
             target = fungame;
             targetProp = dataProp;
         }
@@ -1069,8 +1074,7 @@ public class ModCommand : ModCommandBase
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        return string.IsNullOrEmpty(fieldName) ? fieldName :
-            fieldName.ToLowerInvariant();
+        return string.IsNullOrEmpty(fieldName) ? fieldName : fieldName.ToLowerInvariant();
     }
 
     private static bool EnsureWorldLoaded()
@@ -1208,21 +1212,15 @@ public class ModCommand : ModCommandBase
         Log.Warning(message, Logger);
     }
 
-    /// <summary>
-    /// 自定义等待左键点击的 YieldInstruction，避免使用 MossLib.Tool.Key.WaitForLeftClick()
-    /// 因为 Key.IsKeyDown() 内部引用的 KeyBinds 类型在某些游戏版本中无法加载（TypeLoadException）
-    /// </summary>
     private sealed class LeftClickYieldInstruction : CustomYieldInstruction
     {
-        private bool _clicked;
-
         public Vector2 Result { get; private set; }
 
         public override bool keepWaiting
         {
             get
             {
-                if (_clicked)
+                if (field)
                     return false;
 
                 if (!Input.GetMouseButtonDown(0))
@@ -1235,7 +1233,7 @@ public class ModCommand : ModCommandBase
                     Result = new Vector2(worldPos.x, worldPos.y);
                 }
 
-                _clicked = true;
+                field = true;
                 return false;
             }
         }

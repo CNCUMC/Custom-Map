@@ -38,11 +38,9 @@ public static class FungameCheck
 
         foreach (var fungamesDirectory in directories)
         {
-            // 新版结构只需要 fungame.json 作为入口
             var fungameJsonPath = Path.Combine(fungamesDirectory, "fungame.json");
             if (!File.Exists(fungameJsonPath))
             {
-                // Warning($"{Path.GetFileName(fungamesDirectory)} Missing fungame.json");
                 continue;
             }
 
@@ -88,11 +86,6 @@ public static class FungameCheck
     {
         return ModLocale.Log($"{LocaleKeyPre}{key}", args);
     }
-
-    // private static void Warning(string key)
-    // {
-    //     Log.Warning(key, _logger);
-    // }
 
     private static void UninitializedWarning(string key)
     {

@@ -27,6 +27,7 @@ public class Plugin : BaseUnityPlugin
     public static ConfigEntry<bool> MoreLogs;
     public static ConfigEntry<bool> StartGameUseFungame;
     public static ConfigEntry<string> FirstUseFungame;
+    public static ConfigEntry<int> ProgressUpdateInterval;
 
     public void Awake()
     {
@@ -44,6 +45,7 @@ public class Plugin : BaseUnityPlugin
         MoreLogs = RegisterConfig("more_logs", false);
         StartGameUseFungame = RegisterConfig("start_game_use_fungame", false);
         FirstUseFungame = RegisterConfig("first_use_fungame", TemplateFungame.Id);
+        ProgressUpdateInterval = RegisterConfig("progress_update_interval", 33);
         ModConfigs.ReloadConfigs();
     }
 

@@ -14,7 +14,9 @@ namespace CustomFungamePack.Lang
             Add("config.start_game_use_fungame.name", "開始遊戲使用 Fungame");
             Add("config.start_game_use_fungame.description", "開啟新遊戲時使用選中的 Fungame");
             Add("config.first_use_fungame.name", "首選 Fungame");
-            Add("config.first_use_fungame.description", "開始新遊戲時使用的 Fungame ID。需要啟用“開始遊戲使用 Fungame”");
+            Add("config.first_use_fungame.description", "開始新遊戲時使用的 Fungame ID。需要啟用\"開始遊戲使用 Fungame\"");
+            Add("config.progress_update_interval.name", "進度更新間隔");
+            Add("config.progress_update_interval.description", "放置方塊時每 N 個方塊更新一次進度顯示。數值越小更新越頻繁，但可能影響生成效能。");
             
             // Fungame Format
             Add("format.author", "作者: {0}");

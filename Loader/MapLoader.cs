@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -147,7 +148,7 @@ public static class MapLoader
         var startY = fungame.Y;
 
         var updateCounter = 0;
-        const int updateInterval = 30; // 每30个方块刷新一次加载文本
+        var updateInterval = ModConfigs.ProgressUpdateInterval; // 每N个方块刷新一次加载文本
 
         for (var row = 0; row < rowCount; row++)
         {
@@ -187,6 +188,130 @@ public static class MapLoader
         WorldGenerationPatch.FailCount = failCount;
         MoreLogs("string_map_applied", successCount, failCount);
         PickItems(fungame);
+    }
+
+    private static IEnumerator ParseAndApplyStringMapAsync(Fungame fungame)
+    {
+        var mapData = fungame.MapData;
+        if (mapData.Map == null || mapData.Map.Length == 0)
+        {
+            MoreLogs("validation.no_data", ModLocale.Log("common.map"), "string map");
+            yield break;
+        }
+
+        if (mapData.Key == null || mapData.Key.Count == 0)
+        {
+            Error("key_missing");
+            yield break;
+        }
+
+        var rowCount = mapData.Map.Length;
+        var maxColCount = mapData.Map.Max(row => row?.Length ?? 0);
+
+        if (maxColCount == 0)
+        {
+            MoreLogs("validation.row_data_empty", "string map");
+            yield break;
+        }
+
+        // 计算总方块数（剔除空行和空字符）
+        var totalBlocks = mapData.Map
+            .Where(mapRow => !string.IsNullOrEmpty(mapRow))
+            .Sum(mapRow => mapRow.Count(c => c != ' '));
+
+        WorldGenerationPatch.TotalBlocks = totalBlocks;
+        WorldGenerationPatch._isSpawningMap = true; // 双重保险：确保 TotalBlocks 设置后才启用百分比显示
+
+        var successCount = 0;
+        var failCount = 0;
+        const int failLimit = 50;
+
+        var startX = fungame.X;
+        var startY = fungame.Y;
+
+        var updateCounter = 0;
+        var updateInterval = ModConfigs.ProgressUpdateInterval;
+
+        for (var row = 0; row < rowCount; row++)
+        {
+            var mapRow = mapData.Map[row];
+            if (string.IsNullOrEmpty(mapRow))
+            {
+                startY--;
+                continue;
+            }
+
+            var worldX = startX;
+            var worldY = startY;
+
+            foreach (var charStr
+                     in mapRow.Select(t => t.ToString()))
+            {
+                if (!mapData.Key.TryGetValue(charStr, out var value))
+                {
+                    worldX++;
+                    continue;
+                }
+
+                WorldGenerationPatch.SuccessCount = successCount;
+                WorldGenerationPatch.FailCount = failCount;
+                ProcessValue(value, worldX, worldY, ref successCount, ref failCount, failLimit);
+                worldX++;
+
+                // 每30个方块 yield 一次，让 Unity 渲染更新的进度文本
+                if (++updateCounter % updateInterval != 0) continue;
+                WorldGenerationPatch.SuccessCount = successCount;
+                WorldGenerationPatch.FailCount = failCount;
+                WorldGenerationPatch.RefreshLoadingText();
+                yield return null;
+            }
+
+            startY--;
+        }
+
+        WorldGenerationPatch.SuccessCount = successCount;
+        WorldGenerationPatch.FailCount = failCount;
+        MoreLogs("string_map_applied", successCount, failCount);
+        PickItems(fungame);
+    }
+
+    public static IEnumerator LoadAndApplyMapFromFungameAsync(Fungame fungame)
+    {
+        // 注意：C# 禁止在 try-catch 中使用 yield return，
+        // 因此验证和 LogFeatureInfo 在无 try 块中执行，异常由调用者捕获
+        if (fungame == null)
+        {
+            Error("no_current_fungame");
+            yield break;
+        }
+
+        var hasMapData = fungame.MapData != null;
+        var hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
+
+        switch (hasMapData)
+        {
+            case false when !hasCustomStructures:
+                Error("load_error");
+                yield break;
+            case false:
+                Warning("custom_structures_not_supported", ModLocale.Log("common.map"));
+                yield break;
+        }
+
+        var mapData = fungame.MapData;
+
+        if (mapData.Map == null || mapData.Map.Length == 0)
+        {
+            Error("invalid_format");
+            yield break;
+        }
+
+        LogFeatureInfo(fungame);
+
+        yield return ParseAndApplyStringMapAsync(fungame);
+
+        MoreLogs("load_success", fungame.X, fungame.Y, mapData.Map.Length,
+            mapData.Map.Max(row => row?.Length ?? 0));
     }
 
     private static void ProcessValue(object value, int x, int y, ref int blockCount, ref int failCount, int failLimit)
