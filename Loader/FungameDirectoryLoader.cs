@@ -40,7 +40,7 @@ public static class FungameDirectoryLoader
             fungame.SpikeStabberData = LoadFeatureFile<SpikeStabberData>(directoryPath, "world", "spike_stabber.json", "feature.world.spike_stabber");
             fungame.GeyserData = LoadFeatureFile<GeyserData>(directoryPath, "world", "geyser.json", "feature.world.geyser");
             fungame.BearTrapData = LoadFeatureFile<BearTrapData>(directoryPath, "world", "beartrap.json", "feature.world.beartrap");
-
+            
             fungame.XpData = LoadFeatureFile<XpData>(directoryPath, "player", "xp.json", "feature.player.xp") ?? new XpData();
 
             fungame.CommandData = LoadCommandData(directoryPath);
@@ -92,11 +92,12 @@ public static class FungameDirectoryLoader
             : LoadJsonWithTypeCheck<WorldSettingsData>(settingsPath, "feature.world.settings");
     }
 
-    private static T LoadFeatureFile<T>(string directoryPath, string subDir, string fileName, string expectedType) where T : class
+    private static T LoadFeatureFile<T>(string directoryPath, string subDir, string fileName, string expectedType)
+        where T : class
     {
         var filePath = Path.Combine(directoryPath, "feature", subDir, fileName);
         return !File.Exists(filePath)
-            ? null 
+            ? null
             : LoadJsonWithTypeCheck<T>(filePath, expectedType);
     }
 
@@ -128,7 +129,7 @@ public static class FungameDirectoryLoader
             return null;
         }
     }
-    
+
     public static void SaveToDirectory(Fungame fungame, string targetDirectory = null)
     {
         var directoryPath = targetDirectory ?? fungame.DirectoryPath;
@@ -155,8 +156,14 @@ public static class FungameDirectoryLoader
             // 清理旧的关卡文件，防止重复
             foreach (var oldFile in Directory.GetFiles(levelDir, "*.json"))
             {
-                try { File.Delete(oldFile); }
-                catch { /* ignore */ }
+                try
+                {
+                    File.Delete(oldFile);
+                }
+                catch
+                {
+                    /* ignore */
+                }
             }
 
             for (var i = 0; i < fungame.Levels.Count; i++)
@@ -215,7 +222,8 @@ public static class FungameDirectoryLoader
         }
     }
 
-    private static void SaveFeatureFileToDisk<T>(string directoryPath, string subDir, string fileName, T obj, string expectedType) where T : class
+    private static void SaveFeatureFileToDisk<T>(string directoryPath, string subDir, string fileName, T obj,
+        string expectedType) where T : class
     {
         if (obj == null)
             return;

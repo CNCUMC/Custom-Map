@@ -17,6 +17,15 @@ public static class WorldGenerationPatch
     public static WorldGeneration WorldGeneration;
     internal static Fungame CurrentFungame;
     private static float _sLoopTimer;
+    private static bool _loading;
+    internal static int SuccessCount;
+    internal static int FailCount;
+    internal static int TotalBlocks;
+
+    private static string _generationPhase = "";
+    private static bool _isSpawningMap;
+    private static bool _hasShownFungameLoading;
+
     public static WorldGeneration.OverrideSceneType? ExitTargetScene;
 
     [HarmonyPatch("Awake")]
@@ -24,12 +33,14 @@ public static class WorldGenerationPatch
     public static void Awake(WorldGeneration __instance)
     {
         WorldGeneration = __instance;
+        _hasShownFungameLoading = false;
 
         if (FungameCheck.HasRunningFungame)
         {
             var fungame = FungameCheck.CurrentFungame;
 
             CurrentFungame = fungame;
+            StartFungameLoading(fungame);
 
             if (fungame.MapData != null)
             {
@@ -74,6 +85,7 @@ public static class WorldGenerationPatch
             if (fungame != null)
             {
                 CurrentFungame = fungame;
+                StartFungameLoading(fungame);
 
                 if (fungame.MapData != null)
                 {
@@ -94,6 +106,22 @@ public static class WorldGenerationPatch
         }
     }
 
+    private static void StartFungameLoading(Fungame fungame)
+    {
+        _loading = true;
+        _isSpawningMap = false;
+        SuccessCount = 0;
+        FailCount = 0;
+        TotalBlocks = 0;
+        SetPhase("preparing");
+        Info("loading_start", FungameLocale.GetName(fungame));
+    }
+
+    private static void SetPhase(string phaseKey)
+    {
+        _generationPhase = phaseKey;
+    }
+
     private static void SuppressCustomStructuresForMapData()
     {
         CustomStructuresLoader.SuppressAutoGeneration();
@@ -103,6 +131,9 @@ public static class WorldGenerationPatch
     [HarmonyPostfix]
     private static void Update()
     {
+        if (_loading)
+            UpdateLoadingText();
+
         var settings = CurrentFungame?.WorldSettingsData;
         if (settings == null) return;
 
@@ -133,11 +164,56 @@ public static class WorldGenerationPatch
         MoreLogs("scene_type_set", __instance.biomeOverride);
     }
 
+    /// <summary>
+    /// 强制立即更新加载文本（用于同步操作期间，Update() 不会触发的情况）
+    /// </summary>
+    internal static void RefreshLoadingText()
+    {
+        if (WorldGeneration == null || CurrentFungame == null) return;
+
+        var name = FungameLocale.GetName(CurrentFungame);
+
+        string text;
+        if (_isSpawningMap && TotalBlocks > 0)
+        {
+            var total = SuccessCount + FailCount;
+            var pct = Mathf.Clamp((int)((float)total / TotalBlocks * 100f), 0, 100);
+            text = Locale("phase.placing_blocks", name, SuccessCount, FailCount, TotalBlocks, pct);
+        }
+        else
+            text = _generationPhase switch
+            {
+                "preparing" => Locale("phase.preparing", name),
+                "skipping" => Locale("phase.skipping", name, _phaseArg),
+                "spawning_map" => Locale("phase.spawning_map", name),
+                "spawning_custom_structures" => Locale("phase.spawning_custom_structures", name),
+                "spawning_build_mode_save" => Locale("phase.spawning_build_mode_save", name),
+                "applying_settings" => Locale("phase.applying_settings", name),
+                _ => Locale("phase.generating", name)
+            };
+
+        WorldGeneration.loadingText.text = text;
+    }
+
+    private static void UpdateLoadingText()
+    {
+        RefreshLoadingText();
+    }
+
+    private static string _phaseArg = "";
+
+    private static void SetPhase(string phaseKey, string arg = "")
+    {
+        _generationPhase = phaseKey;
+        _phaseArg = arg;
+    }
+
     [HarmonyPatch("WorldCreateBackground")]
     [HarmonyPrefix]
     public static bool SkipWorldCreateBackground()
     {
         if (CurrentFungame is not { SkipBackground: true }) return true;
+        SetPhase("skipping", ModLocale.Log("common.background"));
         MoreLogs("skip_generation", ModLocale.Log("common.background"));
         return false;
     }
@@ -147,15 +223,27 @@ public static class WorldGenerationPatch
     public static bool SkipWorldGenerateStructures()
     {
         if (CurrentFungame is not { SkipStructures: true }) return true;
+        SetPhase("skipping", ModLocale.Log("common.structure"));
         MoreLogs("skip_generation", ModLocale.Log("common.structure"));
         return false;
     }
+
+    [HarmonyPatch("SetLoadingText")]
+    [HarmonyPrefix]
+    public static bool SetLoadingTextPrefix(string localetext)
+    {
+        return !_loading || CurrentFungame == null;
+        // 正在加载Fungame时，阻塞游戏自身的进度文本，防止覆盖我们的实时进度显示
+        // UpdateLoadingText 会在 Update 中持续设置正确的文本
+    }
+
 
     [HarmonyPatch("WorldGenerateTerrain")]
     [HarmonyPrefix]
     public static bool SkipWorldGenerateTerrain()
     {
         if (CurrentFungame is not { SkipTerrain: true }) return true;
+        SetPhase("skipping", ModLocale.Log("common.terrain"));
         MoreLogs("skip_generation", ModLocale.Log("common.terrain"));
         return false;
     }
@@ -164,11 +252,20 @@ public static class WorldGenerationPatch
     [HarmonyPostfix]
     public static void InitializationWorld()
     {
-        WorldGeneration.loadingText.text = Locale("initializing_world");
+        if (_hasShownFungameLoading)
+        {
+            // 如果是通过 StartFungameLoading 启动的，此时 _loading 已经为 true
+            // 但 FinishWorldGeneration 结束后我们需要继续执行内容加载
+        }
+        else
+        {
+            _loading = true;
+        }
 
         if (ExitTargetScene.HasValue)
         {
             ExitTargetScene = null;
+            _loading = false;
             Info("exited_fungame");
             return;
         }
@@ -177,6 +274,7 @@ public static class WorldGenerationPatch
 
         if (fungame == null)
         {
+            _loading = false;
             if (FungameCheck.Fungames.Count > 0)
                 Warning("no_fungame_selected");
             else
@@ -184,25 +282,32 @@ public static class WorldGenerationPatch
             return;
         }
 
+        // 应用设置覆盖
         if (fungame.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
         {
+            SetPhase("applying_settings");
             MoreLogs("applying_settings_overrides", $"count={overrides.Count}");
             ApplySettingsOverrides(overrides);
         }
 
-        bool hasMapData = fungame.MapData != null;
-        bool hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
-        bool hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
+        var hasMapData = fungame.MapData != null;
+        var hasCustomStructures = !string.IsNullOrEmpty(fungame.CustomStructures);
+        var hasBuildModeSave = !string.IsNullOrEmpty(fungame.BuildModeSave);
 
         // 支持所有内容类型共存 按顺序执行
         if (hasMapData)
         {
+            SetPhase("spawning_map");
+            _isSpawningMap = true;
+            RefreshLoadingText(); // 立即显示阶段文本（Update 不会在此帧触发）
             SpawnMap(fungame);
+            _isSpawningMap = false;
         }
 
         if (hasCustomStructures)
         {
-            bool hasCustomStructuresMod = Type.GetType(
+            SetPhase("spawning_custom_structures");
+            var hasCustomStructuresMod = Type.GetType(
                 "Custom_Structures.Plugin, Custom Structures") != null;
             if (hasCustomStructuresMod)
             {
@@ -216,6 +321,7 @@ public static class WorldGenerationPatch
 
         if (hasBuildModeSave)
         {
+            SetPhase("spawning_build_mode_save");
             BuildModeSaveLoader.SpawnBuildModeSave(fungame);
         }
 
@@ -223,13 +329,12 @@ public static class WorldGenerationPatch
         {
             Warning("no_content_type", FungameLocale.GetName(fungame));
         }
+
+        _loading = false;
     }
 
     private static void SpawnMap(Fungame fungame)
     {
-        var localizedName = FungameLocale.GetName(fungame);
-        MoreLogs("loading_fungame_map", localizedName);
-        WorldGeneration.loadingText.text = Locale("loading_fungame_map", localizedName);
         MapLoader.LoadAndApplyMapFromFungame(fungame);
         ExecuteCommands(fungame);
 

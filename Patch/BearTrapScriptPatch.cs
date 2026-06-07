@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CustomFungamePack.Data;
 using CustomFungamePack.Data.Feature.World;
@@ -8,6 +9,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(BearTrap))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class BearTrapScriptPatch
 {
     private static BearTrapData BearTrapData => FungameCheck.CurrentFungame?.BearTrapData;
@@ -28,15 +30,15 @@ public class BearTrapScriptPatch
     public static bool OnTriggerPrefix(BearTrap __instance, Collider2D other)
     {
         var data = BearTrapData;
-        float mult = data?.DamageMult ?? 1f;
-        bool undestroy = data?.Undestroy ?? false;
-        float cooldown = data?.Cooldown ?? 0f;
+        var mult = data?.DamageMult ?? 1f;
+        var undestroy = data?.Undestroy ?? false;
+        var cooldown = data?.Cooldown ?? 0f;
 
-        bool isActivated = (bool)(ActivatedField?.GetValue(__instance) ?? false);
-        float now = Time.time;
+        var isActivated = (bool)(ActivatedField?.GetValue(__instance) ?? false);
+        var now = Time.time;
 
         if (cooldown > 0f
-            && LastTriggerTime.TryGetValue(__instance, out float lastTime)
+            && LastTriggerTime.TryGetValue(__instance, out var lastTime)
             && now - lastTime < cooldown)
             return false;
 
@@ -104,7 +106,7 @@ public class BearTrapScriptPatch
 
     private static void HandleReTrigger(BearTrap instance, Collider2D other, BearTrapData data)
     {
-        float mult = data.DamageMult;
+        var mult = data.DamageMult;
         var spriteRenderer = instance.GetComponent<SpriteRenderer>();
 
         if (instance.closeSprite != null)

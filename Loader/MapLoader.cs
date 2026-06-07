@@ -132,14 +132,24 @@ public static class MapLoader
             return;
         }
 
-        var blockCount = 0;
+        // 计算总方块数（剔除空行和空字符）
+        var totalBlocks = mapData.Map
+            .Where(mapRow => !string.IsNullOrEmpty(mapRow))
+            .Sum(mapRow => mapRow.Count(c => c != ' '));
+
+        WorldGenerationPatch.TotalBlocks = totalBlocks;
+
+        var successCount = 0;
         var failCount = 0;
         const int failLimit = 50;
 
         var startX = fungame.X;
         var startY = fungame.Y;
 
-        for (int row = 0; row < rowCount; row++)
+        var updateCounter = 0;
+        const int updateInterval = 30; // 每30个方块刷新一次加载文本
+
+        for (var row = 0; row < rowCount; row++)
         {
             var mapRow = mapData.Map[row];
             if (string.IsNullOrEmpty(mapRow))
@@ -151,23 +161,31 @@ public static class MapLoader
             var worldX = startX;
             var worldY = startY;
 
-            foreach (var t in mapRow)
+            foreach (var charStr
+                     in mapRow.Select(t => t.ToString()))
             {
-                var charStr = t.ToString();
                 if (!mapData.Key.TryGetValue(charStr, out var value))
                 {
                     worldX++;
                     continue;
                 }
 
-                ProcessValue(value, worldX, worldY, ref blockCount, ref failCount, failLimit);
+                WorldGenerationPatch.SuccessCount = successCount;
+                WorldGenerationPatch.FailCount = failCount;
+                ProcessValue(value, worldX, worldY, ref successCount, ref failCount, failLimit);
                 worldX++;
+
+                // 周期更新加载文本，实现实时进度显示
+                if (++updateCounter % updateInterval == 0)
+                    WorldGenerationPatch.RefreshLoadingText();
             }
 
             startY--;
         }
 
-        MoreLogs("string_map_applied", blockCount, 0, failCount);
+        WorldGenerationPatch.SuccessCount = successCount;
+        WorldGenerationPatch.FailCount = failCount;
+        MoreLogs("string_map_applied", successCount, failCount);
         PickItems(fungame);
     }
 
@@ -178,10 +196,10 @@ public static class MapLoader
 
         switch (value)
         {
-            case long longVal when longVal >= 0:
+            case long longVal and >= 0:
                 PlaceBlock((int)longVal, x, y, ref blockCount, ref failCount);
                 break;
-            case int intVal when intVal >= 0:
+            case int intVal and >= 0:
                 PlaceBlock(intVal, x, y, ref blockCount, ref failCount);
                 break;
             case ushort ushortVal:
@@ -196,7 +214,8 @@ public static class MapLoader
         }
     }
 
-    private static void ProcessListValue(JArray jArray, int x, int y, ref int blockCount, ref int failCount, int failLimit)
+    private static void ProcessListValue(JArray jArray, int x, int y, ref int blockCount, ref int failCount,
+        int failLimit)
     {
         if (jArray == null || jArray.Count == 0)
             return;
@@ -212,9 +231,6 @@ public static class MapLoader
     {
         try
         {
-            // World.PlaceBlock(int, int, ushort) expects WORLD coordinates (relative to world center).
-            // It internally converts to block array indices via WorldToBlockPos (adds halfWidth/halfHeight).
-            // Do NOT replace with World.FillBlocks() — that takes raw block array indices directly.
             World.PlaceBlock(x, y, (ushort)blockId);
             blockCount++;
         }
@@ -259,33 +275,33 @@ public static class MapLoader
             liquids = new byte[width, height];
             backgrounds = new Dictionary<Vector2Int, string>();
 
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (var x = 0; x < width; x++)
                 {
                     blocks[x, y] = reader.ReadUInt16();
                     liquids[x, y] = reader.ReadByte();
-                    string bg = reader.ReadString();
+                    var bg = reader.ReadString();
                     if (!string.IsNullOrEmpty(bg))
                         backgrounds[new Vector2Int(x, y)] = bg;
                 }
             }
         }
 
-        int blockCount = 0;
-        int liquidCount = 0;
-        int bgCount = backgrounds.Count;
-        int failCount = 0;
+        var blockCount = 0;
+        var liquidCount = 0;
+        var bgCount = backgrounds.Count;
+        var failCount = 0;
 
-        int worldWidth = (int)WorldGeneration.world.width;
-        int worldHeight = (int)WorldGeneration.world.height;
+        var worldWidth = (int)WorldGeneration.world.width;
+        var worldHeight = (int)WorldGeneration.world.height;
 
-        for (int x = 0; x < width; x++)
+        for (var x = 0; x < width; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
             {
-                int worldX = anchorX + x;
-                int worldY = anchorY + y;
+                var worldX = anchorX + x;
+                var worldY = anchorY + y;
 
                 if (worldX < 0 || worldX >= worldWidth || worldY < 0 || worldY >= worldHeight)
                     continue;
@@ -318,7 +334,7 @@ public static class MapLoader
         }
 
         MoreLogs("build_mode_save_applied", blockCount, liquidCount, bgCount, failCount);
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             Player.Tp(FungameCheck.CurrentFungame.SpawnPosition);
         }
@@ -436,7 +452,8 @@ public static class MapLoader
     {
         var fungames = FungameCheck.Fungames;
 
-        if (fungames == null || fungames.Count == 0)
+        if (fungames == null
+            || fungames.Count == 0)
         {
             LogConsole("list.empty");
             return;
@@ -445,7 +462,7 @@ public static class MapLoader
         Log.Divider();
         LogConsole("list.header", fungames.Count);
 
-        for (int i = 0; i < fungames.Count; i++)
+        for (var i = 0; i < fungames.Count; i++)
         {
             var fungame = fungames[i];
             var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
@@ -495,11 +512,5 @@ public static class MapLoader
     {
         var message = ModLocale.Log($"{LocaleKeyPre}{key}", args);
         Log.Warning(message, Logger);
-    }
-
-    private static void NormalizeKey(JObject jsonObject, string pascalKey, string lowerKey)
-    {
-        if (!jsonObject.ContainsKey(lowerKey) && jsonObject.ContainsKey(pascalKey))
-            jsonObject[lowerKey] = jsonObject[pascalKey];
     }
 }

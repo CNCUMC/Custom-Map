@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CustomFungamePack.Data;
 using CustomFungamePack.Data.Feature.World;
@@ -8,6 +9,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(MineScript))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class MineScriptPatch
 {
     private static MineData MineData => FungameCheck.CurrentFungame?.MineData;
@@ -55,8 +57,8 @@ public class MineScriptPatch
         __instance.timeSincePressed += Time.deltaTime;
 
         var explosionDelay = MineData?.Cooldown ?? 0.8f;
-        bool exploded = (bool)ExplodedField.GetValue(__instance);
-        bool mineUndestroy = MineData?.Undestroy ?? false;
+        var exploded = (bool)ExplodedField.GetValue(__instance);
+        var mineUndestroy = MineData?.Undestroy ?? false;
 
         if (mineUndestroy && exploded && __instance.timeSincePressed > explosionDelay)
         {
@@ -71,7 +73,7 @@ public class MineScriptPatch
 
         if (mineUndestroy)
         {
-            __instance.build.health = 99999f;
+            __instance.build.health += 3f;
             PressedField.SetValue(__instance, false);
         }
         else

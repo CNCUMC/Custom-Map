@@ -23,7 +23,7 @@ public static class BuildModeSaveLoader
 
         try
         {
-            string saveFilePath = Path.Combine(
+            var saveFilePath = Path.Combine(
                 fungame.DirectoryPath,
                 $"{fungame.BuildModeSave}.alexx_BMsave");
 
@@ -33,9 +33,9 @@ public static class BuildModeSaveLoader
                 return;
             }
 
-            Vector2 anchor = fungame.MapPosition;
-            int anchorX = (int)anchor.x;
-            int anchorY = (int)anchor.y;
+            var anchor = fungame.MapPosition;
+            var anchorX = (int)anchor.x;
+            var anchorY = (int)anchor.y;
 
             MapLoader.ApplyBuildModeSave(saveFilePath, anchorX, anchorY);
         }

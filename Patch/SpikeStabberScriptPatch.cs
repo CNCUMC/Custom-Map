@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CustomFungamePack.Data;
 using HarmonyLib;
@@ -10,6 +11,7 @@ using UnityEngine.Rendering.Universal;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(SpikeStabberScript))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class SpikeStabberScriptPatch
 {
     private static SpikeStabberData SpikeStabberData => FungameCheck.CurrentFungame?.SpikeStabberData;
@@ -83,7 +85,7 @@ public class SpikeStabberScriptPatch
     private static IEnumerator ResetSpikeCoroutine(SpikeStabberScript instance)
     {
         var data = SpikeStabberData;
-        float cooldown = data?.Cooldown ?? 0f;
+        var cooldown = data?.Cooldown ?? 0f;
 
         if (cooldown > 0f)
             yield return new WaitForSeconds(cooldown);

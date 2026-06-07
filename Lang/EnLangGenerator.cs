@@ -168,8 +168,15 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.feature_enabled_with_value", "{0} enabled: {1}");
             Add("log.world_generation.unknown_feature", "Unknown feature: {0}");
             Add("log.world_generation.skip_generation", "Skipped {0} generation");
-            Add("log.world_generation.initializing_world", "Initializing Fungame map...");
-            Add("log.world_generation.loading_fungame_map", "Loading Fungame map: {0}");
+            Add("log.world_generation.phase.preparing", "Preparing Fungame: {0}...");
+            Add("log.world_generation.phase.generating", "{0} - Generating world...");
+            Add("log.world_generation.phase.skipping", "{0} - Skipped {1}");
+            Add("log.world_generation.phase.placing_blocks", "{0} - Placing blocks: {1} success, {2} failed / {3} total ({4}%)");
+            Add("log.world_generation.phase.spawning_map", "{0} - Spawning map...");
+            Add("log.world_generation.phase.spawning_custom_structures", "{0} - Spawning custom structures...");
+            Add("log.world_generation.phase.spawning_build_mode_save", "{0} - Spawning build mode save...");
+            Add("log.world_generation.phase.applying_settings", "{0} - Applying settings...");
+            Add("log.world_generation.loading_start", "Started loading Fungame: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} does not contain map data");
             Add("log.world_generation.no_content_type", "Fungame '{0}' has no content type defined (MapData, CustomStructures, or BuildModeSave)");
             Add("log.world_generation.no_commands", "No {0} enabled");

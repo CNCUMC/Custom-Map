@@ -17,6 +17,5 @@ public class LevelData
     [JsonProperty("y")] public int Y { get; set; }
     [JsonProperty("waypoints")] public List<WaypointData> Waypoints { get; set; } = [];
     [JsonProperty("items")] public List<ItemData> Items { get; set; } = [];
-    [JsonIgnore]
-    public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;
+    [JsonIgnore] public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;
 }

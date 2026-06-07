@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CustomFungamePack.Data;
 using CustomFungamePack.Data.Feature.World;
@@ -8,6 +9,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(SoundCannon))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class SoundCannonScriptPatch
 {
     private static SoundCannonData SoundCannonData => FungameCheck.CurrentFungame?.SoundCannonData;
@@ -49,8 +51,8 @@ public class SoundCannonScriptPatch
 
         try
         {
-            bool isCharging = (bool)(ChargingField?.GetValue(__instance) ?? false);
-            bool isSpent = (bool)(SpentField?.GetValue(__instance) ?? false);
+            var isCharging = (bool)(ChargingField?.GetValue(__instance) ?? false);
+            var isSpent = (bool)(SpentField?.GetValue(__instance) ?? false);
 
             if (isCharging)
             {

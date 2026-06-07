@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
-using CustomFungamePack.Data;
 using CustomFungamePack.Data.Feature.World;
 using HarmonyLib;
 using UnityEngine;
@@ -9,6 +9,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(TurretScript))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class TurretScriptPatch
 {
     private static TurretData TurretData => FungameCheck.CurrentFungame?.TurretData;

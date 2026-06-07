@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using CustomFungamePack.Data;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using CustomFungamePack.Data.Feature.World;
 using HarmonyLib;
 using MossLib.Constant;
@@ -8,6 +8,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(Body))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public static class BodyPatch
 {
     private static WorldSettingsData WorldSettings => FungameCheck.CurrentFungame?.WorldSettingsData;

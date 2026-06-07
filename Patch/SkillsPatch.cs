@@ -1,8 +1,10 @@
-﻿using HarmonyLib;
+﻿using System.Diagnostics.CodeAnalysis;
+using HarmonyLib;
 
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(Skills))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class SkillsPatch
 {
     [HarmonyPatch("Setup")]

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CustomFungamePack.Data;
 using CustomFungamePack.Data.Feature.World;
@@ -7,6 +8,7 @@ using UnityEngine;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(GeyserScript))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class GeyserScriptPatch
 {
     private static GeyserData GeyserData => FungameCheck.CurrentFungame?.GeyserData;
@@ -24,7 +26,7 @@ public class GeyserScriptPatch
         try
         {
             var activateTime = (float)(ActivateTimeField?.GetValue(__instance) ?? 0f);
-            float shift = 10f - data.Cooldown;
+            var shift = 10f - data.Cooldown;
             if (shift > 0f)
                 ActivateTimeField?.SetValue(__instance, activateTime - shift);
         }
@@ -43,11 +45,11 @@ public class GeyserScriptPatch
 
         try
         {
-            float activateTime = (float)(ActivateTimeField?.GetValue(__instance) ?? 0f);
+            var activateTime = (float)(ActivateTimeField?.GetValue(__instance) ?? 0f);
 
             if (activateTime < -50f) return;
 
-            float elapsed = Time.time - activateTime;
+            var elapsed = Time.time - activateTime;
 
             if (elapsed >= data.ActivateDuration && elapsed < 4.5f)
                 ActivateTimeField?.SetValue(__instance, Time.time - 5f);

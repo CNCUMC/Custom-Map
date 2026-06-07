@@ -168,8 +168,15 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.feature_enabled_with_value", "已啟用 {0}: {1}");
             Add("log.world_generation.unknown_feature", "未知的特性: {0}");
             Add("log.world_generation.skip_generation", "已跳過 {0} 生成");
-            Add("log.world_generation.initializing_world", "初始化Fungame地圖...");
-            Add("log.world_generation.loading_fungame_map", "正在加載Fungame地圖: {0}");
+            Add("log.world_generation.phase.preparing", "正在準備Fungame: {0}...");
+            Add("log.world_generation.phase.generating", "{0} - 世界生成中...");
+            Add("log.world_generation.phase.skipping", "{0} - 已跳過{1}");
+            Add("log.world_generation.phase.placing_blocks", "{0} - 放置方塊: 成功{1} 失敗{2} / 總計{3} ({4}%)");
+            Add("log.world_generation.phase.spawning_map", "{0} - 正在生成地圖...");
+            Add("log.world_generation.phase.spawning_custom_structures", "{0} - 正在生成自訂結構...");
+            Add("log.world_generation.phase.spawning_build_mode_save", "{0} - 正在生成建築模式存檔...");
+            Add("log.world_generation.phase.applying_settings", "{0} - 正在應用設定...");
+            Add("log.world_generation.loading_start", "開始加載Fungame: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} 不包含地圖數據");
             Add("log.world_generation.no_content_type", "Fungame '{0}' 未定義任何內容類型（MapData、CustomStructures 或 BuildModeSave）");
             Add("log.world_generation.no_commands", "未啟用任何 {0}");

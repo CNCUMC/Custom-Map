@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using CustomFungamePack.Data.Feature.World;
 using HarmonyLib;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.Rendering.Universal;
 namespace CustomFungamePack.Patch;
 
 [HarmonyPatch(typeof(JumpPadScript))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class JumpPadScriptPatch
 {
     private static JumpPadData JumpPadData => FungameCheck.CurrentFungame?.JumpPadData;
@@ -31,7 +33,7 @@ public class JumpPadScriptPatch
             !collision.rigidbody || collision.rigidbody.isKinematic)
             return true;
 
-        float force = data.Force;
+        var force = data.Force;
         var light = (Light2D)LightField.GetValue(__instance);
 
         if (collision.gameObject.GetComponent<Body>())
@@ -43,7 +45,7 @@ public class JumpPadScriptPatch
             if (collision.gameObject.TryGetComponent(out Limb limbComponent))
             {
                 if (light) light.intensity = 1f;
-                foreach (Limb limb in limbComponent.body.limbs)
+                foreach (var limb in limbComponent.body.limbs)
                     limb.rb.velocity = new Vector2(limb.rb.velocity.x, 65f * force);
                 limbComponent.body.Scream();
                 Sound.Play("jumppad", __instance.transform.position);

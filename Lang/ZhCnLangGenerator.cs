@@ -168,8 +168,15 @@ namespace CustomFungamePack.Lang
             Add("log.world_generation.feature_enabled_with_value", "已启用 {0}: {1}");
             Add("log.world_generation.unknown_feature", "未知的特性: {0}");
             Add("log.world_generation.skip_generation", "已跳过 {0} 生成");
-            Add("log.world_generation.initializing_world", "初始化Fungame地图...");
-            Add("log.world_generation.loading_fungame_map", "正在加载Fungame地图: {0}");
+            Add("log.world_generation.phase.preparing", "正在准备Fungame: {0}...");
+            Add("log.world_generation.phase.generating", "{0} - 世界生成中...");
+            Add("log.world_generation.phase.skipping", "{0} - 已跳过{1}");
+            Add("log.world_generation.phase.placing_blocks", "{0} - 放置方块: 成功{1} 失败{2} / 总计{3} ({4}%)");
+            Add("log.world_generation.phase.spawning_map", "{0} - 正在生成地图...");
+            Add("log.world_generation.phase.spawning_custom_structures", "{0} - 正在生成自定义结构...");
+            Add("log.world_generation.phase.spawning_build_mode_save", "{0} - 正在生成建筑模式存档...");
+            Add("log.world_generation.phase.applying_settings", "{0} - 正在应用设置...");
+            Add("log.world_generation.loading_start", "开始加载Fungame: {0}");
             Add("log.world_generation.no_map_data", "Fungame {0} 不包含地图数据");
             Add("log.world_generation.no_content_type", "Fungame '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
             Add("log.world_generation.no_commands", "未启用任何 {0}");
@@ -213,7 +220,7 @@ namespace CustomFungamePack.Lang
             Add("log.map_loader.load_error", "Fungame 或地图数据为空");
             Add("log.map_loader.invalid_format", "无效的地图格式，缺少 map 字段");
             Add("log.map_loader.key_missing", "错误: 字符串地图格式缺少 'key' 定义");
-            Add("log.map_loader.string_map_applied", "字符串地图应用完成，放置 {0} 个方块，{1} 个物品，失败 {2} 个");
+            Add("log.map_loader.string_map_applied", "字符串地图应用完成，成功 {0} 个，失败 {1} 个");
             Add("log.map_loader.load_success", "成功加载地图: 起始坐标({0}, {1}), 尺寸({2}x{3})");
             Add("log.map_loader.load_failed", "加载地图失败: {0}");
             Add("log.map_loader.place_failed", "在 ({0}, {1}) 放置{2} {3} 失败: {4}");

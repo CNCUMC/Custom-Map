@@ -48,8 +48,9 @@ public static class CustomStructuresLoader
             foreach (var field in structureLoaderType.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
                                                                 BindingFlags.Static))
             {
-                if (!field.FieldType.Name.Contains("Dictionary") && !field.FieldType.Name.Contains("List") &&
-                    !field.FieldType.Name.Contains("IEnumerable")) continue;
+                if (!field.FieldType.Name.Contains("Dictionary")
+                    && !field.FieldType.Name.Contains("List")
+                    && !field.FieldType.Name.Contains("IEnumerable")) continue;
                 var value = field.GetValue(null);
                 switch (value)
                 {
@@ -90,28 +91,30 @@ public static class CustomStructuresLoader
                 return;
             }
 
-            Assembly customStructuresAssembly = targetPlugin.Instance.GetType().Assembly;
+            var customStructuresAssembly = targetPlugin.Instance.GetType().Assembly;
 
-            string filePath = Path.Combine(fungame.DirectoryPath, fungame.CustomStructures);
+            var filePath = Path.Combine(fungame.DirectoryPath, fungame.CustomStructures);
             if (!File.Exists(filePath))
             {
                 Error("not_found_custom_structures");
                 return;
             }
 
-            string text = File.ReadAllText(filePath);
-            string fileName = Path.GetFileName(filePath);
-            bool isV2 = filePath.EndsWith(".ms2.json", StringComparison.OrdinalIgnoreCase);
+            var text = File.ReadAllText(filePath);
+            var fileName = Path.GetFileName(filePath);
+            var isV2 = filePath.EndsWith(".ms2.json", StringComparison.OrdinalIgnoreCase);
 
-            Type structureLoaderType = customStructuresAssembly.GetType("Custom_Structures.StructureLoader");
+            var structureLoaderType = customStructuresAssembly.GetType("Custom_Structures.StructureLoader");
             if (structureLoaderType == null)
             {
                 Error("not_found", "StructureLoader");
                 return;
             }
 
-            string parseMethodName = isV2 ? "ParseAndRegisterV2" : "ParseAndRegister";
-            MethodInfo parseMethod = structureLoaderType.GetMethod(
+            var parseMethodName = isV2
+                ? "ParseAndRegisterV2" 
+                : "ParseAndRegister";
+            var parseMethod = structureLoaderType.GetMethod(
                 parseMethodName,
                 BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -123,22 +126,21 @@ public static class CustomStructuresLoader
 
             parseMethod.Invoke(null, [text, fileName]);
 
-            string structName = ExtractStructureName(text, fileName, isV2);
+            var structName = ExtractStructureName(text, fileName, isV2);
             if (string.IsNullOrEmpty(structName))
             {
                 Error("not_found", "structure name");
                 return;
             }
 
-            Type worldGenPatcherType =
-                customStructuresAssembly.GetType("Custom_Structures.WorldGenerationPatcher");
+            var worldGenPatcherType = customStructuresAssembly.GetType("Custom_Structures.WorldGenerationPatcher");
             if (worldGenPatcherType == null)
             {
                 Error("not_found", "WorldGenerationPatcher");
                 return;
             }
 
-            MethodInfo generateMethod = worldGenPatcherType.GetMethod(
+            var generateMethod = worldGenPatcherType.GetMethod(
                 "GenerateStructure",
                 BindingFlags.Public | BindingFlags.Static);
 
@@ -148,7 +150,7 @@ public static class CustomStructuresLoader
                 return;
             }
 
-            Vector2 position = fungame.MapPosition;
+            var position = fungame.MapPosition;
             generateMethod.Invoke(null, [structName, position]);
 
             MoreInfo("loading", fungame.CustomStructures);
@@ -165,8 +167,8 @@ public static class CustomStructuresLoader
         {
             try
             {
-                JObject json = JObject.Parse(text);
-                string name = json["metadata"]?["name"]?.Value<string>();
+                var json = JObject.Parse(text);
+                var name = json["metadata"]?["name"]?.Value<string>();
                 if (!string.IsNullOrWhiteSpace(name))
                     return name.Trim();
             }
@@ -175,15 +177,15 @@ public static class CustomStructuresLoader
                 // fall through to fallback
             }
 
-            string nameFromFile = Path.GetFileNameWithoutExtension(fileName);
+            var nameFromFile = Path.GetFileNameWithoutExtension(fileName);
             if (nameFromFile.EndsWith(".ms2", StringComparison.OrdinalIgnoreCase))
                 nameFromFile = Path.GetFileNameWithoutExtension(nameFromFile);
             return nameFromFile;
         }
 
-        Match match = V1NameRegex.Match(text);
+        var match = V1NameRegex.Match(text);
         return match.Success
-            ? match.Groups[1].Value 
+            ? match.Groups[1].Value
             : Path.GetFileNameWithoutExtension(fileName);
     }
 
