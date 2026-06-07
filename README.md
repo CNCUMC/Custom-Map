@@ -38,6 +38,7 @@ _A custom map/gamemode ("Fungame") management system for **Casualties Unknown**.
     - [XP Configuration](#xp-configuration)
     - [Localization](#localization)
 - [Project Structure](#project-structure)
+- [Changelog](#changelog)
 
 ---
 
@@ -53,7 +54,8 @@ logic.
 
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx) for Casualties Unknown.
 2. Install [Moss Lib](https://github.com/Explosive-Hydra/Moss-Lib).
-3. Download the latest release from the [Releases](https://github.com/Explosive-Hydra/Custom-Fungame-Pack/releases) page.
+3. Download the latest release from the [Releases](https://github.com/Explosive-Hydra/Custom-Fungame-Pack/releases)
+   page.
 4. Extract the downloaded archive and place the entire `Custom Fungame Pack` folder into your `BepInEx/plugins/` folder.
 5. Create a `Fungames/` folder in your game's root directory (next to `CasualtiesUnknown.exe`).
 6. Place your Fungame folders inside `Fungames/` (see [Fungame Directory Structure](#fungame-directory-structure)).
@@ -92,11 +94,12 @@ Casualties Unknown Demo/
 
 Configure via `BepInEx/config/blackmoss.customfungamepack.cfg`:
 
-| Key                 | Type     | Default    | Description                                            |
-|---------------------|----------|------------|--------------------------------------------------------|
-| `more_logs`         | `bool`   | `false`    | Enable verbose logging                                 |
-| `start_use_fungame` | `bool`   | `false`    | Automatically load a Fungame on new game start         |
-| `first_use_fungame` | `string` | `template` | Fungame ID to load when `Start Use Fungame` is enabled |
+| Key                        | Type     | Default    | Description                                                                                 |
+|----------------------------|----------|------------|---------------------------------------------------------------------------------------------|
+| `more_logs`                | `bool`   | `false`    | Enable verbose logging                                                                      |
+| `start_use_fungame`        | `bool`   | `false`    | Automatically load a Fungame on new game start                                              |
+| `first_use_fungame`        | `string` | `template` | Fungame ID to load when `Start Use Fungame` is enabled                                      |
+| `progress_update_interval` | `int`    | `30`       | Number of blocks between progress text updates during map generation (lower = more updates) |
 
 ---
 
@@ -272,12 +275,12 @@ localization files under the `lang/` directory, not in this JSON.
 }
 ```
 
-| Field     | Type       | Required | Description                                                     |
-|-----------|------------|----------|-----------------------------------------------------------------|
-| `id`      | `string`   | No       | Unique identifier (auto-generated from folder name if omitted)  |
-| `version` | `string`   | No       | Version string (default: `1.0.0`)                               |
-| `author`  | `string[]` | No       | List of authors (default: `["Unknown"]`)                        |
-| `type`    | `string`   | No       | Always `"fungame"` for validation                               |
+| Field     | Type       | Required | Description                                                    |
+|-----------|------------|----------|----------------------------------------------------------------|
+| `id`      | `string`   | No       | Unique identifier (auto-generated from folder name if omitted) |
+| `version` | `string`   | No       | Version string (default: `1.0.0`)                              |
+| `author`  | `string[]` | No       | List of authors (default: `["Unknown"]`)                       |
+| `type`    | `string`   | No       | Always `"fungame"` for validation                              |
 
 > **Localization:** The display `name` and `description` are read from `lang/{currentLocale}.json` under the
 > key `fungame.name` and `fungame.description`. If no locale file exists, the Fungame object's raw property values are
@@ -456,6 +459,7 @@ The file name must match the game's current locale setting (e.g., `zh-CN.json` f
 `EN.json` for English). The game's current language is determined by `PlayerPrefs.GetString("locale", "EN")`.
 
 When displaying a Fungame's name or description, the system:
+
 1. Reads from `{FungameDir}/lang/{currentLocale}.json` → `fungame.name` / `fungame.description`
 2. Falls back to the raw `Name` / `Description` property on the Fungame object if no localized text is found
 
@@ -521,6 +525,35 @@ CustomFungamePack/
 ├── StartGame.ps1                   # Game launcher PowerShell script
 └── .gitignore
 ```
+
+---
+
+---
+
+## Changelog
+
+### v1.2.0 — Real-time Progress Display & Configurable Update Interval
+
+- **Real-time progress display**: Converted synchronous block placement to coroutine-based async placement, allowing the
+  loading screen to display real-time progress percentage during map generation.
+- **Configurable update interval**: Added [`progress_update_interval`](#config-options) config option (default: `30`) to
+  control the number of blocks placed between progress text updates (lower = more frequent updates).
+- **Bug fixes**:
+    - Fixed blocks appearing transparent after entering the world — added [`WorldGeneration.UpdateWorld()`](Patch/WorldGenerationPatch.cs) to refresh chunk visuals.
+    - Fixed `fg reload` and `fg exit` commands not responding during Fungame loading — added `generatingWorld = false`
+      in cleanup phase ([`WorldGenerationPatch.cs`](Patch/WorldGenerationPatch.cs)).
+    - Fixed progress display showing 100% before any blocks were placed — added safety checks in [`RefreshLoadingText()`](Patch/WorldGenerationPatch.cs) for division-by-zero and proper initialization order.
+
+### v1.0.1 — Bug fixes and locale improvements
+
+- Added locale entries for config options across all languages.
+- General bug fixes and stability improvements.
+
+### v1.0.1 — Fungame Save System
+
+- Added `fg save` and `fg save as` commands.
+- Introduced `BuildModeSave` and `CustomStructures` content types.
+- Improved Fungame directory serialization with `FungameDirectoryLoader`.
 
 ---
 
