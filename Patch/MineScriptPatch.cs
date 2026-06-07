@@ -22,14 +22,14 @@ public class MineScriptPatch
 
     private static readonly Lazy<ExplosionParams> DefaultExplosionParams = new(() => new ExplosionParams());
 
-    private static ExplosionParams CreateMineExplosionParams(Vector3 position)
+    private static ExplosionParams CreateMineExplosionParams(Vector3 pos)
     {
         var explosionData = MineData?.ExplosionParamsData;
         var defaults = DefaultExplosionParams.Value;
 
         return new ExplosionParams
         {
-            position = position,
+            position = pos,
             muscleDamage = explosionData?.MuscleDamage ?? defaults.muscleDamage,
             skinDamage = explosionData?.SkinDamage ?? defaults.skinDamage,
             skinDamageChance = explosionData?.SkinDamageChance ?? defaults.skinDamageChance,

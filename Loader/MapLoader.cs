@@ -451,7 +451,8 @@ public static class MapLoader
             var isCurrent = fungame.Id == FungameCheck.CurrentFungame?.Id;
             var marker = isCurrent ? "->" : "  ";
 
-            LogConsole("list.item", marker, i + 1, fungame.Name, fungame.Id, fungame.Version, fungame.Authors);
+            var displayName = FungameLocale.GetName(fungame);
+            LogConsole("list.item", marker, i + 1, displayName, fungame.Id, fungame.Version, fungame.Authors);
         }
 
         Log.NewLine();

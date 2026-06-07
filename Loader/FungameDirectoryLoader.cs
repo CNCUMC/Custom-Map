@@ -71,9 +71,7 @@ public static class FungameDirectoryLoader
         {
             try
             {
-                var fileName = Path.GetFileNameWithoutExtension(levelFile);
-                var expectedType = $"level.{fileName}";
-                var levelData = LoadJsonWithTypeCheck<LevelData>(levelFile, expectedType);
+                var levelData = LoadJsonWithTypeCheck<LevelData>(levelFile, "level");
                 if (levelData != null)
                     levels.Add(levelData);
             }
@@ -137,24 +135,17 @@ public static class FungameDirectoryLoader
         if (string.IsNullOrEmpty(directoryPath))
             return;
 
-        // 如果 Id 为空，从目录名补全（小写）
+        // 从目录名生成 id（小写）
         var dirName = Path.GetFileName(directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        if (string.IsNullOrEmpty(fungame.Id))
-            fungame.Id = dirName.ToLowerInvariant();
+        var originalId = fungame.Id;
+        fungame.Id = dirName.ToLowerInvariant();
 
         var fungameJsonPath = Path.Combine(directoryPath, "fungame.json");
 
-        // 保存原始值，写入 fungame.json 时不包含 name/description（它们只存在 lang 文件中）
-        var originalName = fungame.Name;
-        var originalDescription = fungame.Description;
-        fungame.Name = null;
-        fungame.Description = null;
-
         SaveJsonWithTypeCheck(fungameJsonPath, fungame, "fungame");
 
-        // 恢复原始值，后续 SaveToCurrentLang 需要使用它们
-        fungame.Name = originalName;
-        fungame.Description = originalDescription;
+        // 恢复原始 Id
+        fungame.Id = originalId;
 
         if (fungame.Levels is { Count: > 0 })
         {
@@ -209,14 +200,14 @@ public static class FungameDirectoryLoader
             if (!string.IsNullOrEmpty(directory))
                 Directory.CreateDirectory(directory);
 
-            var jObject = JObject.FromObject(obj, new JsonSerializer
+            var jObject = JObject.FromObject(obj, JsonSerializer.Create(new JsonSerializerSettings
             {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented
-            });
+                NullValueHandling = NullValueHandling.Ignore
+            }));
             jObject["type"] = expectedType;
 
-            File.WriteAllText(filePath, jObject.ToString(Formatting.Indented));
+            var json = JsonConvert.SerializeObject(jObject, Formatting.Indented);
+            File.WriteAllText(filePath, json);
         }
         catch (Exception ex)
         {
