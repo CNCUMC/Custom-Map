@@ -10,7 +10,7 @@ namespace CustomFungamePack.Patch;
 [HarmonyPatch(typeof(Body))]
 public static class BodyPatch
 {
-    private static WorldSettingsData WorldSettings => FungameCheck.CurrentFungame?.WorldSettings;
+    private static WorldSettingsData WorldSettings => FungameCheck.CurrentFungame?.WorldSettingsData;
 
     private static readonly FieldInfo JumpCooldownField = typeof(Body).GetField(
         "jumpCooldown",

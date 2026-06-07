@@ -895,7 +895,7 @@ public class ModCommand : ModCommandBase
         InfoFungame("feature.list_header");
 
         // List WorldSettings features
-        var settings = fungame.WorldSettings;
+        var settings = fungame.WorldSettingsData;
         if (settings != null)
         {
             var wsDisplay = Locale("feature.world_settings_data");

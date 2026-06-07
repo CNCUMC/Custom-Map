@@ -24,7 +24,7 @@ public class Fungame
 
     [JsonIgnore] public List<LevelData> Levels { get; set; } = [];
 
-    [JsonIgnore] public WorldSettingsData WorldSettings { get; set; } = new();
+    [JsonIgnore] public WorldSettingsData WorldSettingsData { get; set; } = new();
 
     [JsonIgnore] public CommandData CommandData { get; set; }
 
@@ -60,9 +60,9 @@ public class Fungame
     [JsonIgnore] public List<WaypointData> Waypoints => CurrentLevel?.Waypoints;
     [JsonIgnore] public int X => CurrentLevel?.X ?? 0;
     [JsonIgnore] public int Y => CurrentLevel?.Y ?? 0;
-    [JsonIgnore] public bool SkipTerrain => WorldSettings?.SkipTerrain ?? true;
-    [JsonIgnore] public bool SkipStructures => WorldSettings?.SkipStructures ?? true;
-    [JsonIgnore] public bool SkipBackground => WorldSettings?.SkipBackground ?? true;
+    [JsonIgnore] public bool SkipTerrain => WorldSettingsData?.SkipTerrain ?? true;
+    [JsonIgnore] public bool SkipStructures => WorldSettingsData?.SkipStructures ?? true;
+    [JsonIgnore] public bool SkipBackground => WorldSettingsData?.SkipBackground ?? true;
 
     [JsonIgnore]
     public WorldGeneration.OverrideSceneType Type => CurrentLevel?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
@@ -74,14 +74,14 @@ public class Fungame
         {
             var items = new List<string>();
 
-            if (WorldSettings?.FullBright == true)
+            if (WorldSettingsData?.FullBright == true)
                 items.Add("full_bright");
 
-            if (WorldSettings?.ForgivingLevel == true)
+            if (WorldSettingsData?.ForgivingLevel == true)
                 items.Add("forgiving_level");
 
-            if (WorldSettings?.Gravity != Physics2D.gravity.y)
-                items.Add($"gravity={WorldSettings?.Gravity}");
+            if (WorldSettingsData?.Gravity != Physics2D.gravity.y)
+                items.Add($"gravity={WorldSettingsData?.Gravity}");
 
             if (MineData != null)
                 items.Add("mine");

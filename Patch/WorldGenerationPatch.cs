@@ -103,7 +103,7 @@ public static class WorldGenerationPatch
     [HarmonyPostfix]
     private static void Update()
     {
-        var settings = CurrentFungame?.WorldSettings;
+        var settings = CurrentFungame?.WorldSettingsData;
         if (settings == null) return;
 
         if (settings.ForgivingLevel)
@@ -184,7 +184,7 @@ public static class WorldGenerationPatch
             return;
         }
 
-        if (fungame.WorldSettings?.SettingsOverrides is { Count: > 0 } overrides)
+        if (fungame.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
         {
             MoreLogs("applying_settings_overrides", $"count={overrides.Count}");
             ApplySettingsOverrides(overrides);

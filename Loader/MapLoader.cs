@@ -62,7 +62,7 @@ public static class MapLoader
 
     private static void LogFeatureInfo(Fungame fungame)
     {
-        var settings = fungame.WorldSettings;
+        var settings = fungame.WorldSettingsData;
 
         var hasAnyFeature = false;
 

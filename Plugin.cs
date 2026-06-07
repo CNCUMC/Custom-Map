@@ -239,6 +239,10 @@ public class Plugin : BaseUnityPlugin
             StrXp = 9999,
             ResXp = 999,
             IntXp = 999
+        },
+        WorldSettingsData = new WorldSettingsData
+        {
+            SkipBackground = false
         }
     };
 

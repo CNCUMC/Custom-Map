@@ -31,7 +31,7 @@ public static class FungameDirectoryLoader
 
             fungame.Levels = LoadLevels(directoryPath);
 
-            fungame.WorldSettings = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
+            fungame.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
             fungame.MineData = LoadFeatureFile<MineData>(directoryPath, "world", "mine.json", "feature.world.mine");
             fungame.JumpPadData = LoadFeatureFile<JumpPadData>(directoryPath, "world", "jump_pad.json", "feature.world.jump_pad");
@@ -166,8 +166,8 @@ public static class FungameDirectoryLoader
             }
         }
 
-        if (fungame.WorldSettings != null)
-            SaveFeatureFileToDisk(directoryPath, "world", "settings.json", fungame.WorldSettings, "feature.world.settings");
+        if (fungame.WorldSettingsData != null)
+            SaveFeatureFileToDisk(directoryPath, "world", "settings.json", fungame.WorldSettingsData, "feature.world.settings");
 
         SaveFeatureFileToDisk(directoryPath, "world", "mine.json", fungame.MineData, "feature.world.mine");
         SaveFeatureFileToDisk(directoryPath, "world", "jump_pad.json", fungame.JumpPadData, "feature.world.jump_pad");
