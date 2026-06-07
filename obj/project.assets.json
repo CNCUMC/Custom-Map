@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
-    ".NETFramework,Version=v4.7.2": {
+    "net472": {
       "BepInEx.Analyzers/1.0.8": {
         "type": "package"
       },
@@ -830,7 +830,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.7.2": [
+    "net472": [
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.AssemblyPublicizer.MSBuild >= 0.4.2",
       "BepInEx.Core >= 5.*",
@@ -866,6 +866,7 @@
       },
       "frameworks": {
         "net472": {
+          "framework": "net472",
           "targetAlias": "net472",
           "projectReferences": {}
         }
@@ -884,6 +885,7 @@
     },
     "frameworks": {
       "net472": {
+        "framework": "net472",
         "targetAlias": "net472",
         "dependencies": {
           "BepInEx.Analyzers": {

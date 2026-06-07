@@ -17,7 +17,6 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.description", "The Fungame ID to use when starting a new game. Requires 'Start Use Fungame' to be enabled.");
             
             // Fungame Format
-            Add("format.name_version", "{0} v{1}");
             Add("format.author", "by {0}");
             Add("format.features", "Features: {0}");
             
@@ -27,6 +26,10 @@ namespace CustomFungamePack.Lang
             Add("feature.gravity", "Gravity");
             Add("feature.jump_limit", "Jump Limit");
             Add("feature.climb_limit", "Climb Limit");
+            Add("feature.world_settings_data", "World Settings");
+            Add("feature.skip_terrain", "Skip Terrain");
+            Add("feature.skip_structures", "Skip Structures");
+            Add("feature.skip_background", "Skip Background");
             Add("feature.mine_data", "Mine");
             Add("feature.jump_pad_data", "Jump Pad");
             Add("feature.turret_data", "Turret");
@@ -118,8 +121,6 @@ namespace CustomFungamePack.Lang
             // Command - Fungame - Config
             Add("command.fungame.config.set_missing_params", "Please specify configuration name and value to set");
             Add("command.fungame.config.list_header", "Current configuration settings:");
-            Add("command.fungame.config.item", " {0}({1}): {2}");
-            Add("command.fungame.config.item_description", " {0}");
             Add("command.fungame.config.set_success", "Configuration '{0}' has been set to {1}");
             Add("command.fungame.config.set_failed", "Failed to set configuration '{0}': {1}");
             Add("command.fungame.config.not_found", "Configuration not found: {0}");
@@ -149,8 +150,6 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.unknown_subcommand", "Unknown feature subcommand: {0}");
             Add("command.fungame.feature.set_missing_params", "Please specify feature name and value to set");
             Add("command.fungame.feature.list_header", "Current feature settings:");
-            Add("command.fungame.feature.item", "    {0}({1}): {2}");
-            Add("command.fungame.feature.parent_item", "    {0}({1}):");
             Add("command.fungame.feature.get_success", "Feature '{0}' = {1}");
             Add("command.fungame.feature.set_success", "Feature '{0}' set to {1}");
             Add("command.fungame.feature.not_found", "Feature not found: {0}");

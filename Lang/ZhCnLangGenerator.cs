@@ -17,7 +17,6 @@ namespace CustomFungamePack.Lang
             Add("config.first_use_fungame.description", "开始新游戏时使用的 Fungame ID。需要启用“开始游戏使用 Fungame”");
             
             // Fungame Format
-            Add("format.name_version", "{0} v{1}");
             Add("format.author", "作者: {0}");
             Add("format.features", "特性: {0}");
             
@@ -27,6 +26,10 @@ namespace CustomFungamePack.Lang
             Add("feature.gravity", "重力");
             Add("feature.jump_limit", "跳跃极限");
             Add("feature.climb_limit", "攀爬极限");
+            Add("feature.world_settings_data", "世界设置");
+            Add("feature.skip_terrain", "跳过地形");
+            Add("feature.skip_structures", "跳过结构");
+            Add("feature.skip_background", "跳过背景");
             Add("feature.mine_data", "地雷");
             Add("feature.jump_pad_data", "弹跳板");
             Add("feature.turret_data", "炮塔");
@@ -118,8 +121,6 @@ namespace CustomFungamePack.Lang
             // Command - Fungame - Config
             Add("command.fungame.config.set_missing_params", "请指定配置名称和值来设置");
             Add("command.fungame.config.list_header", "当前配置设置：");
-            Add("command.fungame.config.item", "    {0}({1}): {2}");
-            Add("command.fungame.config.item_description", "        {0}");
             Add("command.fungame.config.set_success", "配置 '{0}' 已设置为 {1}");
             Add("command.fungame.config.set_failed", "设置配置 '{0}' 失败: {1}");
             Add("command.fungame.config.not_found", "未找到配置：{0}");
@@ -149,8 +150,6 @@ namespace CustomFungamePack.Lang
             Add("command.fungame.feature.unknown_subcommand", "未知的特性子命令：{0}");
             Add("command.fungame.feature.set_missing_params", "请指定特性名称和值来设置");
             Add("command.fungame.feature.list_header", "当前特性设置：");
-            Add("command.fungame.feature.item", "    {0}({1}): {2}");
-            Add("command.fungame.feature.parent_item", "    {0}({1}):");
             Add("command.fungame.feature.get_success", "特性 '{0}' = {1}");
             Add("command.fungame.feature.set_success", "特性 '{0}' 已设置为 {1}");
             Add("command.fungame.feature.not_found", "未找到特性：{0}");

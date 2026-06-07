@@ -3,6 +3,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using CustomFungamePack.Data;
+using CustomFungamePack.Data.Feature.Player;
 using CustomFungamePack.Data.Feature.World;
 using CustomFungamePack.Lang;
 using HarmonyLib;
@@ -17,7 +18,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string Guid = "org.explosivehydra.customfungamepack";
     public const string Name = "Custom Fungame Pack";
-    public const string Version = "1.1.1";
+    public const string Version = "1.1.2";
 
     internal new static ManualLogSource Logger;
     private readonly Harmony _harmony = new(Guid);
@@ -126,8 +127,8 @@ public class Plugin : BaseUnityPlugin
                         "11                                                                                              11             11                     11",
                         "11                                                                                              11             11                     11",
                         "11                                                                                              11                      p p p p p p p 11",
-                        "11                                                                                              11                   1111111111111111111",
                         "11                                                                                              11 b b b b b         1111111111111111111",
+                        "11                                                                                              11                   1111111111111111111",
                         "11                                                                                              11111111111111111    11t             t1",
                         "11                                                                                              11111111111111111    11               11",
                         "11                                                                                              11111111111111111    11t             t11",
@@ -167,7 +168,7 @@ public class Plugin : BaseUnityPlugin
                 [
                     new ItemData
                     {
-                        Id = Items.GeoFruit,
+                        Id = Items.Rifle,
                         Slot = Slots.MainHand
                     },
                     new ItemData
@@ -232,6 +233,12 @@ public class Plugin : BaseUnityPlugin
         {
             Undestroy = true,
             Cooldown = 1
+        },
+        XpData = new XpData
+        {
+            StrXp = 9999,
+            ResXp = 999,
+            IntXp = 999
         }
     };
 

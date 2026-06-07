@@ -62,7 +62,7 @@ public static class FungameLocale
     public static string GetFormattedNameVersion(Fungame fungame)
     {
         if (fungame == null) return string.Empty;
-        return GetFormatted("name_version", GetName(fungame), fungame.Version ?? "1.0.0");
+        return $"{GetName(fungame)} v{fungame.Version ?? "1.0.0"}";
     }
 
     /// <summary>

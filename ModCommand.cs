@@ -106,20 +106,9 @@ public class ModCommand : ModCommandBase
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            // WorldSettings features (scalar)
-            "full_bright",
-            "forgiving_level",
-            "gravity",
-            "jump_limit",
-            "climb_limit",
-            "skip_terrain",
-            "skip_structures",
-            "skip_background"
-        };
+        var allNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Feature data objects and their sub-properties
+        AddFeatureSubProperties<WorldSettingsData>("world_settings", allNames);
         AddFeatureSubProperties<MineData>("mine", allNames);
         AddFeatureSubProperties<JumpPadData>("jump_pad", allNames);
         AddFeatureSubProperties<TurretData>("turret", allNames);
@@ -141,6 +130,7 @@ public class ModCommand : ModCommandBase
         names.Add(baseName);
         foreach (var subProp in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
+            if (subProp.Name == "Type") continue;
             if (!IsSimpleType(subProp.PropertyType))
                 continue;
             string subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
@@ -323,11 +313,11 @@ public class ModCommand : ModCommandBase
             string displayName = Locale($"config.{key}.name");
             string description = Locale($"config.{key}.description");
 
-            InfoFungame("config.item", displayName, key, value);
+            Log.Info($"    {displayName}({key}): {value}", Logger);
 
             if (!string.IsNullOrEmpty(description) && description != $"config.{key}.description")
             {
-                InfoFungame("config.item_description", description);
+                Log.Info($"        {description}", Logger);
             }
         }
 
@@ -908,14 +898,16 @@ public class ModCommand : ModCommandBase
         var settings = fungame.WorldSettings;
         if (settings != null)
         {
-            InfoFungame("feature.category", "WorldSettings");
+            var wsDisplay = Locale("feature.world_settings_data");
+            Log.Info($"    {wsDisplay}(world_settings):", Logger);
             foreach (var prop in typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (prop.Name == "Type") continue;
                 if (!IsSimpleType(prop.PropertyType)) continue;
                 var value = prop.GetValue(settings);
                 var jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name;
                 var displayName = Locale($"feature.{GetFeatureDisplayName(jsonName)}");
-                InfoFungame("feature.item", displayName, jsonName, value);
+                Log.Info($"        {displayName}({jsonName}): {value}", Logger);
             }
         }
 
@@ -934,21 +926,22 @@ public class ModCommand : ModCommandBase
         foreach (var kvp in featureDataTypes)
         {
             var value = kvp.Value;
-            var displayName = Locale($"feature.{GetFeatureDisplayName(kvp.Key)}");
+            var displayName = Locale($"feature.{kvp.Key}_data");
             if (value == null)
             {
-                InfoFungame("feature.item", displayName, kvp.Key, "null");
+                Log.Info($"    {displayName}({kvp.Key}): null", Logger);
                 continue;
             }
 
-            InfoFungame("feature.parent_item", displayName, kvp.Key);
+            Log.Info($"    {displayName}({kvp.Key}):", Logger);
             foreach (var subProp in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (subProp.Name == "Type") continue;
                 if (!IsSimpleType(subProp.PropertyType)) continue;
                 var subValue = subProp.GetValue(value);
                 var subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name;
                 var subDisplay = Locale($"feature.{GetFeatureDisplayName($"{kvp.Key}.{subJson}")}");
-                InfoFungame("feature.item", $"    {subDisplay}", subJson, subValue);
+                Log.Info($"        {subDisplay}({subJson}): {subValue}", Logger);
             }
         }
 
@@ -971,49 +964,39 @@ public class ModCommand : ModCommandBase
 
         if (parts.Length == 1)
         {
-            // Try WorldSettings first
-            targetProp = FindNestedProperty(typeof(WorldSettingsData), parts[0]);
-            if (targetProp != null)
+            // Single-part feature name — toggle data objects (mine, jump_pad, etc.)
+            var dataProp = FindFungameFeatureProperty(parts[0]);
+            if (dataProp == null)
             {
-                target = fungame.WorldSettings;
+                ErrorFungame("feature.not_found", featureName);
+                return;
             }
-            else
+            
+            // For data objects (non-simple type), toggle creation/null
+            if (!IsSimpleType(dataProp.PropertyType))
             {
-                // Try direct feature data object (mine, jump_pad, etc.)
-                var dataProp = FindFungameFeatureProperty(parts[0]);
-                if (dataProp == null)
+                var current = dataProp.GetValue(fungame);
+                if (current == null)
                 {
-                    ErrorFungame("feature.not_found", featureName);
-                    return;
+                    // Create new instance
+                    var instance = Activator.CreateInstance(dataProp.PropertyType);
+                    dataProp.SetValue(fungame, instance);
+                    InfoFungame("feature.set_success", featureName, "enabled");
                 }
-                
-                // For data objects (non-simple type), toggle creation/null
-                if (!IsSimpleType(dataProp.PropertyType))
+                else
                 {
-                    var current = dataProp.GetValue(fungame);
-                    if (current == null)
-                    {
-                        // Create new instance
-                        var instance = Activator.CreateInstance(dataProp.PropertyType);
-                        dataProp.SetValue(fungame, instance);
-                        InfoFungame("feature.set_success", featureName, "enabled");
-                    }
-                    else
-                    {
-                        dataProp.SetValue(fungame, null);
-                        InfoFungame("feature.set_success", featureName, "disabled");
-                    }
-                    return;
+                    dataProp.SetValue(fungame, null);
+                    InfoFungame("feature.set_success", featureName, "disabled");
                 }
-                
-                target = fungame;
-                targetProp = dataProp;
+                return;
             }
+            
+            target = fungame;
+            targetProp = dataProp;
         }
         else
         {
-            // multi-part: e.g. "mine.undestroy" or "fullbright"
-            // First part is the feature name (mine, jump_pad, etc. or world setting)
+            // multi-part: e.g. "world_settings.full_bright" or "mine.undestroy"
             var dataProp = FindFungameFeatureProperty(parts[0]);
             if (dataProp == null)
             {
@@ -1060,19 +1043,12 @@ public class ModCommand : ModCommandBase
             "spike_stabber" => "SpikeStabberData",
             "geyser" => "GeyserData",
             "beartrap" => "BearTrapData",
-            "full_bright" => "FullBright",
-            "forgiving_level" => "ForgivingLevel",
-            "gravity" => "Gravity",
-            "jump_limit" => "JumpLimit",
-            "climb_limit" => "ClimbLimit",
-            "skip_terrain" => "SkipTerrain",
-            "skip_structures" => "SkipStructures",
-            "skip_background" => "SkipBackground",
+            "world_settings" => "WorldSettings",
             _ => null
         };
 
-        return propName == null 
-            ? null 
+        return propName == null
+            ? null
             : typeof(Fungame).GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
     }
 
