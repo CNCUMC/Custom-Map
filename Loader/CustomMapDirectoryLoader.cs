@@ -147,7 +147,7 @@ public static class CustomMapDirectoryLoader
         var originalId = map.Id;
         map.Id = dirName.ToLowerInvariant();
 
-        var MapJsonPath = Path.Combine(directoryPath, "Map.json");
+        var MapJsonPath = Path.Combine(directoryPath, "map.json");
 
         SaveJsonWithTypeCheck(MapJsonPath, map, "Map");
 

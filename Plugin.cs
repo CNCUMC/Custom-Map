@@ -10,6 +10,7 @@ using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
 using CustomMap.Lang;
+using CustomMap.Loader;
 using HarmonyLib;
 
 namespace CustomMap;
@@ -28,7 +29,7 @@ public class Plugin : BaseUnityPlugin
 
     public static bool MoreLogs;
     public static bool StartGameUseMap;
-    public static int ProgressUpdateInterval;
+    public static float ProgressUpdateInterval;
     public static string FirstUseMap;
 
     public static readonly Map TemplateMap = new()
@@ -235,12 +236,12 @@ public class Plugin : BaseUnityPlugin
 
         BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
         BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
-        BetterOptions.Int(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
+        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
             v => ProgressUpdateInterval = v);
         RegisterMapOption();
 
         BetterLocale.Flush();
-        
+
         MapCheck.Initialize();
         _harmony.PatchAll();
     }
@@ -255,12 +256,23 @@ public class Plugin : BaseUnityPlugin
         try
         {
             if (Directory.Exists(mapsDir))
-                foreach (var file in Directory.GetFiles(mapsDir, "*.json"))
+                foreach (var dir in Directory.GetDirectories(mapsDir))
                 {
-                    var name = Path.GetFileNameWithoutExtension(file);
-                    BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{name}", name);
-                    AddMapChoice(choices, name, name);
+                    var mapJsonPath = Path.Combine(dir, "map.json");
+                    if (!File.Exists(mapJsonPath)) continue;
+                    try
+                    {
+                        var map = CustomMapDirectoryLoader.LoadFromDirectory(dir);
+                        if (map == null) continue;
+                        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", map.Name);
+                        AddMapChoice(choices, map.Id, MapLocale.GetName(map));
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
+
             BetterLocale.Flush();
         }
         catch (Exception ex)

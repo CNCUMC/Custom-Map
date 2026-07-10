@@ -18,50 +18,6 @@ public static class MapLoader
     private const string LocaleKeyPre = "map_loader.";
     private static readonly ManualLogSource Logger = Plugin.Logger;
 
-    public static void LoadAndApplyMapFromMap(Map map)
-    {
-        try
-        {
-            if (map == null)
-            {
-                Error("no_current_map");
-                return;
-            }
-
-            var hasMapData = map.MapData != null;
-            var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
-
-            switch (hasMapData)
-            {
-                case false when !hasCustomStructures:
-                    Error("load_error");
-                    return;
-                case false:
-                    Warning("custom_structures_not_supported", BetterLocale.GetCommand("map"));
-                    return;
-            }
-
-            var mapData = map.MapData;
-
-            if (mapData.Map == null || mapData.Map.Length == 0)
-            {
-                Error("invalid_format");
-                return;
-            }
-
-            LogFeatureInfo(map);
-
-            ParseAndApplyStringMap(map);
-
-            MoreLogs("load_success", map.X, map.Y, mapData.Map.Length,
-                mapData.Map.Max(row => row?.Length ?? 0));
-        }
-        catch (Exception ex)
-        {
-            Error("load_failed", ex.Message);
-        }
-    }
-
     private static void LogFeatureInfo(Map map)
     {
         var settings = map.WorldSettingsData;
@@ -107,87 +63,6 @@ public static class MapLoader
         if (!hasAnyFeature) Warning("no_features_enabled");
     }
 
-    private static void ParseAndApplyStringMap(Map map)
-    {
-        var mapData = map.MapData;
-        if (mapData.Map == null || mapData.Map.Length == 0)
-        {
-            MoreLogs("validation.no_data", BetterLocale.GetOther("common.map"), "string map");
-            return;
-        }
-
-        if (mapData.Key == null || mapData.Key.Count == 0)
-        {
-            Error("key_missing");
-            return;
-        }
-
-        var rowCount = mapData.Map.Length;
-        var maxColCount = mapData.Map.Max(row => row?.Length ?? 0);
-
-        if (maxColCount == 0)
-        {
-            MoreLogs("validation.row_data_empty", "string map");
-            return;
-        }
-
-        // �����ܷ��������޳����кͿ��ַ���
-        var totalBlocks = mapData.Map
-            .Where(mapRow => !string.IsNullOrEmpty(mapRow))
-            .Sum(mapRow => mapRow.Count(c => c != ' '));
-
-        WorldGenerationPatch.TotalBlocks = totalBlocks;
-
-        var successCount = 0;
-        var failCount = 0;
-        const int failLimit = 50;
-
-        var startX = map.X;
-        var startY = map.Y;
-
-        var updateCounter = 0;
-        var updateInterval = Plugin.ProgressUpdateInterval;
-
-        for (var row = 0; row < rowCount; row++)
-        {
-            var mapRow = mapData.Map[row];
-            if (string.IsNullOrEmpty(mapRow))
-            {
-                startY--;
-                continue;
-            }
-
-            var worldX = startX;
-            var worldY = startY;
-
-            foreach (var charStr
-                     in mapRow.Select(t => t.ToString()))
-            {
-                if (!mapData.Key.TryGetValue(charStr, out var value))
-                {
-                    worldX++;
-                    continue;
-                }
-
-                WorldGenerationPatch.SuccessCount = successCount;
-                WorldGenerationPatch.FailCount = failCount;
-                ProcessValue(value, worldX, worldY, ref successCount, ref failCount, failLimit);
-                worldX++;
-
-                // ���ڸ��¼����ı���ʵ��ʵʱ������??
-                if (++updateCounter % updateInterval == 0)
-                    WorldGenerationPatch.RefreshLoadingText();
-            }
-
-            startY--;
-        }
-
-        WorldGenerationPatch.SuccessCount = successCount;
-        WorldGenerationPatch.FailCount = failCount;
-        MoreLogs("string_map_applied", successCount, failCount);
-        PickItems(map);
-    }
-
     private static IEnumerator ParseAndApplyStringMapAsync(Map map)
     {
         var mapData = map.MapData;
@@ -212,7 +87,6 @@ public static class MapLoader
             yield break;
         }
 
-        // �����ܷ��������޳����кͿ��ַ���
         var totalBlocks = mapData.Map
             .Where(mapRow => !string.IsNullOrEmpty(mapRow))
             .Sum(mapRow => mapRow.Count(c => c != ' '));
@@ -274,8 +148,6 @@ public static class MapLoader
 
     public static IEnumerator LoadAndApplyMapFromMapAsync(Map map)
     {
-        // ע�⣺C# ��ֹ??try-catch ��ʹ??yield return??
-        // �����֤??LogFeatureInfo ���� try ����ִ�У��쳣�ɵ����߲�??
         if (map == null)
         {
             Error("no_current_map");
@@ -354,13 +226,15 @@ public static class MapLoader
         try
         {
             WorldUtil.PlaceBlock(x, y, (ushort)blockId);
-            blockCount++;
         }
         catch (Exception ex)
         {
             Error("place_failed", x, y, BetterLocale.GetOther("common.block"), blockId, ex.Message);
             failCount++;
+            return;
         }
+
+        blockCount++;
     }
 
     private static void PlaceItem(int x, int y, string id)
@@ -597,20 +471,9 @@ public static class MapLoader
             Info(key, args);
     }
 
-    private static void Error(string key, params object[] args)
-    {
-        LogUtil.Error(LocaleLog(key, args), Logger);
-    }
-    
-    private static void Info(string key, params object[] args)
-    {
-        LogUtil.Info(LocaleLog(key, args), Logger);
-    }
-    
-    private static void Warning(string key, params object[] args)
-    {
-        LogUtil.Warning(LocaleLog(key, args), Logger);
-    }
+    private static void Error(string key, params object[] args) => LogUtil.Error(LocaleLog(key, args), Logger);
+    private static void Info(string key, params object[] args) => LogUtil.Info(LocaleLog(key, args), Logger);
+    private static void Warning(string key, params object[] args) => LogUtil.Warning(LocaleLog(key, args), Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
