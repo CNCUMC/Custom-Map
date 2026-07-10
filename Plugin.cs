@@ -239,6 +239,8 @@ public class Plugin : BaseUnityPlugin
             v => ProgressUpdateInterval = v);
         RegisterMapOption();
 
+        BetterLocale.Flush();
+        
         MapCheck.Initialize();
         _harmony.PatchAll();
     }
@@ -246,19 +248,20 @@ public class Plugin : BaseUnityPlugin
     private static void RegisterMapOption()
     {
         var choices = new List<ModDropdownChoice>();
-        var mapsDir = Paths.GameRootPath + "\\Maps";
-        var maps = Directory.GetFiles(mapsDir, "*.json");
+        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{TemplateMap.Id}", TemplateMap.Name);
+        AddMapChoice(choices, TemplateMap.Id, MapLocale.GetName(TemplateMap));
+        var mapsDir = MapCheck.MapsPath;
         Logger.LogInfo(mapsDir);
         try
         {
-            maps.AddItem(TemplateMap.Name);
             if (Directory.Exists(mapsDir))
-                foreach (var file in maps)
+                foreach (var file in Directory.GetFiles(mapsDir, "*.json"))
                 {
-                    var map = Path.GetFileNameWithoutExtension(file);
-                    BetterLocale.SetDefault("EN", NameSpace, $"custommap.custommap.select_map{map}", map);
-                    choices.Add(new ModDropdownChoice(map, map));
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{name}", name);
+                    AddMapChoice(choices, name, name);
                 }
+            BetterLocale.Flush();
         }
         catch (Exception ex)
         {
@@ -266,11 +269,15 @@ public class Plugin : BaseUnityPlugin
         }
 
         var arr = choices.ToArray();
-        var defaultIndex = Math.Max(0, Array.FindIndex(arr, c => c.Key == "EN"));
-        BetterOptions.Dropdown(NameSpace, "select_map", NameSpace,
-            defaultIndex, arr,
+        BetterOptions.Dropdown(NameSpace, "first_use_map", NameSpace,
+            0, arr,
             i => FirstUseMap = i >= 0 && i < arr.Length
                 ? arr[i].Key
-                : "EN");
+                : TemplateMap.Id);
+    }
+
+    private static void AddMapChoice(List<ModDropdownChoice> choices, string id, string displayName)
+    {
+        choices.Add(new ModDropdownChoice(id, displayName));
     }
 }

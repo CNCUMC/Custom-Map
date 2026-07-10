@@ -9,10 +9,10 @@ public class ZhCnLangGenerator : ModLangGenBase
     protected override void BuildLocaleData()
     {
         // Config - 设置标签和描述
-        Option("custommap.more_logs", "更多日志", "显示更多日志");
-        Option("custommap.start_game_use_map", "开始游戏使用地图", "开启新游戏时使用选中的地图");
-        Option("custommap.first_use_map", "首选地图", "开始新游戏时使用的地图ID。需要启用\"开始游戏使用地图\"");
-        Option("custommap.progress_update_interval", "进度更新间隔", "放置方块时每 N 个方块更新一次进度显示。数值越小更新越频繁，但可能影响生成性能");
+        Option("custommap.custommap.more_logs", "更多日志", "显示更多日志");
+        Option("custommap.custommap.start_game_use_map", "开始游戏使用地图", "开启新游戏时使用选中的地图");
+        Option("custommap.custommap.first_use_map", "首选地图", "开始新游戏时使用的地图ID。需要启用\"开始游戏使用地图\"");
+        Option("custommap.custommap.progress_update_interval", "进度更新间隔", "放置方块时每 N 个方块更新一次进度显示。数值越小更新越频繁，但可能影响生成性能");
 
         // Map Format
         Other("format.author", "作者: {0}");

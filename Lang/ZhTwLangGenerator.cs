@@ -9,10 +9,10 @@ public class ZhTwLangGenerator : ModLangGenBase
     protected override void BuildLocaleData()
     {
         // Config - 設置標籤和描述
-        Option("custommap.more_logs", "更多日誌", "顯示更多日誌");
-        Option("custommap.start_game_use_map", "開始遊戲使用地圖", "開啟新遊戲時使用選中的地圖");
-        Option("custommap.first_use_map", "首選地圖", "開始新遊戲時使用的地圖ID。需要啟用\"開始遊戲使用地圖\"");
-        Option("custommap.progress_update_interval", "進度更新間隔", "放置方塊時每 N 個方塊更新一次進度顯示。數值越小更新越頻繁，但可能影響生成效能");
+        Option("custommap.custommap.more_logs", "更多日誌", "顯示更多日誌");
+        Option("custommap.custommap.start_game_use_map", "開始遊戲使用地圖", "開啟新遊戲時使用選中的地圖");
+        Option("custommap.custommap.first_use_map", "首選地圖", "開始新遊戲時使用的地圖ID。需要啟用\"開始遊戲使用地圖\"");
+        Option("custommap.custommap.progress_update_interval", "進度更新間隔", "放置方塊時每 N 個方塊更新一次進度顯示。數值越小更新越頻繁，但可能影響生成效能");
 
         // Map Format
         Other("format.author", "作者: {0}");
