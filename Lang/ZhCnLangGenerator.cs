@@ -183,7 +183,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("world_generation.feature_enabled_with_value", "已启用 {0}: {1}");
         Log("world_generation.unknown_feature", "未知的特性: {0}");
         Log("world_generation.skip_generation", "已跳过 {0} 生成");
-        Log("world_generation.phase.preparing", "正在准备Map: {0}...");
+        Log("world_generation.phase.preparing", "正在准备地图: {0}...");
         Log("world_generation.phase.generating", "{0} - 世界生成中...");
         Log("world_generation.phase.skipping", "{0} - 已跳过{1}");
         Log("world_generation.phase.placing_blocks", "{0} - 放置方块: 成功{1} 失败{2} / 总计{3} ({4}%)");
@@ -191,10 +191,10 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("world_generation.phase.spawning_custom_structures", "{0} - 正在生成自定义结构...");
         Log("world_generation.phase.spawning_build_mode_save", "{0} - 正在生成建筑模式存档...");
         Log("world_generation.phase.applying_settings", "{0} - 正在应用设置...");
-        Log("world_generation.loading_start", "开始加载Map: {0}");
-        Log("world_generation.no_map_data", "Map {0} 不包含地图数据");
+        Log("world_generation.loading_start", "开始加载地图: {0}");
+        Log("world_generation.no_map_data", "地图 {0} 不包含地图数据");
         Log("world_generation.no_content_type",
-            "Map '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
+            "地图 '{0}' 未定义任何内容类型（MapData、CustomStructures 或 BuildModeSave）");
         Log("world_generation.no_commands", "未启用任何 {0}");
         Log("world_generation.exited_map", "已退出地图");
         Log("world_generation.executing_command", "执行 {0}: '{1}'");
@@ -234,7 +234,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("validation.array_empty_removed", "{0} 数组为空，已移除");
 
         // Log - Map Loader
-        Log("map_loader.load_error", "Map 或地图数据为空");
+        Log("map_loader.load_error", "地图或地图数据为空");
         Log("map_loader.invalid_format", "无效的地图格式，缺少 map 字段");
         Log("map_loader.key_missing", "错误: 字符串地图格式缺少 'key' 定义");
         Log("map_loader.string_map_applied", "字符串地图应用完成，成功 {0} 个，失败 {1} 个");
@@ -257,10 +257,10 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_loader.feature_enabled", "已启用 {0}");
         Log("map_loader.feature_enabled_with_value", "已启用 {0}: {1}");
         Log("map_loader.skip_generation", "已跳过 {0} 生成");
-        Log("map_loader.no_directory_path", "Map 目录路径为空");
+        Log("map_loader.no_directory_path", "地图目录路径为空");
         Log("map_loader.map_json_not_found", "在 {0} 中找不到 map.json");
         Log("map_loader.map_deserialize_failed", "反序列化地图 失败");
-        Log("map_loader.map_reloaded_from_disk", "已从磁盘重新加载 Map: {0}");
+        Log("map_loader.map_reloaded_from_disk", "已从磁盘重新加载地图: {0}");
         Log("map_loader.map_reload_failed", "重新加载地图 失败: {0}");
         Log("map_loader.validation.no_data", "{0} 中没有 {1} 数据");
         Log("map_loader.validation.row_data_empty", "{0} 行数据为空");
@@ -268,9 +268,9 @@ public class ZhCnLangGenerator : ModLangGenBase
         // Log - Error
         Log("error.no_map_file", "找不到 map.json 文件: {0}");
         Log("error.no_valid_directories", "没有有效的地图 目录，请检查 Maps 文件夹");
-        Log("error.custom_structures_mod_not_loaded", "Map '{0}' 需要自定义结构模组，但该模组未加载");
+        Log("error.custom_structures_mod_not_loaded", "地图 '{0}' 需要自定义结构模组，但该模组未加载");
         Log("error.multiple_content_types",
-            "Map '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
+            "地图 '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
 
         // Log - Map Load
         Log("map_load.empty_target_path", "目标路径不能为空");
@@ -324,7 +324,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("loader.directory_not_found", "找不到目录: {0}");
         Log("loader.map_json_not_found", "在 {0} 中找不到 map.json");
         Log("loader.map_json_failed", "反序列化 map.json 失败: {0}");
-        Log("loader.success", "成功加载 Map: {0} (ID: {1}, 版本: {2})");
+        Log("loader.success", "成功加载地图: {0} (ID: {1}, 版本: {2})");
         Log("loader.failed", "从 {0} 加载地图失败: {1}");
         Log("loader.level_dir_not_found", "找不到关卡目录: {0}");
         Log("loader.no_level_files", "在 {0} 中未找到关卡文件");

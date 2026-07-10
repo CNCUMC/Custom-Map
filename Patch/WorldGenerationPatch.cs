@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
 using BepInEx.Logging;
@@ -165,7 +166,7 @@ public static class WorldGenerationPatch
 
     internal static void RefreshLoadingText()
     {
-        if (WorldGeneration == null || CurrentMap == null) return;
+        if (!WorldGeneration || CurrentMap == null) return;
 
         var name = MapLocale.GetName(CurrentMap);
 
@@ -173,7 +174,6 @@ public static class WorldGenerationPatch
         if (_isSpawningMap && TotalBlocks > 0)
         {
             var total = SuccessCount + FailCount;
-            // 安全保护：当 total==0 时强�?pct=0，防�?TotalBlocks 尚未设置时除零导�?NaN�?00
             var pct = total > 0
                 ? Mathf.Clamp((int)((float)total / TotalBlocks * 100f), 0, 100)
                 : 0;
@@ -232,8 +232,8 @@ public static class WorldGenerationPatch
     public static bool SetLoadingTextPrefix(string localetext)
     {
         return !_loading || CurrentMap == null;
-        // 正在加载Map时，阻塞游戏自身的进度文本，防止覆盖我们的实时进度显�?
-        // UpdateLoadingText 会在 Update 中持续设置正确的文本
+        // ���ڼ���Mapʱ��������Ϸ����Ľ����ı�����ֹ�������ǵ�ʵʱ������ʾ
+        // UpdateLoadingText ���� Update �г���������ȷ���ı�
     }
 
 
@@ -251,8 +251,8 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool InitializationWorld(WorldGeneration __instance)
     {
-        // 阻塞原始 FinishWorldGeneration 协程，改用我们自己的协程
-        // 这样可以在方块放置过程中 yield Unity 渲染进度文本
+        // ����ԭʼ FinishWorldGeneration Э�̣����������Լ���Э��
+        // ���������ڷ�����ù����� yield Unity ��Ⱦ�����ı�
         __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
         return false;
     }
@@ -261,7 +261,7 @@ public static class WorldGenerationPatch
     {
         if (_hasShownMapLoading)
         {
-            // 通过 StartMapLoading 启动的，_loading 已经�?true
+            // ͨ�� StartMapLoading �����ģ�_loading �Ѿ� true
         }
         else
         {
@@ -288,7 +288,7 @@ public static class WorldGenerationPatch
             yield break;
         }
 
-        // 应用设置覆盖
+        // Ӧ�����ø���
         if (map.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
         {
             SetPhase("applying_settings");
@@ -300,10 +300,8 @@ public static class WorldGenerationPatch
         var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
 
-        // 支持所有内容类型共存，按顺序执�?
         if (hasMapData)
         {
-            // 提前计算 TotalBlocks，确保第一�?RefreshLoadingText 就能显示正确百分�?
             var mapData = map.MapData;
             if (mapData?.Map is { Length: > 0 })
                 TotalBlocks = mapData.Map
@@ -312,14 +310,14 @@ public static class WorldGenerationPatch
 
             SetPhase("spawning_map");
             _isSpawningMap = true;
-            RefreshLoadingText(); // 此时 TotalBlocks 已设置，显示 0%
+            RefreshLoadingText();
 
-            // 异步加载地图：每30个方�?yield 一次，�?Unity 渲染进度文本
+            SetWorldExists();
+            WorldGeneration.world.generatingWorld = false;
             yield return MapLoader.LoadAndApplyMapFromMapAsync(map);
 
             _isSpawningMap = false;
 
-            // 地图加载完成后执行启动命令和提示（仍在加载界面下�?
             ExecuteCommands(map);
 
             var modInfo = MapLocale.GetFormattedNameVersion(map);
@@ -352,27 +350,30 @@ public static class WorldGenerationPatch
         if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
             Warning("no_content_type", MapLocale.GetName(map));
 
-        // === 复用原始 FinishWorldGeneration 的清理逻辑 ===
         GlobalDark.main.Darken();
         yield return new WaitUntil(() => !GlobalDark.main.IsDarkening());
 
-        // 应用层修饰（原始逻辑中仅�?biomeOverride == None 时调用）
         instance.ApplyLayerModifiers();
 
-        // 标记世界生成完成（必要：游戏检查此标志判断世界是否可交互）
         instance.generatingWorld = false;
 
-        // 强制刷新全部方块视觉（确保我们放置的方块正确渲染�?
         instance.UpdateWorld();
 
-        // 停用所有块、更新可见�?
         instance.DisableAllChunks();
         instance.UpdateChunkVisibility();
 
-        // 隐藏加载界面
+        yield return new WaitForSeconds(9f);
         instance.loadingObject.SetActive(false);
 
         _loading = false;
+    }
+
+    private static void SetWorldExists()
+    {
+        const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+        var field = typeof(WorldGeneration).GetField("worldExists", flags)
+                    ?? typeof(WorldGeneration).GetField("<worldExists>k__BackingField", flags);
+        field?.SetValue(WorldGeneration.world, true);
     }
 
     private static void ExecuteCommands(Map map)
@@ -449,21 +450,12 @@ public static class WorldGenerationPatch
             Info(key, args);
     }
 
-    private static void Error(string key, params object[] args)
-    {
-        LogUtil.Error(LocaleLog(key, args), Logger);
-    }
-    
-    private static void Info(string key, params object[] args)
-    {
+    private static void Error(string key, params object[] args) =>
+        LogUtil.Error(BetterLocale.GetLog($"error.{key}", args), Logger);
+    private static void Info(string key, params object[] args) =>
         LogUtil.Info(LocaleLog(key, args), Logger);
-    }
-    
-    private static void Warning(string key, params object[] args)
-    {
+    private static void Warning(string key, params object[] args) =>
         LogUtil.Warning(LocaleLog(key, args), Logger);
-    }
-
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
 }

@@ -1,7 +1,11 @@
-﻿using Bark.BetterCCL;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Bark.BetterCCL;
 using Bark.Constant;
 using BepInEx;
 using BepInEx.Logging;
+using CUCoreLib.Data;
 using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
@@ -18,7 +22,7 @@ public class Plugin : BaseUnityPlugin
     public const string Guid = "org.cncumc.custommap";
     public const string Name = "Custom Map";
     public const string Version = "1.0.0";
-    private const string NameSpace = "quantum";
+    private const string NameSpace = "custommap";
     internal new static ManualLogSource Logger;
     private readonly Harmony _harmony = new(Guid);
 
@@ -231,37 +235,42 @@ public class Plugin : BaseUnityPlugin
 
         BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
         BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
-        BetterOptions.Int(NameSpace, "progress_update_interval", NameSpace, 10, 1000, 333,
+        BetterOptions.Int(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
             v => ProgressUpdateInterval = v);
+        RegisterMapOption();
 
+        MapCheck.Initialize();
         _harmony.PatchAll();
     }
 
-    // private static void RegisterMapOption()
-    // {
-    //     var choices = new List<ModDropdownChoice>();
-    //     var langDir = $"{Application.dataPath}/Maps";
-    //     try
-    //     {
-    //         if (Directory.Exists(langDir))
-    //             foreach (var file in Directory.GetFiles(langDir, "*.json"))
-    //             {
-    //                 var code = Path.GetFileNameWithoutExtension(file);
-    //                 BetterLocale.SetDefault("EN", "option", $"quantum.video.bilingual_name{code}", code);
-    //                 choices.Add(new ModDropdownChoice(code, code));
-    //             }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Logger.LogWarning($"Failed to scan language directory '{langDir}': {ex.Message}");
-    //     }
-    //
-    //     var arr = choices.ToArray();
-    //     var defaultIndex = Math.Max(0, Array.FindIndex(arr, c => c.Key == "EN"));
-    //     BetterOptions.Dropdown(NameSpace, "bilingual_name", Setting.SettingCategory.Video,
-    //         defaultIndex, arr,
-    //         i => FirstUseMap = i >= 0 && i < arr.Length
-    //             ? arr[i].Key
-    //             : "EN");
-    // }
+    private static void RegisterMapOption()
+    {
+        var choices = new List<ModDropdownChoice>();
+        var mapsDir = Paths.GameRootPath + "\\Maps";
+        var maps = Directory.GetFiles(mapsDir, "*.json");
+        Logger.LogInfo(mapsDir);
+        try
+        {
+            maps.AddItem(TemplateMap.Name);
+            if (Directory.Exists(mapsDir))
+                foreach (var file in maps)
+                {
+                    var map = Path.GetFileNameWithoutExtension(file);
+                    BetterLocale.SetDefault("EN", NameSpace, $"custommap.custommap.select_map{map}", map);
+                    choices.Add(new ModDropdownChoice(map, map));
+                }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning($"Failed to scan maps directory '{mapsDir}': {ex.Message}");
+        }
+
+        var arr = choices.ToArray();
+        var defaultIndex = Math.Max(0, Array.FindIndex(arr, c => c.Key == "EN"));
+        BetterOptions.Dropdown(NameSpace, "select_map", NameSpace,
+            defaultIndex, arr,
+            i => FirstUseMap = i >= 0 && i < arr.Length
+                ? arr[i].Key
+                : "EN");
+    }
 }

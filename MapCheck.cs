@@ -27,6 +27,9 @@ public static class MapCheck
 
     private static void LoadMapDirectories()
     {
+        if (!Directory.Exists(MapsPath))
+            Directory.CreateDirectory(MapsPath);
+        
         var directories = Directory.GetDirectories(MapsPath);
 
         _logger.LogInfo($"Read {directories.Length} Map folders");
