@@ -10,6 +10,7 @@ using CUCoreLib.Helpers;
 using CustomMap.Loader;
 using HarmonyLib;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 namespace CustomMap.Patch;
@@ -27,13 +28,12 @@ public static class WorldGenerationPatch
     internal static int FailCount;
     internal static int TotalBlocks;
 
-    private static string _generationPhase = "";
+    private static TextMeshProUGUI _coverText;
     internal static bool _isSpawningMap;
     private static bool _hasShownMapLoading;
+    private static GameObject _coverRoot;
 
     public static WorldGeneration.OverrideSceneType? ExitTargetScene;
-
-    private static string _phaseArg = "";
 
     [HarmonyPatch("Awake")]
     [HarmonyPostfix]
@@ -120,9 +120,8 @@ public static class WorldGenerationPatch
         Info("loading_start", MapLocale.GetName(map));
     }
 
-    private static void SetPhase(string phaseKey)
+    private static void SetPhase(string phaseKey, string arg = null)
     {
-        _generationPhase = phaseKey;
     }
 
     private static void SuppressCustomStructuresForMapData()
@@ -168,44 +167,12 @@ public static class WorldGenerationPatch
     internal static void RefreshLoadingText()
     {
         if (!WorldGeneration || CurrentMap == null) return;
-
-        var name = MapLocale.GetName(CurrentMap);
-
-        string text;
-        if (_isSpawningMap && TotalBlocks > 0)
-        {
-            var total = SuccessCount + FailCount;
-            var pct = total > 0
-                ? Mathf.Clamp((int)((float)total / TotalBlocks * 100f), 0, 100)
-                : 0;
-            text = LocaleLog("phase.placing_blocks", name, SuccessCount, FailCount, TotalBlocks, pct);
-        }
-        else
-        {
-            text = _generationPhase switch
-            {
-                "preparing" => LocaleLog("phase.preparing", name),
-                "skipping" => LocaleLog("phase.skipping", name, _phaseArg),
-                "spawning_map" => LocaleLog("phase.spawning_map", name),
-                "spawning_custom_structures" => LocaleLog("phase.spawning_custom_structures", name),
-                "spawning_build_mode_save" => LocaleLog("phase.spawning_build_mode_save", name),
-                "applying_settings" => LocaleLog("phase.applying_settings", name),
-                _ => LocaleLog("phase.generating", name)
-            };
-        }
-
-        WorldGeneration.loadingText.text = text;
+        UpdateCoverText();
     }
 
     private static void UpdateLoadingText()
     {
         RefreshLoadingText();
-    }
-
-    private static void SetPhase(string phaseKey, string arg)
-    {
-        _generationPhase = phaseKey;
-        _phaseArg = arg;
     }
 
     [HarmonyPatch("WorldCreateBackground")]
@@ -234,7 +201,6 @@ public static class WorldGenerationPatch
     {
         return !_loading || CurrentMap == null;
     }
-
 
     [HarmonyPatch("WorldGenerateTerrain")]
     [HarmonyPrefix]
@@ -376,32 +342,60 @@ public static class WorldGenerationPatch
             var body = PlayerCamera.main.body;
             body.transform.position = new Vector3(safePos.x, safePos.y, 0);
         }
+
         yield return null;
         if (PlayerCamera.main && PlayerCamera.main.body)
         {
             PlayerCamera.main.body.rb.simulated = true;
             if (ConsoleScript.instance) ConsoleScript.instance.noClip = false;
         }
-        instance.loadingObject.SetActive(false);
-        UnityEngine.Object.Destroy(cover);
 
         _loading = false;
+        yield return null;
+        _coverRoot.SetActive(false);
+    }
+
+    private static void UpdateCoverText()
+    {
+        if (!_coverText || CurrentMap == null) return;
+        var total = SuccessCount + FailCount;
+        var pct = TotalBlocks > 0
+            ? Mathf.Clamp((int)((float)Math.Min(total, TotalBlocks) / TotalBlocks * 100f), 0, 100)
+            : 0;
+        var bar = TotalBlocks > 0 ? new string('█', pct / 10) + new string('░', 10 - pct / 10) : "          ";
+        var line = _isSpawningMap ? $"{Math.Min(total, TotalBlocks)}/{TotalBlocks} ({pct}%)" : "正在应用...";
+        _coverText.text = $"{CurrentMap.Name}\n{bar}\n{line}";
     }
 
     private static GameObject CreateLoadingCover()
     {
-        var go = new GameObject("CustomMapLoadingCover", typeof(RectTransform));
-        var canvas = go.AddComponent<Canvas>();
+        _coverRoot = new GameObject("CustomMapLoadingCover", typeof(RectTransform));
+        var canvas = _coverRoot.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 999;
-        var image = go.AddComponent<UnityEngine.UI.Image>();
-        image.color = Color.black;
-        var rect = go.GetComponent<RectTransform>();
+        var bg = _coverRoot.AddComponent<Image>();
+        bg.color = Color.black;
+        var rect = _coverRoot.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
-        return go;
+
+        var textGo = new GameObject("ProgressText", typeof(RectTransform));
+        textGo.transform.SetParent(_coverRoot.transform, false);
+        var textRect = textGo.GetComponent<RectTransform>();
+        textRect.anchorMin = new Vector2(0.1f, 0.3f);
+        textRect.anchorMax = new Vector2(0.9f, 0.7f);
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+        _coverText = textGo.AddComponent<TextMeshProUGUI>();
+        _coverText.font = Resources.FindObjectsOfTypeAll<TMP_FontAsset>().FirstOrDefault(f
+            => f.name.Contains("Retro Gaming SDF"));
+        _coverText.alignment = TextAlignmentOptions.Center;
+        _coverText.fontSize = 36;
+        _coverText.color = Color.white;
+        _coverText.text = "Loading...";
+        return _coverRoot;
     }
 
     private static void SetWorldExists()
