@@ -256,7 +256,6 @@ public static class MapLoader
                 ProcessValue(value, worldX, worldY, ref successCount, ref failCount, failLimit);
                 worldX++;
 
-                // ??0����??yield һ�Σ�??Unity ��Ⱦ���µĽ�����??
                 if (++updateCounter % updateInterval != 0) continue;
                 WorldGenerationPatch.SuccessCount = successCount;
                 WorldGenerationPatch.FailCount = failCount;

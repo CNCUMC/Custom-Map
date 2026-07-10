@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,7 @@ using CUCoreLib.Helpers;
 using CustomMap.Loader;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CustomMap.Patch;
 
@@ -232,8 +233,6 @@ public static class WorldGenerationPatch
     public static bool SetLoadingTextPrefix(string localetext)
     {
         return !_loading || CurrentMap == null;
-        // ���ڼ���Mapʱ��������Ϸ����Ľ����ı�����ֹ�������ǵ�ʵʱ������ʾ
-        // UpdateLoadingText ���� Update �г���������ȷ���ı�
     }
 
 
@@ -247,21 +246,31 @@ public static class WorldGenerationPatch
         return false;
     }
 
+    [HarmonyPatch("WorldPlacePlayer")]
+    [HarmonyPostfix]
+    public static void AfterWorldPlacePlayer()
+    {
+        if (CurrentMap == null) return;
+        var pos = CurrentMap.SpawnPosition;
+        if (!PlayerCamera.main || !PlayerCamera.main.body) return;
+        PlayerCamera.main.body.transform.position = new Vector3(pos.x, pos.y, 0);
+        if (ConsoleScript.instance) ConsoleScript.instance.noClip = true;
+        PlayerCamera.main.body.rb.simulated = false;
+    }
+
     [HarmonyPatch("FinishWorldGeneration")]
     [HarmonyPrefix]
     public static bool InitializationWorld(WorldGeneration __instance)
     {
-        // ����ԭʼ FinishWorldGeneration Э�̣����������Լ���Э��
-        // ���������ڷ�����ù����� yield Unity ��Ⱦ�����ı�
         __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
         return false;
     }
 
     private static IEnumerator ContentLoadingCoroutine(WorldGeneration instance)
     {
+        var cover = CreateLoadingCover();
         if (_hasShownMapLoading)
         {
-            // ͨ�� StartMapLoading �����ģ�_loading �Ѿ� true
         }
         else
         {
@@ -288,7 +297,6 @@ public static class WorldGenerationPatch
             yield break;
         }
 
-        // Ӧ�����ø���
         if (map.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
         {
             SetPhase("applying_settings");
@@ -362,10 +370,38 @@ public static class WorldGenerationPatch
         instance.DisableAllChunks();
         instance.UpdateChunkVisibility();
 
-        yield return new WaitForSeconds(9f);
+        var safePos = map.SpawnPosition;
+        if (PlayerCamera.main && PlayerCamera.main.body)
+        {
+            var body = PlayerCamera.main.body;
+            body.transform.position = new Vector3(safePos.x, safePos.y, 0);
+        }
+        yield return null;
+        if (PlayerCamera.main && PlayerCamera.main.body)
+        {
+            PlayerCamera.main.body.rb.simulated = true;
+            if (ConsoleScript.instance) ConsoleScript.instance.noClip = false;
+        }
         instance.loadingObject.SetActive(false);
+        UnityEngine.Object.Destroy(cover);
 
         _loading = false;
+    }
+
+    private static GameObject CreateLoadingCover()
+    {
+        var go = new GameObject("CustomMapLoadingCover", typeof(RectTransform));
+        var canvas = go.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999;
+        var image = go.AddComponent<UnityEngine.UI.Image>();
+        image.color = Color.black;
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        return go;
     }
 
     private static void SetWorldExists()
@@ -452,10 +488,13 @@ public static class WorldGenerationPatch
 
     private static void Error(string key, params object[] args) =>
         LogUtil.Error(BetterLocale.GetLog($"error.{key}", args), Logger);
+
     private static void Info(string key, params object[] args) =>
         LogUtil.Info(LocaleLog(key, args), Logger);
+
     private static void Warning(string key, params object[] args) =>
         LogUtil.Warning(LocaleLog(key, args), Logger);
+
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
 }
