@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -250,7 +249,7 @@ public static class MapLoader
         }
     }
 
-    public static void ApplyBuildModeSave(string saveFilePath, int anchorX, int anchorY)
+    public static void ApplyBuildModeSave(string saveFilePath)
     {
         if (!File.Exists(saveFilePath))
         {
@@ -398,13 +397,13 @@ public static class MapLoader
         }
 
         LogUtil.Divider();
-        LogConsole("info.name", MapLocale.GetName(map));
-        LogConsole("info.id", map.Id);
-        LogConsole("info.version", map.Version);
-        LogConsole("info.authors", MapLocale.GetAuthor(map));
-        LogConsole("info.description", MapLocale.GetDescription(map));
-        LogConsole("info.features", map.ActiveFeatures);
-        LogConsole("info.spawn", map.SpawnPosition);
+        Info("info.name", MapLocale.GetName(map));
+        Info("info.id", map.Id);
+        Info("info.version", map.Version);
+        Info("info.authors", MapLocale.GetAuthor(map));
+        Info("info.description", MapLocale.GetDescription(map));
+        Info("info.features", map.ActiveFeatures);
+        Info("info.spawn", map.SpawnPosition);
         LogUtil.Divider();
         LogUtil.NewLine();
     }
@@ -416,12 +415,12 @@ public static class MapLoader
         if (maps == null
             || maps.Count == 0)
         {
-            LogConsole("list.empty");
+            Info("list.empty");
             return;
         }
 
         LogUtil.Divider();
-        LogConsole("list.header", maps.Count);
+        Info("list.header", maps.Count);
 
         for (var i = 0; i < maps.Count; i++)
         {
@@ -430,7 +429,7 @@ public static class MapLoader
             var marker = isCurrent ? "->" : "  ";
 
             var displayName = MapLocale.GetName(map);
-            LogConsole("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
+            Info("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
         }
 
         LogUtil.NewLine();
@@ -442,21 +441,20 @@ public static class MapLoader
         foreach (var item in items) PlayerUtil.PickItem(item.Id, item.Slot, item.Force);
     }
 
-    private static void LogConsole(string key, params object[] args)
-    {
-        var message = BetterLocale.GetCommand($"custommap.{key}", args);
-        LogUtil.Info(message, Logger);
-    }
-
     private static void MoreLogs(string key, params object[] args)
     {
         if (Plugin.MoreLogs)
             Info(key, args);
     }
 
-    private static void Error(string key, params object[] args) => LogUtil.Error(LocaleLog(key, args), Logger);
-    private static void Info(string key, params object[] args) => LogUtil.Info(LocaleLog(key, args), Logger);
-    private static void Warning(string key, params object[] args) => LogUtil.Warning(LocaleLog(key, args), Logger);
+    private static void Error(string key, params object[] args) =>
+        LogUtil.Error(LocaleLog(key, args), Logger);
+
+    private static void Info(string key, params object[] args) =>
+        LogUtil.Info(LocaleLog(key, args), Logger);
+
+    private static void Warning(string key, params object[] args) =>
+        LogUtil.Warning(LocaleLog(key, args), Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

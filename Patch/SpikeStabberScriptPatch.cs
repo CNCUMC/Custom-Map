@@ -23,8 +23,7 @@ public class SpikeStabberScriptPatch
     public static bool OnTriggerPrefix(SpikeStabberScript __instance, Collider2D collision)
     {
         var data = SpikeStabberData;
-        if (data == null)
-            return true;
+        if (data == null) return true;
 
         try
         {
@@ -55,8 +54,8 @@ public class SpikeStabberScriptPatch
             switch (data.Undestroy)
             {
                 case true when data.Cooldown > 0f &&
-                               LastTriggerTime.TryGetValue(__instance, out var lastTime) &&
-                               Time.time - lastTime < data.Cooldown:
+                               LastTriggerTime.TryGetValue(__instance, out var lastTime)
+                               && Time.time - lastTime < data.Cooldown:
                     return;
                 case true:
                     LastTriggerTime[__instance] = Time.time;
@@ -67,7 +66,8 @@ public class SpikeStabberScriptPatch
                     break;
             }
 
-            if (!data.NoLight) return;
+            if (!data.NoLight) 
+                return;
             if (LightField?.GetValue(__instance) is Light2D light)
                 light.enabled = false;
             if (__instance.bonusLight != null)
@@ -75,7 +75,7 @@ public class SpikeStabberScriptPatch
         }
         catch
         {
-            // Silently ignore
+            // ignore
         }
     }
 
@@ -87,7 +87,8 @@ public class SpikeStabberScriptPatch
         if (cooldown > 0f)
             yield return new WaitForSeconds(cooldown);
 
-        if (!instance || !WorldGeneration.world) yield break;
+        if (!instance || !WorldGeneration.world) 
+            yield break;
 
         WorldUtil.PlaceItem(instance.transform.position, "spikestabber");
 

@@ -10,7 +10,6 @@ namespace CustomMap;
 
 public static class MapCheck
 {
-    private static ManualLogSource _logger;
     public static readonly string MapsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps");
     public static readonly List<string> ValidDirectories = [];
     public static readonly List<string> CheckFailDirectories = [];
@@ -20,8 +19,8 @@ public static class MapCheck
 
     public static void Initialize()
     {
-        if (_logger != null) return;
-        _logger = Plugin.Logger;
+        if (Plugin.Logger != null) return;
+        Plugin.Logger = Plugin.Logger;
         LoadMapDirectories();
     }
 
@@ -29,10 +28,10 @@ public static class MapCheck
     {
         if (!Directory.Exists(MapsPath))
             Directory.CreateDirectory(MapsPath);
-        
+
         var directories = Directory.GetDirectories(MapsPath);
 
-        _logger.LogInfo($"Read {directories.Length} Map folders");
+        Plugin.Logger.LogInfo($"Read {directories.Length} Map folders");
 
         ValidDirectories.Clear();
         CheckFailDirectories.Clear();
@@ -49,7 +48,7 @@ public static class MapCheck
         Maps.Add(Plugin.TemplateMap);
 
         if (ValidDirectories.Count == 0) return;
-        _logger.LogInfo($"Valid directories: {ValidDirectories.Count}, loading...");
+        Plugin.Logger.LogInfo($"Valid directories: {ValidDirectories.Count}, loading...");
 
         var directoriesToValidate = ValidDirectories.ToList();
         foreach (var directory in directoriesToValidate)
@@ -67,10 +66,10 @@ public static class MapCheck
         }
 
         if (CheckFailDirectories.Count == 0) return;
-        _logger.LogInfo($"Directory validation failed: {CheckFailDirectories.Count}:");
+        Plugin.Logger.LogInfo($"Directory validation failed: {CheckFailDirectories.Count}:");
         foreach (var failDirectory in CheckFailDirectories)
         {
-            _logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
+            Plugin.Logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
             ValidDirectories.Remove(failDirectory);
         }
     }
@@ -83,8 +82,6 @@ public static class MapCheck
             : target.DirectoryPath;
     }
 
-    private static void UninitializedWarning(string key)
-    {
-        _logger.LogWarning($"{key}");
-    }
+    private static void UninitializedWarning(string key) =>
+        Plugin.Logger.LogWarning($"{key}");
 }

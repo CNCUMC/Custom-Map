@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Linq;
 using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
@@ -33,22 +34,16 @@ public static class CustomMapDirectoryLoader
 
             map.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
-            map.MineData = LoadFeatureFile<MineData>(directoryPath, "world", "mine.json", "feature.world.mine");
-            map.JumpPadData =
-                LoadFeatureFile<JumpPadData>(directoryPath, "world", "jump_pad.json", "feature.world.jump_pad");
-            map.TurretData =
-                LoadFeatureFile<TurretData>(directoryPath, "world", "turret.json", "feature.world.turret");
-            map.SoundCannonData = LoadFeatureFile<SoundCannonData>(directoryPath, "world", "sound_cannon.json",
-                "feature.world.sound_cannon");
-            map.SpikeStabberData = LoadFeatureFile<SpikeStabberData>(directoryPath, "world", "spike_stabber.json",
-                "feature.world.spike_stabber");
-            map.GeyserData =
-                LoadFeatureFile<GeyserData>(directoryPath, "world", "geyser.json", "feature.world.geyser");
-            map.BearTrapData =
-                LoadFeatureFile<BearTrapData>(directoryPath, "world", "beartrap.json", "feature.world.beartrap");
+            foreach (var (propName, subDir, fileName, typeCheck) in FeatureDescriptors)
+            {
+                var prop = typeof(Map).GetProperty(propName);
+                if (prop == null) continue;
+                var value = LoadFeatureFileByType(prop.PropertyType, directoryPath, subDir, fileName, typeCheck);
+                if (value != null)
+                    prop.SetValue(map, value);
+            }
 
-            map.XpData = LoadFeatureFile<XpData>(directoryPath, "player", "xp.json", "feature.player.xp") ??
-                         new XpData();
+            map.XpData ??= new XpData();
 
             map.CommandData = LoadCommandData(directoryPath);
 
@@ -95,6 +90,26 @@ public static class CustomMapDirectoryLoader
         return !File.Exists(settingsPath)
             ? null
             : LoadJsonWithTypeCheck<WorldSettingsData>(settingsPath, "feature.world.settings");
+    }
+
+    private static readonly (string PropName, string SubDir, string FileName, string TypeCheck)[] FeatureDescriptors =
+    [
+        (nameof(Map.MineData), "world", "mine.json", "feature.world.mine"),
+        (nameof(Map.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
+        (nameof(Map.TurretData), "world", "turret.json", "feature.world.turret"),
+        (nameof(Map.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
+        (nameof(Map.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
+        (nameof(Map.GeyserData), "world", "geyser.json", "feature.world.geyser"),
+        (nameof(Map.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
+        (nameof(Map.XpData), "player", "xp.json", "feature.player.xp"),
+    ];
+
+    private static object LoadFeatureFileByType(Type dataType, string directoryPath, string subDir, string fileName,
+        string expectedType)
+    {
+        var method = typeof(CustomMapDirectoryLoader).GetMethod(nameof(LoadFeatureFile),
+            BindingFlags.NonPublic | BindingFlags.Static);
+        return method?.MakeGenericMethod(dataType).Invoke(null, [directoryPath, subDir, fileName, expectedType]);
     }
 
     private static T LoadFeatureFile<T>(string directoryPath, string subDir, string fileName, string expectedType)

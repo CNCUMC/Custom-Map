@@ -34,7 +34,7 @@ public class SoundCannonScriptPatch
         }
         catch
         {
-            // Silently ignore
+            // ignored
         }
     }
 
@@ -71,7 +71,7 @@ public class SoundCannonScriptPatch
         }
         catch
         {
-            // Silently ignore
+            // ignore
         }
     }
 }

@@ -111,8 +111,8 @@ public class ZhTwLangGenerator : ModLangGenBase
 
         // Command - Map - Waypoint
         Command("custommap.waypoint.help", "路徑點子命令:\n  " +
-                                             "list - 列出所有路徑點\n  " +
-                                             "get <id或名稱> - 傳送到指定路徑點");
+                                           "list - 列出所有路徑點\n  " +
+                                           "get <id或名稱> - 傳送到指定路徑點");
         Command("custommap.waypoint.list_header", "可用路徑點 ({0}):");
         Command("custommap.waypoint.list_item", "  {0}. {1} - 位置: {2}");
         Command("custommap.waypoint.teleport", "正在傳送到路徑點'{0}'，位置 {1}...");
@@ -336,7 +336,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("loader.type_mismatch", "{0} 類型不匹配: 期望 '{1}'，實際 '{2}'");
         Log("loader.failed_to_load_file", "加載 {0} 失敗: {1}");
     }
-    
+
     private void Feature(string key, string value)
     {
         Other($"feature.{key}", value);

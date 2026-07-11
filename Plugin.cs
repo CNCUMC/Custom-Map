@@ -25,7 +25,6 @@ public class Plugin : BaseUnityPlugin
     public const string Version = "1.0.0";
     private const string NameSpace = "custommap";
     internal new static ManualLogSource Logger;
-    private readonly Harmony _harmony = new(Guid);
 
     public static bool MoreLogs;
     public static bool StartGameUseMap;
@@ -225,6 +224,8 @@ public class Plugin : BaseUnityPlugin
             SkipBackground = false
         }
     };
+
+    private readonly Harmony _harmony = new(Guid);
 
     public void Awake()
     {

@@ -29,7 +29,7 @@ public class GeyserScriptPatch
         }
         catch
         {
-            // Silently ignore
+            // ignored
         }
     }
 
@@ -43,11 +43,9 @@ public class GeyserScriptPatch
         try
         {
             var activateTime = (float)(ActivateTimeField?.GetValue(__instance) ?? 0f);
-
             if (activateTime < -50f) return;
 
             var elapsed = Time.time - activateTime;
-
             if (elapsed >= data.ActivateDuration && elapsed < 4.5f)
                 ActivateTimeField?.SetValue(__instance, Time.time - 5f);
 
@@ -57,7 +55,7 @@ public class GeyserScriptPatch
         }
         catch
         {
-            // Silently ignore
+            // ignored
         }
     }
 }

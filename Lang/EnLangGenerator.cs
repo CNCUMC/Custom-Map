@@ -10,9 +10,12 @@ public class EnLangGenerator : ModLangGenBase
     {
         // Config - Settings labels and descriptions
         Option("custommap.custommap.more_logs", "More logs", "Display more logs");
-        Option("custommap.custommap.start_game_use_map", "Start game use map", "Use the selected Map when starting a new game.");
-        Option("custommap.custommap.first_use_map", "First use map", "The Map ID to use when starting a new game. Requires 'Start Use Map' to be enabled.");
-        Option("custommap.custommap.progress_update_interval", "Progress update interval", "Number of blocks between progress text updates during map generation. Lower values update more frequently but may impact performance.");
+        Option("custommap.custommap.start_game_use_map", "Start game use map",
+            "Use the selected Map when starting a new game.");
+        Option("custommap.custommap.first_use_map", "First use map",
+            "The Map ID to use when starting a new game. Requires 'Start Use Map' to be enabled.");
+        Option("custommap.custommap.progress_update_interval", "Progress update interval",
+            "Number of blocks between progress text updates during map generation. Lower values update more frequently but may impact performance.");
 
         // Map Format
         Other("format.author", "by {0}");

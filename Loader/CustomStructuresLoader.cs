@@ -162,7 +162,7 @@ public static class CustomStructuresLoader
             }
             catch
             {
-                // fall through to fallback
+                // ignored
             }
 
             var nameFromFile = Path.GetFileNameWithoutExtension(fileName);
@@ -183,11 +183,14 @@ public static class CustomStructuresLoader
             Info(key, args);
     }
 
-    private static void Info(string key, params object[] args) => LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
+    private static void Info(string key, params object[] args) =>
+        LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
 
-    private static void Warning(string key, params object[] args) => LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
+    private static void Warning(string key, params object[] args) =>
+        LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 
-    private static void Error(string key, params object[] args) => LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    private static void Error(string key, params object[] args) =>
+        LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

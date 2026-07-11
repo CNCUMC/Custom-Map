@@ -76,7 +76,7 @@ public class Map
             if (WorldSettingsData?.ForgivingLevel == true)
                 items.Add("forgiving_level");
 
-            if (WorldSettingsData?.Gravity != Physics2D.gravity.y)
+            if (!Mathf.Approximately(WorldSettingsData?.Gravity ?? Physics2D.gravity.y, Physics2D.gravity.y))
                 items.Add($"gravity={WorldSettingsData?.Gravity}");
 
             if (MineData != null)

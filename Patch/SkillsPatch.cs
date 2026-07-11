@@ -7,7 +7,7 @@ namespace CustomMap.Patch;
 public class SkillsPatch
 {
     private const int MaxSafeLevel = 30;
-    
+
     private const int MaxLevelUpsPerCheck = 20;
 
     [HarmonyPatch("Setup")]
@@ -19,7 +19,7 @@ public class SkillsPatch
             return true;
 
         var xpData = currentMap.XpData;
-        
+
         __instance.STR = Math.Min(xpData.StrXp, MaxSafeLevel);
         __instance.RES = Math.Min(xpData.ResXp, MaxSafeLevel);
         __instance.INT = Math.Min(xpData.IntXp, MaxSafeLevel);

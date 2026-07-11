@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
-using BepInEx.Logging;
 using CUCoreLib.Helpers;
 using CUCoreLib.Registries;
 using CustomMap.Data;
@@ -24,12 +23,7 @@ namespace CustomMap;
 public class ModCommand
 {
     private const string LocaleKeyPre = "mod_command.";
-
-    private const string DefaultVersion = "1.0.0";
-    private static readonly ManualLogSource Logger = Plugin.Logger;
-
     private static bool _autofillRegistered;
-    private static readonly List<string> DefaultAuthor = ["Unknown"];
 
     [HarmonyPatch("RegisterAllCommands")]
     [HarmonyPostfix]
@@ -59,14 +53,14 @@ public class ModCommand
 
             var paramDescriptions = new[]
             {
-                ("string", Map("string")),
-                ("string", Map("parameter")),
-                ("string", Map("parameter"))
+                ("string", LocaleCommand("string")),
+                ("string", LocaleCommand("parameter")),
+                ("string", LocaleCommand("parameter"))
             };
 
             ConsoleCommandRegistry.Register(
                 "custommap",
-                Map("description"),
+                LocaleCommand("description"),
                 ExecuteMapCommand,
                 argAutofill,
                 paramDescriptions
@@ -74,7 +68,7 @@ public class ModCommand
 
             ConsoleCommandRegistry.Register(
                 "cm",
-                Map("description"),
+                LocaleCommand("description"),
                 ExecuteMapCommand,
                 new Dictionary<int, List<string>>(argAutofill),
                 paramDescriptions
@@ -198,19 +192,19 @@ public class ModCommand
                 ListWaypoints(waypoints);
                 break;
             case "help":
-                InfoMap("waypoint.help");
+                InfoCommand("waypoint.help");
                 break;
             case "get":
                 if (args.Length < 4)
                 {
-                    InfoMap("waypoint.get_no_id");
+                    InfoCommand("waypoint.get_no_id");
                     return;
                 }
 
                 TeleportToWaypointById(waypoints, args[3]);
                 break;
             default:
-                InfoMap("waypoint.unknown_subcommand", subCommand);
+                InfoCommand("waypoint.unknown_subcommand", subCommand);
                 break;
         }
     }
@@ -235,21 +229,21 @@ public class ModCommand
                 targetPath = ResolveTargetPath(args[2]);
                 if (targetPath == null)
                 {
-                    ErrorMap("save.target_not_found", args[2]);
+                    ErrorCommand("save.target_not_found", args[2]);
                     return;
                 }
 
                 break;
             }
             case 3:
-                ErrorMap("save.missing_end_position");
+                ErrorCommand("save.missing_end_position");
                 return;
             case 5:
             {
                 targetPath = ResolveTargetPath(args[4]);
                 if (targetPath == null)
                 {
-                    ErrorMap("save.target_not_found", args[4]);
+                    ErrorCommand("save.target_not_found", args[4]);
                     return;
                 }
 
@@ -271,7 +265,7 @@ public class ModCommand
         var directoryPath = targetPath ?? map.DirectoryPath;
         if (string.IsNullOrEmpty(directoryPath))
         {
-            ErrorMap("save.no_directory");
+            ErrorCommand("save.no_directory");
             return;
         }
 
@@ -286,11 +280,11 @@ public class ModCommand
             CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
             MapLocale.SaveToCurrentLang(map, directoryPath);
 
-            InfoMap("save.success", MapLocale.GetName(map), directoryPath);
+            InfoCommand("save.success", MapLocale.GetName(map), directoryPath);
         }
         catch (Exception ex)
         {
-            ErrorMap("save.failed", MapLocale.GetName(map), ex.Message);
+            ErrorCommand("save.failed", MapLocale.GetName(map), ex.Message);
         }
     }
 
@@ -313,7 +307,7 @@ public class ModCommand
             targetPath = ResolveTargetPath(targetName);
             if (targetPath == null)
             {
-                ErrorMap("save.target_not_found", targetName);
+                ErrorCommand("save.target_not_found", targetName);
                 yield break;
             }
 
@@ -329,11 +323,11 @@ public class ModCommand
         var directoryPath = targetPath ?? map.DirectoryPath;
         if (string.IsNullOrEmpty(directoryPath))
         {
-            ErrorMap("save.no_directory");
+            ErrorCommand("save.no_directory");
             yield break;
         }
 
-        TipMap("save.as.start_position");
+        LocaleCommand("save.as.start_position");
 
         var waiter1 = new LeftClickYieldInstruction();
         yield return waiter1;
@@ -341,7 +335,7 @@ public class ModCommand
 
         yield return null;
 
-        TipMap("save.as.end_position");
+        LocaleCommand("save.as.end_position");
 
         var waiter2 = new LeftClickYieldInstruction();
         yield return waiter2;
@@ -372,7 +366,7 @@ public class ModCommand
     private static Map LoadOrCreateDefaultMap(string targetPath)
     {
         if (string.IsNullOrWhiteSpace(targetPath))
-            throw new ArgumentException(Other("map_load.empty_target_path"), nameof(targetPath));
+            throw new ArgumentException(LocaleOther("map_load.empty_target_path"), nameof(targetPath));
 
         var targetJsonPath = Path.Combine(targetPath, "map.json");
 
@@ -397,18 +391,18 @@ public class ModCommand
         }
         catch (UnauthorizedAccessException ex)
         {
-            Logger.LogWarning(Other("map_load.unauthorized", jsonPath, ex.Message));
+            Warning("map_load.unauthorized", jsonPath, ex.Message);
             return null;
         }
         catch (Exception ex) when (ex is IOException or PathTooLongException)
         {
-            Logger.LogWarning(Other("map_load.io_error", jsonPath, ex.Message));
+            Warning("map_load.io_error", jsonPath, ex.Message);
             return null;
         }
 
         if (string.IsNullOrWhiteSpace(json))
         {
-            Logger.LogWarning(Other("map_load.file_empty", jsonPath));
+            Warning("map_load.file_empty", jsonPath);
             return null;
         }
 
@@ -417,7 +411,7 @@ public class ModCommand
             var loaded = JsonConvert.DeserializeObject<Map>(json);
             if (loaded == null)
             {
-                Logger.LogWarning(Other("map_load.deserialize_null", jsonPath));
+                Warning("map_load.deserialize_null", jsonPath);
                 return null;
             }
 
@@ -426,7 +420,7 @@ public class ModCommand
         }
         catch (JsonException ex)
         {
-            Logger.LogWarning(Other("map_load.invalid_json", jsonPath, ex.Message));
+            Warning("map_load.invalid_json", jsonPath, ex.Message);
             return null;
         }
     }
@@ -441,12 +435,12 @@ public class ModCommand
             {
                 Name = folderName,
                 Id = folderName.ToLowerInvariant(),
-                Version = DefaultVersion,
-                Author = DefaultAuthor,
-                Description = Map("save.as.default_description"),
+                Version = "1.0.0",
+                Author = ["Unknown"],
+                Description = LocaleCommand("save.as.default_description"),
                 DirectoryPath = targetPath
             };
-        Logger.LogWarning(Other("map_load.no_folder_name", targetPath));
+        Warning("map_load.no_folder_name", targetPath);
         return null;
     }
 
@@ -464,7 +458,7 @@ public class ModCommand
             || !float.TryParse(endParts[0].Trim(), out var wx2)
             || !float.TryParse(endParts[1].Trim(), out var wy2))
         {
-            ErrorMap("save.invalid_position");
+            ErrorCommand("save.invalid_position");
             return;
         }
 
@@ -487,7 +481,7 @@ public class ModCommand
 
         if (regionW <= 0 || regionH <= 0)
         {
-            ErrorMap("save.area_empty");
+            ErrorCommand("save.area_empty");
             return;
         }
 
@@ -556,7 +550,7 @@ public class ModCommand
         CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
         MapLocale.SaveToCurrentLang(map, directoryPath);
 
-        InfoMap("save.area_success",
+        InfoCommand("save.area_success",
             cMinX, cMinY, cMaxX, cMaxY,
             regionW, regionH, uniqueBlockIds.Count, directoryPath);
     }
@@ -575,7 +569,7 @@ public class ModCommand
 
         if (target != "tutorial" && target != "none")
         {
-            ErrorMap("exit.invalid_target", target);
+            ErrorCommand("exit.invalid_target", target);
             return;
         }
 
@@ -590,11 +584,11 @@ public class ModCommand
 
         var targetName = target switch
         {
-            "tutorial" => Map("exit.target.tutorial"),
-            "none" => Map("exit.target.none"),
+            "tutorial" => LocaleCommand("exit.target.tutorial"),
+            "none" => LocaleCommand("exit.target.none"),
             _ => target
         };
-        InfoMap("exiting", targetName);
+        InfoCommand("exiting", targetName);
 
         var currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
@@ -624,14 +618,14 @@ public class ModCommand
         {
             if (index < 1 || index > waypoints.Count)
             {
-                ErrorMap("waypoint.invalid_index", index, waypoints.Count);
+                ErrorCommand("waypoint.invalid_index", index, waypoints.Count);
                 return;
             }
 
             target = waypoints[index - 1];
             if (target == null)
             {
-                ErrorMap("waypoint.not_found", waypointId);
+                ErrorCommand("waypoint.not_found", waypointId);
                 return;
             }
 
@@ -644,7 +638,7 @@ public class ModCommand
 
         if (target == null)
         {
-            ErrorMap("waypoint.not_found", waypointId);
+            ErrorCommand("waypoint.not_found", waypointId);
             return;
         }
 
@@ -653,7 +647,7 @@ public class ModCommand
 
     private static void TeleportToWaypoint(WaypointData waypointData, string displayId)
     {
-        InfoMap("waypoint.teleport", displayId, waypointData.Position);
+        InfoCommand("waypoint.teleport", displayId, waypointData.Position);
         PlayerUtil.Tp(waypointData.Position);
     }
 
@@ -672,12 +666,12 @@ public class ModCommand
             return;
         }
 
-        var header = Map("waypoint.list_header", waypoints.Count);
+        var header = LocaleCommand("waypoint.list_header", waypoints.Count);
         var items = waypoints
             .Select((wp, i) => $"{wp.Id ?? $"waypoint_{i + 1}"}: ({wp.X}, {wp.Y})")
             .ToList();
 
-        LogUtil.PrintNumberedList(header, items, Logger);
+        LogUtil.PrintNumberedList(header, items, Plugin.Logger);
     }
 
     private static void HandleFeature(string[] args)
@@ -692,14 +686,14 @@ public class ModCommand
         switch (args.Length)
         {
             case < 3:
-                InfoMap("help");
+                InfoCommand("help");
                 ListFeatures(map);
                 return;
             case >= 4:
                 SetFeature(map, args[2], args[3]);
                 break;
             default:
-                InfoMap("feature.set_missing_params");
+                InfoCommand("feature.set_missing_params");
                 break;
         }
     }
@@ -711,14 +705,14 @@ public class ModCommand
         var settings = map.WorldSettingsData;
         if (settings != null)
         {
-            var wsDisplay = Locale("feature.world_settings_data");
+            var wsDisplay = LocaleOther("feature.world_settings_data");
             var wsItems =
                 (from prop in typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     where prop.Name != "Type"
                     where IsSimpleType(prop.PropertyType)
                     let value = prop.GetValue(settings)
                     let jsonName = prop.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? prop.Name
-                    let displayName = Locale($"feature.{GetFeatureDisplayName(jsonName)}")
+                    let displayName = LocaleOther($"feature.{GetFeatureDisplayName(jsonName)}")
                     select $"{displayName}({jsonName}): {value}").ToList();
 
             groups.Add(($"{wsDisplay}(world_settings)", wsItems));
@@ -739,7 +733,7 @@ public class ModCommand
         foreach (var kvp in featureDataTypes)
         {
             var value = kvp.Value;
-            var displayName = Locale($"feature.{kvp.Key}_data");
+            var displayName = LocaleOther($"feature.{kvp.Key}_data");
             if (value == null)
             {
                 groups.Add(($"{displayName}({kvp.Key})", ["null"]));
@@ -753,14 +747,14 @@ public class ModCommand
                     where IsSimpleType(subProp.PropertyType)
                     let subValue = subProp.GetValue(value)
                     let subJson = subProp.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? subProp.Name
-                    let subDisplay = Locale($"feature.{GetFeatureDisplayName($"{kvp.Key}.{subJson}")}")
+                    let subDisplay = LocaleOther($"feature.{GetFeatureDisplayName($"{kvp.Key}.{subJson}")}")
                     select $"{subDisplay}({subJson}): {subValue}")
                 .ToList();
             groups.Add(($"{displayName}({kvp.Key})", items));
         }
 
-        var header = Map("feature.list_header");
-        LogUtil.PrintGroupedList(header, groups, Logger);
+        var header = LocaleCommand("feature.list_header");
+        LogUtil.PrintGroupedList(header, groups, Plugin.Logger);
     }
 
     private static bool IsSimpleType(Type type)
@@ -785,7 +779,7 @@ public class ModCommand
             var dataProp = FindMapFeatureProperty(parts[0]);
             if (dataProp == null)
             {
-                ErrorMap("feature.not_found", featureName);
+                ErrorCommand("feature.not_found", featureName);
                 return;
             }
 
@@ -796,12 +790,12 @@ public class ModCommand
                 {
                     var instance = Activator.CreateInstance(dataProp.PropertyType);
                     dataProp.SetValue(map, instance);
-                    InfoMap("feature.set_success", featureName, "enabled");
+                    InfoCommand("feature.set_success", featureName, "enabled");
                 }
                 else
                 {
                     dataProp.SetValue(map, null);
-                    InfoMap("feature.set_success", featureName, "disabled");
+                    InfoCommand("feature.set_success", featureName, "disabled");
                 }
 
                 return;
@@ -815,21 +809,21 @@ public class ModCommand
             var dataProp = FindMapFeatureProperty(parts[0]);
             if (dataProp == null)
             {
-                ErrorMap("feature.not_found", featureName);
+                ErrorCommand("feature.not_found", featureName);
                 return;
             }
 
             target = dataProp.GetValue(map);
             if (target == null)
             {
-                ErrorMap("feature.not_found", featureName);
+                ErrorCommand("feature.not_found", featureName);
                 return;
             }
 
             targetProp = FindNestedProperty(target.GetType(), parts[1]);
             if (targetProp == null)
             {
-                ErrorMap("feature.not_found", featureName);
+                ErrorCommand("feature.not_found", featureName);
                 return;
             }
         }
@@ -838,12 +832,12 @@ public class ModCommand
         {
             var convertedValue = Convert.ChangeType(valueStr, targetProp.PropertyType);
             targetProp.SetValue(target, convertedValue);
-            var displayName = Locale($"feature.{GetFeatureDisplayName(featureName)}");
-            InfoMap("feature.set_success", $"{displayName} ({featureName})", convertedValue);
+            var displayName = LocaleOther($"feature.{GetFeatureDisplayName(featureName)}");
+            InfoCommand("feature.set_success", $"{displayName} ({featureName})", convertedValue);
         }
         catch (Exception)
         {
-            ErrorMap("feature.invalid_value", featureName, valueStr);
+            ErrorCommand("feature.invalid_value", featureName, valueStr);
         }
     }
 
@@ -911,13 +905,13 @@ public class ModCommand
     {
         if (string.IsNullOrWhiteSpace(key))
         {
-            InfoMap("select.no_key");
+            InfoCommand("select.no_key");
             return;
         }
 
         if (MapCheck.Maps == null || MapCheck.Maps.Count == 0)
         {
-            InfoMap("list.empty");
+            InfoCommand("list.empty");
             return;
         }
 
@@ -927,7 +921,7 @@ public class ModCommand
         {
             if (index < 1 || index > MapCheck.Maps.Count)
             {
-                InfoMap("select.invalid_index", index, MapCheck.Maps.Count);
+                InfoCommand("select.invalid_index", index, MapCheck.Maps.Count);
                 return;
             }
 
@@ -943,13 +937,13 @@ public class ModCommand
 
         if (map == null)
         {
-            InfoMap("select.not_found", key);
+            InfoCommand("select.not_found", key);
             return;
         }
 
         WorldGenerationPatch.CurrentMap = map;
 
-        InfoMap("select.success", MapLocale.GetName(map), map.Id);
+        InfoCommand("select.success", MapLocale.GetName(map), map.Id);
 
         if (HasWorldLoaded())
         {
@@ -958,7 +952,7 @@ public class ModCommand
         }
         else
         {
-            InfoMap("select.without_world", MapLocale.GetName(map));
+            InfoCommand("select.without_world", MapLocale.GetName(map));
         }
     }
 
@@ -966,20 +960,20 @@ public class ModCommand
     {
         var helpItems = new List<(string key, string value)>
         {
-            ("help", Map("help.help")),
-            ("reload", Map("help.reload")),
-            ("info", Map("help.info")),
-            ("spawn", Map("help.spawn")),
-            ("select", Map("help.select")),
-            ("list", Map("help.list")),
-            ("feature", Map("help.feature")),
-            ("waypoint", Map("help.waypoint")),
-            ("save", Map("help.save")),
-            ("exit", Map("help.exit"))
+            ("help", LocaleCommand("help.help")),
+            ("reload", LocaleCommand("help.reload")),
+            ("info", LocaleCommand("help.info")),
+            ("spawn", LocaleCommand("help.spawn")),
+            ("select", LocaleCommand("help.select")),
+            ("list", LocaleCommand("help.list")),
+            ("feature", LocaleCommand("help.feature")),
+            ("waypoint", LocaleCommand("help.waypoint")),
+            ("save", LocaleCommand("help.save")),
+            ("exit", LocaleCommand("help.exit"))
         };
 
-        var header = Map("help.header");
-        LogUtil.PrintKeyValueList(header, helpItems, Logger);
+        var header = LocaleCommand("help.header");
+        LogUtil.PrintKeyValueList(header, helpItems, Plugin.Logger);
     }
 
     private static void CheckArg(string[] args, int index)
@@ -990,38 +984,30 @@ public class ModCommand
     private static void Spawn()
     {
         var map = MapCheck.CurrentMap;
-        InfoMap("spawn", map.SpawnPosition);
+        InfoCommand("spawn", map.SpawnPosition);
         PlayerUtil.Tp(map.SpawnPosition);
-    }
-    
-    private static void Error(string key, params object[] args)
-    {
-        LogUtil.Error(LocaleLog(key, args), Logger);
     }
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
-    
+
+    private static string LocaleOther(string key, params object[] args) =>
+        BetterLocale.GetOther(key, args);
+
     private static string LocaleCommand(string key, params object[] args) =>
         BetterLocale.GetCommand($"custommap.{key}", args);
 
-    private static string Map(string key, params object[] args) =>
-        LocaleCommand(key, args);
+    private static void Error(string key, params object[] args) =>
+        LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    
+    private static void Warning(string key, params object[] args) =>
+        LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 
-    private static void InfoMap(string key, params object[] args) =>
-        LogUtil.Info(LocaleCommand(key, args), Logger);
+    private static void InfoCommand(string key, params object[] args) =>
+        LogUtil.Info(LocaleCommand(key, args), Plugin.Logger);
 
-    private static void ErrorMap(string key, params object[] args) =>
-        LogUtil.Error(LocaleCommand(key, args), Logger);
-
-    private static void TipMap(string key, params object[] args) =>
-        LogUtil.Info(LocaleCommand(key, args), Logger);
-
-    private static string Locale(string key) =>
-        BetterLocale.GetOther(key);
-
-    private static string Other(string key, params object[] args) =>
-        BetterLocale.GetOther(key, args);
+    private static void ErrorCommand(string key, params object[] args) =>
+        LogUtil.Error(LocaleCommand(key, args), Plugin.Logger);
 
     private sealed class LeftClickYieldInstruction : CustomYieldInstruction
     {

@@ -2,15 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
-using BepInEx.Logging;
 using CUCoreLib.Helpers;
 using CustomMap.Loader;
 using HarmonyLib;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace CustomMap.Patch;
@@ -19,7 +17,6 @@ namespace CustomMap.Patch;
 public static class WorldGenerationPatch
 {
     private const string LocaleKeyPre = "world_generation.";
-    private static readonly ManualLogSource Logger = Plugin.Logger;
     public static WorldGeneration WorldGeneration;
     internal static Map CurrentMap;
     private static float _sLoopTimer;
@@ -294,10 +291,7 @@ public static class WorldGenerationPatch
                 Error("custom_structures_mod_not_loaded", MapLocale.GetName(map));
         }
 
-        if (hasBuildModeSave)
-        {
-            BuildModeSaveLoader.SpawnBuildModeSave(map);
-        }
+        if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
 
         if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
             Warning("no_content_type", MapLocale.GetName(map));
@@ -450,13 +444,13 @@ public static class WorldGenerationPatch
     }
 
     private static void Error(string key, params object[] args) =>
-        LogUtil.Error(BetterLocale.GetLog($"error.{key}", args), Logger);
+        LogUtil.Error(BetterLocale.GetLog($"error.{key}", args), Plugin.Logger);
 
-    private static void Info(string key, params object[] args) =>
-        LogUtil.Info(LocaleLog(key, args), Logger);
+    private static void Info(string key, params object[] args) => 
+        LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
 
     private static void Warning(string key, params object[] args) =>
-        LogUtil.Warning(LocaleLog(key, args), Logger);
+        LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

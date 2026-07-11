@@ -28,11 +28,7 @@ public static class BuildModeSaveLoader
                 return;
             }
 
-            var anchor = map.MapPosition;
-            var anchorX = (int)anchor.x;
-            var anchorY = (int)anchor.y;
-
-            MapLoader.ApplyBuildModeSave(saveFilePath, anchorX, anchorY);
+            MapLoader.ApplyBuildModeSave(saveFilePath);
         }
         catch (Exception e)
         {
@@ -40,7 +36,8 @@ public static class BuildModeSaveLoader
         }
     }
 
-    private static void Error(string key, params object[] args) => LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    private static void Error(string key, params object[] args) => 
+        LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

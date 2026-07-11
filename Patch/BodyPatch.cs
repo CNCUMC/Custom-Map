@@ -21,9 +21,10 @@ public static class BodyPatch
     private static int _climbCount;
     private static WorldSettingsData WorldSettings => MapCheck.CurrentMap?.WorldSettingsData;
 
-    private static bool IsPatchActive => WorldSettings != null
-                                         && JumpCooldownField != null
-                                         && FirstWallJumpField != null;
+    private static bool IsPatchActive =>
+        WorldSettings != null
+        && JumpCooldownField != null
+        && FirstWallJumpField != null;
 
     private static bool JumpKey => Input.GetKeyDown(Keys.Jump);
 

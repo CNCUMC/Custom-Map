@@ -111,8 +111,8 @@ public class ZhCnLangGenerator : ModLangGenBase
 
         // Command - Map - Waypoint
         Command("custommap.waypoint.help", "路径点子命令:\n  " +
-                                             "list - 列出所有路径点\n  " +
-                                             "get <id或名称> - 传送到指定路径点");
+                                           "list - 列出所有路径点\n  " +
+                                           "get <id或名称> - 传送到指定路径点");
         Command("custommap.waypoint.list_header", "可用路径点 ({0}):");
         Command("custommap.waypoint.list_item", "  {0}. {1} - 位置: {2}");
         Command("custommap.waypoint.teleport", "正在传送到路径点'{0}'，位置 {1}...");
@@ -336,7 +336,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("loader.type_mismatch", "{0} 类型不匹配: 期望 '{1}'，实际 '{2}'");
         Log("loader.failed_to_load_file", "加载 {0} 失败: {1}");
     }
-    
+
     private void Feature(string key, string value)
     {
         Other($"feature.{key}", value);
