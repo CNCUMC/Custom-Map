@@ -30,7 +30,6 @@ public static class WorldGenerationPatch
 
     private static TextMeshProUGUI _coverText;
     internal static bool _isSpawningMap;
-    private static bool _hasShownMapLoading;
     private static GameObject _coverRoot;
 
     public static WorldGeneration.OverrideSceneType? ExitTargetScene;
@@ -40,7 +39,6 @@ public static class WorldGenerationPatch
     public static void AwakePrefix(WorldGeneration __instance)
     {
         WorldGeneration = __instance;
-        _hasShownMapLoading = false;
 
         if (MapCheck.HasRunningMap)
         {
@@ -109,10 +107,9 @@ public static class WorldGenerationPatch
 
         if (Plugin.StartGameUseMap)
         {
-            LogUtil.Warning("No valid Map directories, please check the Maps folder", Logger);
+            Warning("no_valid_directories");
+            SetDefaultSceneType(WorldGeneration);
         }
-
-        SetDefaultSceneType(WorldGeneration);
     }
 
     private static void StartMapLoading(Map map)
@@ -226,36 +223,25 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool InitializationWorld(WorldGeneration __instance)
     {
+        if (ExitTargetScene.HasValue)
+        {
+            ExitTargetScene = null;
+            Info("exited_map");
+            return true;
+        }
+
+        if (CurrentMap == null)
+            return true;
+
         __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
         return false;
     }
 
     private static IEnumerator ContentLoadingCoroutine(WorldGeneration instance)
     {
-        if (!_hasShownMapLoading)
-        {
-            _loading = true;
-        }
-
-        if (ExitTargetScene.HasValue)
-        {
-            ExitTargetScene = null;
-            _loading = false;
-            Info("exited_map");
-            yield break;
-        }
-
-        var map = MapCheck.CurrentMap;
-
-        if (map == null)
-        {
-            _loading = false;
-            if (MapCheck.Maps.Count > 0)
-                Warning("no_map_selected");
-            else
-                Error("no_valid_directories");
-            yield break;
-        }
+        var map = CurrentMap;
+        CreateLoadingCover();
+        _loading = true;
 
         if (map.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
         {
@@ -379,7 +365,7 @@ public static class WorldGenerationPatch
         _coverText.text = $"{CurrentMap.Name}\n{bar}\n{line}";
     }
 
-    private static GameObject CreateLoadingCover()
+    private static void CreateLoadingCover()
     {
         _coverRoot = new GameObject("CustomMapLoadingCover", typeof(RectTransform));
         var canvas = _coverRoot.AddComponent<Canvas>();
@@ -407,7 +393,6 @@ public static class WorldGenerationPatch
         _coverText.fontSize = 36;
         _coverText.color = Color.white;
         _coverText.text = "Loading...";
-        return _coverRoot;
     }
 
     private static void SetWorldExists()

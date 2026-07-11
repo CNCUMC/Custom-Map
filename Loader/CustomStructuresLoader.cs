@@ -90,16 +90,25 @@ public static class CustomStructuresLoader
 
             var customStructuresAssembly = targetPlugin.Instance.GetType().Assembly;
 
-            var filePath = Path.Combine(map.DirectoryPath, map.CustomStructures);
+            var basePath = Path.Combine(map.DirectoryPath, map.CustomStructures);
+            var filePath = basePath;
             if (!File.Exists(filePath))
             {
-                Error("not_found_custom_structures");
-                return;
+                filePath = basePath + ".txt";
+                if (!File.Exists(filePath))
+                {
+                    filePath = basePath + ".txt";
+                    if (!File.Exists(filePath))
+                    {
+                        Error("not_found_custom_structures");
+                        return;
+                    }
+                }
             }
 
             var text = File.ReadAllText(filePath);
             var fileName = Path.GetFileName(filePath);
-            var isV2 = filePath.EndsWith(".ms2.json", StringComparison.OrdinalIgnoreCase);
+            var isV2 = !text.TrimStart().StartsWith("StructureDefinitions");
 
             var structureLoaderType = customStructuresAssembly.GetType("Custom_Structures.StructureLoader");
             if (structureLoaderType == null)

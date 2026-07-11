@@ -267,7 +267,7 @@ public class ZhTwLangGenerator : ModLangGenBase
 
         // Log - Error
         Log("error.no_map_file", "找不到 map.json 文件: {0}");
-        Log("error.no_valid_directories", "沒有有效的地圖 目錄，請檢查 Maps 文件夾");
+        Log("error.no_valid_directories", "沒有有效的地圖目錄，請檢查 Maps 文件夾");
         Log("error.custom_structures_mod_not_loaded", "地圖 '{0}' 需要自定義結構模組，但該模組未加載");
         Log("error.multiple_content_types",
             "地圖 '{0}' 同時定義了多種內容類型（MapData、CustomStructures、BuildModeSave），只允許定義一種");

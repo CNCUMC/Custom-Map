@@ -42,6 +42,9 @@
         <Reference Include="Assembly-CSharp">
             <HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath>
         </Reference>
+        <Reference Include="Custom Structures">
+          <HintPath>F:\SteamLibrary\steamapps\common\Casualties Unknown Demo\BepInEx\plugins\Custom Structures.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>$(ManagedDir)/UnityEngine.dll</HintPath>
         </Reference>

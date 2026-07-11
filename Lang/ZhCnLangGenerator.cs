@@ -267,7 +267,7 @@ public class ZhCnLangGenerator : ModLangGenBase
 
         // Log - Error
         Log("error.no_map_file", "找不到 map.json 文件: {0}");
-        Log("error.no_valid_directories", "没有有效的地图 目录，请检查 Maps 文件夹");
+        Log("error.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");
         Log("error.custom_structures_mod_not_loaded", "地图 '{0}' 需要自定义结构模组，但该模组未加载");
         Log("error.multiple_content_types",
             "地图 '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");

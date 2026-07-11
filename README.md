@@ -1,174 +1,202 @@
-# Moss-Template
+![Cover](Cover.png)
 
-一个用于开发 `Casualties Unknown` 模组的 [dotnet new](https://learn.microsoft.com/zh-cn/dotnet/core/tools/dotnet-new)
-模板。
+[中文指南](README_ZH.md)
 
-基于 [05126619z/ScavTemplate](https://github.com/05126619z/ScavTemplate)。
+# Custom Map
 
----
+[GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
-## 快速开始
-
-### 方式一：使用 `NewMod.ps1`（推荐）
-
-1. 克隆本仓库并注册模板：
-
-```powershell
-git clone https://github.com/CNCUMC/Moss-Template.git
-cd Moss-Template
-dotnet new install .
-```
-
-2. 在任意目录运行创建脚本：
-
-```powershell
-cd E:/Projects  # 你想创建项目的目录
-<path-to>\NewMod.ps1
-```
-
-脚本会自动：
-
-- 搜索 Steam 安装路径中的 Casualties Unknown 游戏目录
-- 交互式提示输入模组名称、GUID、版本等信息
-- 调用 `dotnet new custommap` 生成项目
-- 所有文件名和内容自动替换完成
-
-3. 构建并测试：
-
-```powershell
-cd MyCoolMod
-dotnet build
-```
-
-### 方式二：使用 `dotnet new` 命令
-
-注册模板后（见上方第 1 步），直接使用命令行：
-
-```powershell
-dotnet new custommap -n MyCoolMod `
-    --ModDisplayName "My Cool Mod" `
-    --ModGuid "com.example.mycoolmod" `
-    --ModVersion "1.0.0" `
-    --AuthorName "Your Name" `
-    --GameManagedDir "E:/SteamLibrary/steamapps/common/Casualties Unknown Demo/CasualtiesUnknown_Data/Managed"
-```
-
-### 方式三：从 GitHub 克隆（传统方式）
-
-1. 在 GitHub 上点击 [Use this template](https://github.com/new?template_name=Moss-Template) 创建仓库
-2. 克隆仓库后手动替换文件名和内容中的 `CustomMap`
-3. 参考下方手动配置步骤
+_A custom map loader for [Casualties Unknown](https://store.steampowered.com/app/3624440/Casualties_Unknown_Demo/),
+built on top of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
 
 ---
 
-## 模板参数说明
+## Table of Contents
 
-| 参数                 | 说明                             | 默认值                 |
-|--------------------|--------------------------------|---------------------|
-| `-n` / `--name`    | 项目名称（PascalCase，如 `MyCoolMod`） | 必填                  |
-| `--ModDisplayName` | 模组显示名称（如 `My Cool Mod`）        | 从名称自动生成             |
-| `--ModGuid`        | 模组唯一标识（格式 `yourname.modname`）  | `com.example.mymod` |
-| `--ModVersion`     | 初始版本号                          | `1.0.0`             |
-| `--AuthorName`     | 作者名称（用于 LICENSE）               | `Your Name`         |
-| `--GameManagedDir` | 游戏 Managed 目录路径                | Steam 默认路径          |
-
-模板会自动替换以下内容：
-
-- `CustomMap.csproj` → `{项目名}.csproj`
-- `namespace CustomMap` → `namespace {项目名}`
-- `org.cncumc.custommap` → `{ModGuid}`
-- `Custom Map` → `{ModDisplayName}`
-- 版本号、LICENSE 作者名、csproj 中的游戏 DLL 路径
+- [Overview](#overview)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Commands](#commands)
+- [Map Structure](#map-structure)
+- [Features](#features)
+- [Settings](#settings)
+- [License](#license)
 
 ---
 
-## 关于 StartGame.ps1
+## Overview
 
-[StartGame.ps1](StartGame.ps1) 会将编译好的 DLL 文件复制到游戏目录下的 BepInEx 插件目录，并自动启动游戏。
+**Custom Map** allows you to load custom-designed maps in Casualties Unknown. Maps are defined using a string-based format with a key-value mapping system, enabling precise control over every block and entity placement.
 
-**参数：**
-
-- `$GamePath` — 游戏安装目录（如 `E:/SteamLibrary/steamapps/common/Casualties Unknown Demo`）
-- `$ModNamespace` — 模组命名空间（如 `MyCoolMod`）
-
-**命令行运行：**
-
-```powershell
-.\StartGame.ps1 -GamePath "E:/SteamLibrary/steamapps/common/Casualties Unknown Demo" -ModNamespace "MyCoolMod"
-```
-
-### JetBrains Rider 配置
-
-1. 右键 [StartGame.ps1](StartGame.ps1) → `运行 'StartGame.ps1'`
-2. 点击编辑器右上角构建按钮旁的 `StartGame.ps1` 按钮 → `编辑配置...`
-3. 填写 `Script arguments:`：`"E:/SteamLibrary/steamapps/common/Casualties Unknown Demo" "MyCoolMod"`
-4. 设置 `Command parameters`：`-ExecutionPolicy Bypass`
-5. 点击 `执行前` 旁的加号 → `构建解决方案` → 确定
-
-之后每次按绿三角按钮即可自动构建、复制 DLL、启动游戏。
-
-### Visual Studio
-
-右键 [StartGame.ps1](StartGame.ps1) 选择 `运行`，手动填写参数。具体配置方式请自行研究。:P
+- **String map format** — Each character in the map grid maps to a block ID or entity ID via a JSON key dictionary
+- **Feature system** — Per-map configuration for mines, turrets, jump pads, spike stabbers, geysers, bear traps, and more
+- **Custom loading screen** — Shows real-time progress during map generation
+- **Command interface** — Full `cm` command set for managing maps in-game
+- **Multi-language support** — English, 简体中文, 繁體中文
 
 ---
 
-## 发布模组 (Release.ps1)
+## Installation
 
-[Release.ps1](Release.ps1) 用于构建、打包并发布模组到 NexusMods 和 GitHub Release。
-
-**基本用法：**
-```powershell
-.\Release.ps1                          # 交互式确认版本号后发布
-.\Release.ps1 -SkipNexus               # 只发 GitHub
-.\Release.ps1 -SkipBuild -SkipGitHub   # 只发 NexusMods（跳过构建）
-```
-
-### NexusMods API Key 设置
-
-1. 登录 [NexusMods](https://www.nexusmods.com/)
-2. 进入 [API Access](https://www.nexusmods.com/casualtiesunknown/users/myaccount?tab=api) 页面
-3. 点击 `REQUEST API KEY` 获取 Key
-
-**使用方式：**
-```powershell
-# 环境变量（推荐，一次设置永久有效）
-$env:NEXUS_API_KEY = "你的API Key"
-.\Release.ps1
-
-# 或命令行参数
-.\Release.ps1 -NexusApiKey "你的API Key"
-```
-
-### GitHub 认证
-
-```powershell
-# 安装 GitHub CLI
-winget install GitHub.cli
-
-# 登录
-gh auth login
-```
+1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx) for Casualties Unknown.
+2. Install [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) ≥ 1.0.2 —
+   place `CUCoreLib.dll` in `BepInEx/plugins/CUCoreLib/`.
+3. Install [Bark](https://github.com/CNCUMC/Bark) ≥ 1.0.3 —
+   place `Bark.dll` in `BepInEx/plugins/Bark/`.
+4. Download the latest `CustomMap.dll` from [Releases](https://github.com/CNCUMC/Custom-Map/releases).
+5. Place `CustomMap.dll` in `BepInEx/plugins/`.
+6. Place your map folders in `Maps/` (next to the game executable).
 
 ---
 
-## csproj 引用说明
+## Quick Start
 
-模板包含 15 个核心游戏 DLL 引用。所有路径通过 `Directory.Build.props` 中的 MSBuild 属性管理：
+### Loading the Built-in Template
 
-| 属性 | 说明 | 示例 |
-|------|------|------|
-| `$(GameDir)` | 游戏根目录 | `F:/SteamLibrary/steamapps/common/Casualties Unknown Demo` |
-| `$(ManagedDir)` | Managed 目录 | `$(GameDir)/CasualtiesUnknown_Data/Managed` |
-| `$(CUCoreLibDll)` | CUCoreLib 路径（可选） | `$(GameDir)/BepInEx/plugins/CUCoreLib.dll` |
+Custom Map includes a built-in template map. Enable **Start Game Use Map** in the mod settings, select the template, and start a new game.
 
-如需额外引用（如动画、音频、粒子等），在 csproj 中取消注释或添加新条目：
+### Using a Custom Map
 
-```xml
-<!-- 例如：添加音频模块 -->
-<Reference Include="UnityEngine.AudioModule">
-    <HintPath>$(ManagedDir)/UnityEngine.AudioModule.dll</HintPath>
-</Reference>
+1. Create a map folder under `Maps/YourMapName/` (see [Map Structure](#map-structure)).
+2. Start the game. The map will appear in the dropdown under `Mod Settings → Custom Map → First Use Map`.
+3. Use `cm select YourMapName` in the console, or select it from the dropdown before starting.
+
+---
+
+## Commands
+
+All commands use the `cm` prefix (or `custommap`).
+
+| Command                 | Description                                     |
+|-------------------------|-------------------------------------------------|
+| `cm help`               | Show help                                       |
+| `cm list`               | List all available maps                         |
+| `cm list <id>`          | Select and load a map by ID or index            |
+| `cm select <id>`        | Select a map (reloads world if loaded)          |
+| `cm reload`             | Reload current map from disk                    |
+| `cm info`               | Show current map details                        |
+| `cm spawn`              | Teleport to map spawn point                     |
+| `cm feature`            | List or modify map features                     |
+| `cm waypoint`           | List or teleport to waypoints                   |
+| `cm save <start> <end>` | Save an area to current map                     |
+| `cm save as [name]`     | Save an area as a new map (click two positions) |
+| `cm exit`               | Exit custom map and return to vanilla           |
+
+---
+
+## Map Structure
+
+A map is a folder under `Maps/` with the following layout:
+
+```
+Maps/
+└── YourMapName/
+    ├── map.json              # Map metadata (name, id, version, author, description)
+    ├── level/
+    │   └── level1.json       # Level data (map grid, key, spawn, items, waypoints)
+    ├── feature/
+    │   ├── world/
+    │   │   ├── settings.json # World settings (gravity, full bright, skip flags)
+    │   │   ├── mine.json
+    │   │   ├── turret.json
+    │   │   ├── jump_pad.json
+    │   │   ├── spike_stabber.json
+    │   │   ├── sound_cannon.json
+    │   │   ├── geyser.json
+    │   │   └── beartrap.json
+    │   └── player/
+    │       └── xp.json       # XP multiplier settings
+    └── lang/
+        └── zh-CN.json        # Map name/description localizations
 ```
 
-> **注意：** 首次使用时复制 `Directory.Build.props.example` 为 `Directory.Build.props` 并填写你的游戏路径。
+### map.json
+
+```json
+{
+  "name": "My Map",
+  "id": "mymap",
+  "version": "1.0.0",
+  "author": ["AuthorName"],
+  "description": "A custom map",
+  "type": "Map"
+}
+```
+
+### level/level1.json
+
+```json
+{
+  "map_data": {
+    "map": [
+      "1111111",
+      "1000001",
+      "1111111"
+    ],
+    "key": {
+      "0": 0,
+      "1": 6
+    }
+  },
+  "scene_type": "Debug",
+  "spawn": [0.0, 0.0],
+  "x": -68,
+  "y": 62,
+  "waypoints": [],
+  "items": [],
+  "type": "level"
+}
+```
+
+- `map` — Grid of characters (top to bottom = top to bottom in world)
+- `key` — Maps each character to a block ID (number) or entity ID (string)
+- `scene_type` — `"Debug"`, `"Wasteland"`, `"TemperateForest"`, `"RockDesert"`, or `"None"`
+- `x`, `y` — Bottom-left corner of the map in world coordinates
+
+---
+
+## Features
+
+Each feature file overrides the default behavior of in-game entities:
+
+| Feature              | Description                                                                                    |
+|----------------------|------------------------------------------------------------------------------------------------|
+| `settings.json`      | World settings: `full_bright`, `gravity`, `skip_terrain`, `skip_structures`, `skip_background` |
+| `mine.json`          | Mine explosion parameters, undestroyable flag, cooldown                                        |
+| `turret.json`        | Turret targeting range, fire rate, damage                                                      |
+| `jump_pad.json`      | Jump pad force, cooldown                                                                       |
+| `spike_stabber.json` | Spike damage multiplier, sound, undestroyable flag                                             |
+| `sound_cannon.json`  | Sound cannon parameters                                                                        |
+| `geyser.json`        | Geyser eruption parameters                                                                     |
+| `beartrap.json`      | Bear trap damage, escape difficulty                                                            |
+| `xp.json`            | XP multiplier overrides                                                                        |
+
+---
+
+## Settings
+
+| Setting                    | Description                              | Default    |
+|----------------------------|------------------------------------------|------------|
+| `More Logs`                | Enable verbose debug logging             | `false`    |
+| `Start Game Use Map`       | Auto-load a map when starting a new game | `false`    |
+| `First Use Map`            | Which map to load on first game start    | `template` |
+| `Progress Update Interval` | Milliseconds between progress updates    | `333`      |
+
+---
+
+## Compatibility
+
+Custom Map supports soft-integration with the following mods:
+
+| Mod | GUID | Description |
+|-----|------|-------------|
+| [Custom Structures](https://www.nexusmods.com/scavprototype/mods/) | `com.Jimmyking.morestructures` | Load `.ms.json` structure files placed in the map's level folder |
+| [Build Mode](https://www.nexusmods.com/scavprototype/mods/) | `com.alexx_.buildmode` | Load `.alexx_BMsave` build mode saves into the map |
+
+Neither mod is required — Custom Map works fully standalone. If installed, map authors can reference their files in `level1.json` via `custom_structures` and `build_mode_save` fields.
+
+---
+
+## License
+
+[LGPL v3](LICENSE.md)
