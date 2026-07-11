@@ -97,11 +97,15 @@ public static class CustomStructuresLoader
                 filePath = basePath + ".txt";
                 if (!File.Exists(filePath))
                 {
-                    filePath = basePath + ".txt";
+                    filePath = basePath + ".ms.json";
                     if (!File.Exists(filePath))
                     {
-                        Error("not_found_custom_structures");
-                        return;
+                        filePath = basePath + ".ms2.json";
+                        if (!File.Exists(filePath))
+                        {
+                            Error("not_found_custom_structures");
+                            return;
+                        }
                     }
                 }
             }

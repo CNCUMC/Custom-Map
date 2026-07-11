@@ -83,10 +83,10 @@ public static class WorldGenerationPatch
         if (map != null)
         {
             StartMapLoading(map);
+            SuppressCustomStructuresForMapData();
 
             if (map.MapData != null)
             {
-                SuppressCustomStructuresForMapData();
                 WorldGeneration.biomeOverride = map.Type;
                 MoreLogs("scene_type_set", map.Type);
             }
@@ -241,6 +241,7 @@ public static class WorldGenerationPatch
     {
         var map = CurrentMap;
         CreateLoadingCover();
+        instance.loadingObject.SetActive(false);
         _loading = true;
 
         if (map.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
@@ -253,6 +254,9 @@ public static class WorldGenerationPatch
         var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
 
+        SetWorldExists();
+        WorldGeneration.world.generatingWorld = false;
+
         if (hasMapData)
         {
             var mapData = map.MapData;
@@ -264,8 +268,6 @@ public static class WorldGenerationPatch
             _isSpawningMap = true;
             RefreshLoadingText();
 
-            SetWorldExists();
-            WorldGeneration.world.generatingWorld = false;
             yield return MapLoader.LoadAndApplyMapFromMapAsync(map);
             instance.UpdateWorld();
 
