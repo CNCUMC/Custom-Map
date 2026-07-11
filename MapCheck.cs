@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BepInEx.Logging;
 using CustomMap.Loader;
 using CustomMap.Patch;
 
@@ -16,11 +15,12 @@ public static class MapCheck
     public static readonly List<Map> Maps = [];
     public static Map CurrentMap => WorldGenerationPatch.CurrentMap;
     public static bool HasRunningMap => CurrentMap != null;
+    private static bool _initialized;
 
     public static void Initialize()
     {
-        if (Plugin.Logger != null) return;
-        Plugin.Logger = Plugin.Logger;
+        if (_initialized) return;
+        _initialized = true;
         LoadMapDirectories();
     }
 

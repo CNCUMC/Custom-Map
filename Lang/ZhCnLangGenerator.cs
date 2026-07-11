@@ -202,6 +202,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("world_generation.start_game_map", "开始游戏时自动使用配置的地图: {0} (ID: {1})");
         Log("world_generation.start_game_map_not_found", "未找到配置的地图 (ID: {0})，将使用默认");
         Log("world_generation.no_map_selected", "未选择地图，生成原版世界");
+        Log("world_generation.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");
         Log("world_generation.applying_settings_overrides", "正在应用 Settings 覆盖，共 {0} 项");
         Log("world_generation.settings_override_not_found", "未找到 Settings 覆盖项: {0}");
         Log("world_generation.settings_override_applied", "已应用 Settings 覆盖: {0} = {1}");

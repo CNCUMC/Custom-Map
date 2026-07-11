@@ -253,7 +253,7 @@ public class Plugin : BaseUnityPlugin
         BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{TemplateMap.Id}", TemplateMap.Name);
         AddMapChoice(choices, TemplateMap.Id, MapLocale.GetName(TemplateMap));
         var mapsDir = MapCheck.MapsPath;
-        Logger.LogInfo(mapsDir);
+        Logger.LogInfo($"Maps directory: '{mapsDir}'");
         try
         {
             if (Directory.Exists(mapsDir))
@@ -289,8 +289,6 @@ public class Plugin : BaseUnityPlugin
                 : TemplateMap.Id);
     }
 
-    private static void AddMapChoice(List<ModDropdownChoice> choices, string id, string displayName)
-    {
+    private static void AddMapChoice(List<ModDropdownChoice> choices, string id, string displayName) =>
         choices.Add(new ModDropdownChoice(id, displayName));
-    }
 }

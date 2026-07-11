@@ -212,6 +212,8 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.start_game_map_not_found",
             "Configured Map (ID: {0}) not found, using default");
         Log("world_generation.no_map_selected", "No Map selected, generating vanilla world");
+        Log("world_generation.no_valid_directories",
+            "No valid Map directories, please check the Maps folder");
         Log("world_generation.applying_settings_overrides", "Applying settings overrides, count={0}");
         Log("world_generation.settings_override_not_found", "Settings override not found: {0}");
         Log("world_generation.settings_override_applied", "Applied settings override: {0} = {1}");
