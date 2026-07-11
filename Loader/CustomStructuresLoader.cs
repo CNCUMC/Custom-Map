@@ -7,7 +7,6 @@ using Bark.BetterCCL;
 using Bark.Tool;
 using BepInEx;
 using BepInEx.Bootstrap;
-using BepInEx.Logging;
 using Newtonsoft.Json.Linq;
 
 namespace CustomMap.Loader;
@@ -17,7 +16,6 @@ public static class CustomStructuresLoader
 {
     private const string LocaleKeyPre = "custom_structures_loader.";
     private const string CustomStructuresGuid = "com.Jimmyking.morestructures";
-    private static readonly ManualLogSource Logger = Plugin.Logger;
 
     private static readonly Regex V1NameRegex =
         new("StructureDefinitions\\[\"(.*?)\"\\]", RegexOptions.Compiled);
@@ -185,20 +183,11 @@ public static class CustomStructuresLoader
             Info(key, args);
     }
 
-    private static void Info(string key, params object[] args)
-    {
-        LogUtil.Info(LocaleLog(key, args), Logger);
-    }
+    private static void Info(string key, params object[] args) => LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
 
-    private static void Warning(string key, params object[] args)
-    {
-        LogUtil.Warning(LocaleLog(key, args), Logger);
-    }
+    private static void Warning(string key, params object[] args) => LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 
-    private static void Error(string key, params object[] args)
-    {
-        LogUtil.Error(LocaleLog(key, args), Logger);
-    }
+    private static void Error(string key, params object[] args) => LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

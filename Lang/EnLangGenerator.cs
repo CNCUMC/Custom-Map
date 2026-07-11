@@ -338,6 +338,8 @@ public class EnLangGenerator : ModLangGenBase
         Log("map_loader.build_mode_save_applied",
             "Build Mode save applied: {0} blocks, {1} liquids, {2} backgrounds, {3} failed");
         Log("map_loader.not_found_buildmode_save", "Build Mode save file not found");
+        Log("map_loader.build_mode_save_invalid_size",
+            "Build Mode save has invalid dimensions ({0}x{1}), file may be corrupted");
 
         // Log - Map Directory Loader
         Log("loader.directory_not_found", "Directory not found: {0}");

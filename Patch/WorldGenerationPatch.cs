@@ -105,11 +105,9 @@ public static class WorldGenerationPatch
             return;
         }
 
-        if (Plugin.StartGameUseMap)
-        {
-            Warning("no_valid_directories");
-            SetDefaultSceneType(WorldGeneration);
-        }
+        if (!Plugin.StartGameUseMap) return;
+        Warning("no_valid_directories");
+        SetDefaultSceneType(WorldGeneration);
     }
 
     private static void StartMapLoading(Map map)

@@ -319,6 +319,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         // Log - Map Loader (Build Mode)
         Log("map_loader.build_mode_save_applied", "Build Mode 存档应用完成: {0} 个方块, {1} 个液体, {2} 个背景, 失败 {3} 个");
         Log("map_loader.not_found_buildmode_save", "未找到 Build Mode 存档文件");
+        Log("map_loader.build_mode_save_invalid_size", "Build Mode 存档尺寸无效 ({0}x{1})，文件可能已损坏");
 
         // Log - Map Directory Loader
         Log("loader.directory_not_found", "找不到目录: {0}");

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
 using BepInEx.Logging;
@@ -257,67 +258,49 @@ public static class MapLoader
             return;
         }
 
-        int width, height;
-        ushort[,] blocks;
-        byte[,] liquids;
-        Dictionary<Vector2Int, string> backgrounds;
-
-        using (FileStream input = new(saveFilePath, FileMode.Open))
-        using (BinaryReader reader = new(input))
+        try
         {
-            width = reader.ReadInt32();
-            height = reader.ReadInt32();
-            blocks = new ushort[width, height];
-            liquids = new byte[width, height];
-            backgrounds = new Dictionary<Vector2Int, string>();
+            var loadModeType = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(a => a.GetType("LoadMode"))
+                .FirstOrDefault(t => t != null);
 
-            for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
+            if (loadModeType == null)
             {
-                blocks[x, y] = reader.ReadUInt16();
-                liquids[x, y] = reader.ReadByte();
-                var bg = reader.ReadString();
-                if (!string.IsNullOrEmpty(bg))
-                    backgrounds[new Vector2Int(x, y)] = bg;
+                Error("not_found", "Build Mode mod");
+                return;
             }
+
+            var assembly = loadModeType.Assembly;
+            var buildModeModType = assembly.GetType("BuildModeMod");
+            if (buildModeModType == null)
+            {
+                Error("not_found", "BuildModeMod");
+                return;
+            }
+
+            loadModeType.GetMethod("LoadFileAndStartPlacement",
+                    BindingFlags.Public | BindingFlags.Static)
+                ?.Invoke(null, [saveFilePath]);
+
+            var applyLoadMethod = loadModeType.GetMethod("ApplyLoad",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            if (applyLoadMethod == null)
+            {
+                Error("not_found", "LoadMode.ApplyLoad");
+                return;
+            }
+
+            applyLoadMethod.Invoke(null, null);
+
+            buildModeModType.GetField("_loadBuffer", BindingFlags.Public | BindingFlags.Static)
+                ?.SetValue(null, null);
+            buildModeModType.GetField("_isLoading", BindingFlags.Public | BindingFlags.Static)
+                ?.SetValue(null, false);
         }
-
-        var blockCount = 0;
-        var liquidCount = 0;
-        var bgCount = backgrounds.Count;
-        var failCount = 0;
-
-        var worldWidth = (int)WorldGeneration.world.width;
-        var worldHeight = (int)WorldGeneration.world.height;
-
-        for (var x = 0; x < width; x++)
-        for (var y = 0; y < height; y++)
+        catch (Exception ex)
         {
-            var worldX = anchorX + x;
-            var worldY = anchorY + y;
-
-            if (worldX < 0 || worldX >= worldWidth || worldY < 0 || worldY >= worldHeight)
-                continue;
-
-            if (blocks[x, y] > 0) PlaceBlock(blocks[x, y], worldX, worldY, ref blockCount, ref failCount);
-
-            if (liquids[x, y] <= 0 || FluidManager.main == null) continue;
-            try
-            {
-                FluidManager.main.SetLiquid(worldX, worldY, liquids[x, y]);
-                liquidCount++;
-            }
-            catch (Exception ex)
-            {
-                Error("place_failed", worldX, worldY, "liquid", liquids[x, y], ex.Message);
-                failCount++;
-            }
+            Error("build_mode_save_load_failed", ex.Message);
         }
-
-        MoreLogs("build_mode_save_applied", blockCount, liquidCount, bgCount, failCount);
-        for (var i = 0; i < 5; i++) PlayerUtil.Tp(MapCheck.CurrentMap.SpawnPosition);
-
-        PickItems(MapCheck.CurrentMap);
     }
 
     public static void ReloadMapFromDisk(Map map)
