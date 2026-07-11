@@ -254,7 +254,6 @@ public static class WorldGenerationPatch
         var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
 
-        SetWorldExists();
         WorldGeneration.world.generatingWorld = false;
 
         if (hasMapData)
@@ -279,27 +278,8 @@ public static class WorldGenerationPatch
             var authorInfo = MapLocale.GetFormattedAuthor(map);
             var description = MapLocale.GetDescription(map);
 
-            CUCoreUtils.CallWhen(() => PlayerCamera.main && PlayerCamera.main.transform,
-                () =>
-                {
-                    try
-                    {
-                        PlayerUtil.Alert($"{modInfo}\n{authorInfo}", true);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-
-                    try
-                    {
-                        PlayerUtil.Alert(description, false);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                });
+            CUCoreUtils.Alert($"{modInfo}\n{authorInfo}", true);
+            CUCoreUtils.Alert(description, false, 6f);
             MapLoader.LogMapInfo();
             var finalPos = map.SpawnPosition;
             if (PlayerCamera.main && PlayerCamera.main.body)
@@ -395,14 +375,6 @@ public static class WorldGenerationPatch
         _coverText.fontSize = 36;
         _coverText.color = Color.white;
         _coverText.text = "Loading...";
-    }
-
-    private static void SetWorldExists()
-    {
-        const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
-        var field = typeof(WorldGeneration).GetField("worldExists", flags)
-                    ?? typeof(WorldGeneration).GetField("<worldExists>k__BackingField", flags);
-        field?.SetValue(WorldGeneration.world, true);
     }
 
     private static void ExecuteCommands(Map map)

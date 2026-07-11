@@ -40,35 +40,15 @@ public static class CustomStructuresLoader
             var definitionsField = structureLoaderType.GetField("StructureDefinitions",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-            if (definitionsField != null)
+            if (definitionsField == null)
             {
-                if (definitionsField.GetValue(null) is not IDictionary { Count: > 0 } dict) return;
-                dict.Clear();
-                Info("suppress.cleared_definitions");
+                Info("suppress.no_registry");
                 return;
             }
 
-            foreach (var field in structureLoaderType.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
-                                                                BindingFlags.Static))
-            {
-                if (!field.FieldType.Name.Contains("Dictionary")
-                    && !field.FieldType.Name.Contains("List")
-                    && !field.FieldType.Name.Contains("IEnumerable")) continue;
-                var value = field.GetValue(null);
-                switch (value)
-                {
-                    case IDictionary { Count: > 0 } dict2:
-                        dict2.Clear();
-                        Info("suppress.cleared_field", field.Name);
-                        return;
-                    case IList { Count: > 0 } list:
-                        list.Clear();
-                        Info("suppress.cleared_field", field.Name);
-                        return;
-                }
-            }
-
-            Info("suppress.no_registry");
+            if (definitionsField.GetValue(null) is not IDictionary { Count: > 0 } dict) return;
+            dict.Clear();
+            Info("suppress.cleared_definitions");
         }
         catch (Exception ex)
         {
