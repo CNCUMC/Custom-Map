@@ -45,7 +45,6 @@ public class ModCommand
                         "feature",
                         "waypoint",
                         "save",
-                        "config",
                         "level",
                         "exit"
                     ]
@@ -132,6 +131,7 @@ public class ModCommand
                     MapLoader.ReloadMap(MapCheck.CurrentMap);
                     break;
                 case "info":
+                    if (!EnsureWorldLoaded()) return;
                     CheckArg(args, 1);
                     MapLoader.LogMapInfo();
                     break;
@@ -152,15 +152,19 @@ public class ModCommand
                         MapLoader.LogMapList();
                     break;
                 case "feature":
+                    if (!EnsureWorldLoaded()) return;
                     HandleFeature(args);
                     break;
                 case "waypoint":
+                    if (!EnsureWorldLoaded()) return;
                     HandleWaypoint(args);
                     break;
                 case "save":
+                    if (!EnsureWorldLoaded()) return;
                     HandleSave(args);
                     break;
                 case "level":
+                    if (!EnsureWorldLoaded()) return;
                     HandleLevel(args);
                     break;
                 case "exit":
@@ -727,6 +731,12 @@ public class ModCommand
 
     private static void HandleFeature(string[] args)
     {
+        if (CUCoreUtils.IsInWorld())
+        {
+            BetterLocale.GetLog("mod_command.world_not_loaded");
+            return;
+        }
+
         var map = MapCheck.CurrentMap;
         if (map == null)
         {
@@ -989,6 +999,13 @@ public class ModCommand
         if (map == null)
         {
             InfoCommand("select.not_found", key);
+            return;
+        }
+
+        // 检查地图是否有缺失的模组
+        if (map.MissingMods.Count > 0)
+        {
+            ErrorCommand("select.missing_mods", MapLocale.GetName(map), string.Join(", ", map.MissingMods));
             return;
         }
 

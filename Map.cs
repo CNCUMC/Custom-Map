@@ -36,6 +36,11 @@ public class Map
 
     [JsonIgnore] public int CurrentLevelIndex { get; set; }
 
+    /// <summary>
+    /// 存储该地图需要的、但未安装的模组列表
+    /// </summary>
+    [JsonIgnore] public IList<string> MissingMods { get; set; } = [];
+
     [JsonIgnore] public LevelData CurrentLevel => Levels.ElementAtOrDefault(CurrentLevelIndex);
 
     [JsonIgnore] public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;

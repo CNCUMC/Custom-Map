@@ -191,6 +191,11 @@ public class EnLangGenerator : ModLangGenBase
         Log("map_check.author_empty", "Author array is empty, set default value");
         Log("map_check.version_format_warning",
             "Version format '{0}' is incorrect, will use default version '1.0.0'");
+        Log("map_check.missing_build_mode_mod", "Map '{0}' requires Build Mode mod but it is not installed");
+        Log("map_check.missing_custom_structures_mod", "Map '{0}' requires Custom Structures mod but it is not installed");
+        Log("map_check.requires_mod", "[requires {0}]");
+        Log("map_check.missing_mods_skipped", "Map '{0}' skipped due to missing required mods");
+        Command("custommap.select.missing_mods", "Cannot select map '{0}': requires {1}");
 
         // Log - World Generation
         Log("world_generation.scene_type_set", "Set scene type to: {0}");

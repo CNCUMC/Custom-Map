@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bark.BetterCCL;
 using CustomMap.Loader;
 using CustomMap.Patch;
 
@@ -56,6 +57,8 @@ public static class MapCheck
             var map = CustomMapDirectoryLoader.LoadFromDirectory(directory);
             if (map != null)
             {
+                // 检测缺失的模组
+                DetectMissingMods(map);
                 Maps.Add(map);
             }
             else
@@ -71,6 +74,30 @@ public static class MapCheck
         {
             Plugin.Logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
             ValidDirectories.Remove(failDirectory);
+        }
+    }
+
+    /// <summary>
+    /// 检测地图所需的模组是否已安装，将缺失的模组添加到 map.MissingMods 并输出警告
+    /// </summary>
+    public static void DetectMissingMods(Map map)
+    {
+        if (map == null) return;
+
+        var missingMods = map.MissingMods;
+        bool hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
+        bool hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
+
+        if (hasBuildModeSave && !Plugin.BuildModeLoaded)
+        {
+            missingMods.Add("Build Mode");
+            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", map.Name));
+        }
+
+        if (hasCustomStructures && !Plugin.CustomStructuresLoaded)
+        {
+            missingMods.Add("Custom Structures");
+            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_custom_structures_mod", map.Name));
         }
     }
 

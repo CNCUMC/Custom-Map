@@ -183,6 +183,11 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_check.author_not_string", "作者元素 {0} 不是字符串，已移除");
         Log("map_check.author_empty", "作者数组为空，已设置默认值");
         Log("map_check.version_format_warning", "版本格式'{0}'不正确，将使用默认版本'1.0.0'");
+        Log("map_check.missing_build_mode_mod", "地图 '{0}' 需要 Build Mode 模组，但未安装");
+        Log("map_check.missing_custom_structures_mod", "地图 '{0}' 需要 Custom Structures 模组，但未安装");
+        Log("map_check.requires_mod", "[需要 {0}]");
+        Log("map_check.missing_mods_skipped", "地图 '{0}' 因缺少所需模组已被跳过");
+        Command("custommap.select.missing_mods", "无法选择地图 '{0}'：需要安装 {1}");
 
         // Log - World Generation
         Log("world_generation.scene_type_set", "设置场景类型为: {0}");
@@ -302,7 +307,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         // Log - Mod Command
         Log("mod_command.empty_type", "未知的指令类型");
         Log("mod_command.world_not_loaded", "未加载世界");
-        Log("mod_command.no_waypoints", "当前地图 未定义路径点");
+        Log("mod_command.no_waypoints", "当前地图未定义路径点");
         Log("mod_command.exit_no_target", "请指定退出目标: none (原版) 或 tutorial (教程关)");
         Log("mod_command.register_failed", "注册自定义指令失败: {0}\n{1}");
         Log("mod_command.no_map", "当前没有可用的地图");

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
+using CUCoreLib.Helpers;
 using CustomMap.Patch;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -427,7 +428,15 @@ public static class MapLoader
             var marker = isCurrent ? "->" : "  ";
 
             var displayName = MapLocale.GetName(map);
-            Info("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
+            
+            // 如果地图有缺失的模组，灰色显示并附加提示
+            if (map.MissingMods.Count > 0)
+            {
+                var missingInfo = BetterLocale.GetLog("map_check.requires_mod", string.Join(", ", map.MissingMods));
+                displayName = $"<color=grey>{displayName}</color> {missingInfo}";
+            }
+            
+            LocaleCommand("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
         }
 
         LogUtil.NewLine();

@@ -274,6 +274,17 @@ public class Plugin : BaseUnityPlugin
                     {
                         var map = CustomMapDirectoryLoader.LoadFromDirectory(dir);
                         if (map == null) continue;
+                        
+                        // 检测缺失的模组
+                        MapCheck.DetectMissingMods(map);
+                        
+                        // 跳过有缺失模组的地图
+                        if (map.MissingMods.Count > 0)
+                        {
+                            Logger.LogWarning(BetterLocale.GetLog("map_check.missing_mods_skipped", map.Name));
+                            continue;
+                        }
+                        
                         BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", map.Name);
                         AddMapChoice(choices, map.Id, MapLocale.GetName(map));
                     }
