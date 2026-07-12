@@ -90,6 +90,8 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.help.header", "Available subcommands:");
         Command("custommap.help.help", "Show this help message");
         Command("custommap.help.reload", "Reload current map");
+        Command("custommap.help.load", "Reload Maps folder");
+        Command("custommap.load.success", "Maps reloaded successfully");
         Command("custommap.help.info", "Show map info");
         Command("custommap.help.spawn", "Teleport to spawn");
         Command("custommap.help.select", "Select a Map");

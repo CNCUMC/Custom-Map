@@ -36,10 +36,7 @@ public class Map
 
     [JsonIgnore] public int CurrentLevelIndex { get; set; }
 
-    /// <summary>
-    /// 存储该地图需要的、但未安装的模组列表
-    /// </summary>
-    [JsonIgnore] public IList<string> MissingMods { get; set; } = [];
+    [JsonIgnore] public IList<string> MissingMods { get; } = [];
 
     [JsonIgnore] public LevelData CurrentLevel => Levels.ElementAtOrDefault(CurrentLevelIndex);
 
@@ -107,7 +104,9 @@ public class Map
             if (BearTrapData != null)
                 items.Add("beartrap");
 
-            return items.Count > 0 ? string.Join(", ", items) : "None";
+            return items.Count > 0
+                ? string.Join(", ", items)
+                : "None";
         }
     }
 }

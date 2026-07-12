@@ -25,6 +25,15 @@ public static class MapCheck
         LoadMapDirectories();
     }
 
+    /// <summary>
+    /// 重新加载 Maps 文件夹中的所有地图
+    /// </summary>
+    public static void Reload()
+    {
+        _initialized = false;
+        Initialize();
+    }
+
     private static void LoadMapDirectories()
     {
         if (!Directory.Exists(MapsPath))
@@ -77,16 +86,13 @@ public static class MapCheck
         }
     }
 
-    /// <summary>
-    /// 检测地图所需的模组是否已安装，将缺失的模组添加到 map.MissingMods 并输出警告
-    /// </summary>
     public static void DetectMissingMods(Map map)
     {
         if (map == null) return;
 
         var missingMods = map.MissingMods;
-        bool hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
-        bool hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
+        var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
+        var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
 
         if (hasBuildModeSave && !Plugin.BuildModeLoaded)
         {

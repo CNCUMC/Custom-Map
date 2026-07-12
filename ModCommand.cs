@@ -38,6 +38,7 @@ public class ModCommand
                     [
                         "help",
                         "reload",
+                        "load",
                         "info",
                         "spawn",
                         "select",
@@ -129,6 +130,11 @@ public class ModCommand
                     CheckArg(args, 1);
                     MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
                     MapLoader.ReloadMap(MapCheck.CurrentMap);
+                    break;
+                case "load":
+                    CheckArg(args, 1);
+                    MapCheck.Reload();
+                    InfoCommand("load.success");
                     break;
                 case "info":
                     if (!EnsureWorldLoaded()) return;

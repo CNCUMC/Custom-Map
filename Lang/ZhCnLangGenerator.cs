@@ -87,6 +87,8 @@ public class ZhCnLangGenerator : ModLangGenBase
         Command("custommap.help.header", "可用子命令:");
         Command("custommap.help.help", "显示此帮助信息");
         Command("custommap.help.reload", "重新加载当前地图");
+        Command("custommap.help.load", "重新加载 Maps 文件夹");
+        Command("custommap.load.success", "地图重新加载成功");
         Command("custommap.help.info", "显示地图信息");
         Command("custommap.help.spawn", "传送回出生点");
         Command("custommap.help.select", "选择地图");
