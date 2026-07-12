@@ -38,6 +38,20 @@
         </Reference>
     </ItemGroup>
 
+    <!-- Build Mode -->
+    <ItemGroup>
+        <Reference Include="buildmodBetter">
+            <HintPath>$(BuildModDll)</HintPath>
+        </Reference>
+    </ItemGroup>
+    
+    <!-- Custom Structures -->
+    <ItemGroup>
+        <Reference Include="Custom Structures">
+            <HintPath>$(CustomStructuresDll)</HintPath>
+        </Reference>
+    </ItemGroup>
+
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
             <HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath>

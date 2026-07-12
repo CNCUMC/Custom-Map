@@ -274,15 +274,6 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_loader.map_reload_failed", "重新加载地图 失败: {0}");
         Log("map_loader.validation.no_data", "{0} 中没有 {1} 数据");
         Log("map_loader.validation.row_data_empty", "{0} 行数据为空");
-
-        // Log - Error
-        Log("error.no_map_file", "找不到 map.json 文件: {0}");
-        Log("error.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");
-        Log("error.custom_structures_mod_not_loaded", "地图 '{0}' 需要自定义结构模组，但该模组未加载");
-        Log("error.multiple_content_types",
-            "地图 '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
-
-        // Log - Map Load
         Log("map_load.empty_target_path", "目标路径不能为空");
         Log("map_load.unauthorized", "无权读取文件 '{0}': {1}");
         Log("map_load.io_error", "读取文件 '{0}' 失败: {1}");
@@ -290,6 +281,13 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_load.deserialize_null", "文件 '{0}' 反序列化失败（返回 null），将创建默认配置");
         Log("map_load.invalid_json", "文件 '{0}' JSON 格式无效: {1}");
         Log("map_load.no_folder_name", "无法从路径 '{0}' 解析有效的文件夹名称");
+        
+        // Log - Error
+        Log("error.no_map_file", "找不到 map.json 文件: {0}");
+        Log("error.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");
+        Log("error.custom_structures_mod_not_loaded", "地图 '{0}' 需要自定义结构模组，但该模组未加载");
+        Log("error.multiple_content_types",
+            "地图 '{0}' 同时定义了多种内容类型（MapData、CustomStructures、BuildModeSave），只允许定义一种");
 
         // Log - Common
         Log("common.map", "地图");

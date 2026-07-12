@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Bark.BetterCCL;
 using Bark.Constant;
+using Bark.Tool;
 using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using CUCoreLib.Data;
 using CustomMap.Data;
@@ -19,7 +21,6 @@ namespace CustomMap;
 [BepInDependency("net.cucorelib", "1.0.2")]
 [BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.Jimmyking.morestructures", BepInDependency.DependencyFlags.SoftDependency)]
-
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin
 {
@@ -33,6 +34,9 @@ public class Plugin : BaseUnityPlugin
     public static bool StartGameUseMap;
     public static float ProgressUpdateInterval;
     public static string FirstUseMap;
+
+    internal static bool BuildModeLoaded => Chainloader.PluginInfos.ContainsKey("com.alexx_.buildmode");
+    internal static bool CustomStructuresLoaded => Chainloader.PluginInfos.ContainsKey("com.Jimmyking.morestructures");
 
     public static readonly Map TemplateMap = new()
     {
@@ -248,6 +252,8 @@ public class Plugin : BaseUnityPlugin
 
         MapCheck.Initialize();
         _harmony.PatchAll();
+
+        UpdateUtil.Check("CNCUMC/Custom-Map", Name, Version, Logger);
     }
 
     private static void RegisterMapOption()

@@ -3,7 +3,9 @@
     <PropertyGroup>
         <GameDir>F:/SteamLibrary/steamapps/common/Casualties Unknown Demo</GameDir>
         <ManagedDir>$(GameDir)/CasualtiesUnknown_Data/Managed</ManagedDir>
-        <CUCoreLibDll>F:/SteamLibrary/steamapps/common/Casualties Unknown Demo/BepInEx/plugins/CUCoreLib.dll</CUCoreLibDll>
-        <BarkDll>F:/SteamLibrary/steamapps/common/Casualties Unknown Demo/BepInEx/plugins/Bark/Bark.dll</BarkDll>
+        <CUCoreLibDll>$(GameDir)/BepInEx/plugins/CUCoreLib.dll</CUCoreLibDll>
+        <BarkDll>$(GameDir)/BepInEx/plugins/Bark/Bark.dll</BarkDll>
+        <BuildModDll>$(GameDir)/BepInEx/plugins/BuildMod/BuildMod.dll</BuildModDll>
+        <CustomStructuresDll>$(GameDir)/BepInEx/plugins/Custom Structures.dll</CustomStructuresDll>
     </PropertyGroup>
 </Project>
