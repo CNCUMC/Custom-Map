@@ -72,6 +72,7 @@ Custom Map 内置了一个模板地图。在模组设置中启用 **Start Game U
 | `cm list <id>`      | 按 ID 或序号选择并加载地图   |
 | `cm select <id>`    | 选择地图（世界已加载时重载）    |
 | `cm reload`         | 从磁盘重新加载当前地图       |
+| `cm load`           | 重新加载 Maps 文件夹中的所有地图 |
 | `cm info`           | 显示当前地图详情          |
 | `cm spawn`          | 传送到地图出生点          |
 | `cm feature`        | 列出或修改地图特性         |

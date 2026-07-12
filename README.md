@@ -41,8 +41,8 @@ _A custom map loader for [Casualties Unknown](https://store.steampowered.com/app
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx) for Casualties Unknown.
 2. Install [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) ≥ 1.0.2 — place `CUCoreLib.dll` in `BepInEx/plugins/`.
 3. Install [Bark](https://github.com/CNCUMC/Bark) ≥ 1.0.2 — place `Bark.dll` in `BepInEx/plugins/Bark/`.
-4. Install & Place Custom Map in `BepInEx/plugins/Custom Map`.
-5. Place your map folders in `Maps/` (next to the game executable).
+4. Install Custom Map, place in `BepInEx/plugins/Custom Map`.
+5. Place map folders in `Maps/` (next to the game executable).
 
 ---
 
@@ -50,13 +50,13 @@ _A custom map loader for [Casualties Unknown](https://store.steampowered.com/app
 
 ### Loading the Built-in Template
 
-Custom Map includes a built-in template map. Enable **Start Game Use Map** in the mod settings, select the template, and start a new game.
+Custom Map includes a built-in template map. Enable **Start Game Use Map** in mod settings, select the template, then start a new game.
 
-### Using a Custom Map
+### Using Custom Maps
 
-1. Create a map folder under `Maps/YourMapName/` (see [Map Structure](#map-structure)).
-2. Start the game. The map will appear in the dropdown under `Mod Settings → Custom Map → First Use Map`.
-3. Use `cm select YourMapName` in the console, or select it from the dropdown before starting.
+1. Create a map folder under `Maps/your-map-name/` (see [Map Structure](#map-structure)).
+2. Launch the game. Maps will appear in `Mod Settings → Custom Map → First Use Map` dropdown.
+3. Type `cm select your-map-name` in console, or select from the dropdown before starting.
 
 ---
 
@@ -71,6 +71,7 @@ All commands use the `cm` prefix (or `custommap`).
 | `cm list <id>`          | Select and load a map by ID or index            |
 | `cm select <id>`        | Select a map (reloads world if loaded)          |
 | `cm reload`             | Reload current map from disk                    |
+| `cm load`               | Reload all maps from Maps folder                |
 | `cm info`               | Show current map details                        |
 | `cm spawn`              | Teleport to map spawn point                     |
 | `cm feature`            | List or modify map features                     |
@@ -85,129 +86,54 @@ All commands use the `cm` prefix (or `custommap`).
 
 ## Map Structure
 
-A map is a folder under `Maps/` with the following layout:
+A map is a folder under `Maps/` with the following structure:
 
 ```
 Maps/
-└── YourMapName/
-    ├── map.json                      # Map metadata (name, id, version, author, description)
+└── your-map-name/
+    ├── map.json                      # Map metadata (name, ID, version, author, description)
     ├── level/
-    │   ├── level_1.json              # Level data (map grid, key, spawn, items, waypoints)
+    │   ├── level_1.json              # Level data (map grid, key table, spawn, items, waypoints)
     │   └── level_2.json              # (optional) Additional levels
     ├── feature/
     │   ├── world/
     │   │   ├── settings.json         # World settings (gravity, full bright, skip flags)
-    │   │   ├── mine.json
-    │   │   ├── turret.json
-    │   │   ├── jump_pad.json
-    │   │   ├── spike_stabber.json
-    │   │   ├── sound_cannon.json
-    │   │   ├── geyser.json
-    │   │   └── beartrap.json
+    │   │   ├── mine.json             # Mine configuration
+    │   │   ├── jump_pad.json         # Jump pad configuration
+    │   │   ├── turret.json           # Turret configuration
+    │   │   ├── sound_cannon.json     # Sound cannon configuration
+    │   │   ├── spike_stabber.json    # Spike stabber configuration
+    │   │   ├── geyser.json           # Geyser configuration
+    │   │   └── beartrap.json         # Bear trap configuration
     │   └── player/
-    │       └── xp.json               # XP multiplier settings
-    ├── lang/
-    │   └── zh-CN.json                # Map name/description localizations
-    ├── AbandonedLab.ms.json          # (optional) Custom Structures file
-    └── MyBuild.alexx_BMsave          # (optional) Build Mode save file
+    │       └── xp.json               # XP configuration
+    └── command.json                  # Commands (startup/loop)
 ```
-
-### map.json
-
-```json
-{
-  "name": "My Map",
-  "id": "mymap",
-  "version": "1.0.0",
-  "author": [
-    "AuthorName"
-  ],
-  "description": "A custom map",
-  "type": "map"
-}
-```
-
-### level/level1.json
-
-```json
-{
-  "map_data": {
-    "map": [
-      "1111111",
-      "1000001",
-      "1111111"
-    ],
-    "key": {
-      "0": 0,
-      "1": 6
-    }
-  },
-  "custom_structures": "MyStructure",
-  "build_mode_save": "MyBuild",
-  "scene_type": "Debug",
-  "spawn": [
-    0.0,
-    0.0
-  ],
-  "x": -68,
-  "y": 62,
-  "waypoints": [],
-  "items": [],
-  "type": "level"
-}
-```
-
-- `map` — Grid of characters (top to bottom = top to bottom in world)
-- `key` — Maps each character to a block ID (number) or entity ID (string)
-- `custom_structures` — (optional) Name of a `.txt` / `.ms.json` / `.ms2.json` structure file in the map root. Extension auto-detected if omitted.
-- `build_mode_save` — (optional) Name of a Build Mode `.alexx_BMsave` file in the map root (without extension).
-- `scene_type` — `"Debug"`, `"Wasteland"`, `"TemperateForest"`, `"RockDesert"`, or `"None"`
-- `x`, `y` — Bottom-left corner of the map in world coordinates
 
 ---
 
 ## Features
 
-Each feature file overrides the default behavior of in-game entities:
+Each feature is configured per-map via JSON files in `feature/world/`. Common properties include:
 
-| Feature              | Description                                                                                    |
-|----------------------|------------------------------------------------------------------------------------------------|
-| `settings.json`      | World settings: `full_bright`, `gravity`, `skip_terrain`, `skip_structures`, `skip_background` |
-| `mine.json`          | Mine explosion parameters, undestroyable flag, cooldown                                        |
-| `turret.json`        | Turret targeting range, fire rate, damage                                                      |
-| `jump_pad.json`      | Jump pad force, cooldown                                                                       |
-| `spike_stabber.json` | Spike damage multiplier, sound, undestroyable flag                                             |
-| `sound_cannon.json`  | Sound cannon parameters                                                                        |
-| `geyser.json`        | Geyser eruption parameters                                                                     |
-| `beartrap.json`      | Bear trap damage, escape difficulty                                                            |
-| `xp.json`            | XP multiplier overrides                                                                        |
+- **Cooldown** — Time between activations
+- **Undestroy** — Whether the entity is indestructible
+- **NoLight** — Disables the entity's light emission
+- **Damage/Speed multipliers** — Adjusts damage output or movement speed
 
 ---
 
 ## Settings
 
-| Setting                    | Description                              | Default    |
-|----------------------------|------------------------------------------|------------|
-| `More Logs`                | Enable verbose debug logging             | `false`    |
-| `Start Game Use Map`       | Auto-load a map when starting a new game | `false`    |
-| `First Use Map`            | Which map to load on first game start    | `template` |
-| `Progress Update Interval` | Milliseconds between progress updates    | `333`      |
-
----
-
-## Compatibility
-
-Custom Map supports soft-integration with the following mods:
-
-| Mod                                                                 | GUID                           | Description                                                                             |
-|---------------------------------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------|
-| [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) | `com.Jimmyking.morestructures` | Place `.txt` / `.ms.json` / `.ms2.json` files in the map root. Extension auto-detected. |
-| [Build Mode](https://www.nexusmods.com/scavprototype/mods/24)       | `com.alexx_.buildmode`         | Place `.alexx_BMsave` files in the map root. Delegates to Build Mode's own load code.   |
-
-Neither mod is required — Custom Map works fully standalone. If installed, reference files in `level1.json` via `custom_structures` and `build_mode_save` fields (can be without extension).
+| Setting                  | Description                                      |
+|--------------------------|--------------------------------------------------|
+| `more_logs`              | Enable verbose logging                           |
+| `start_game_use_map`     | Automatically use selected map when starting     |
+| `first_use_map`          | Map ID to use when starting a new game           |
+| `progress_update_interval` | Blocks between progress text updates           |
 
 ---
 
 ## License
 
-[LGPL v3](LICENSE.md)
+This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
