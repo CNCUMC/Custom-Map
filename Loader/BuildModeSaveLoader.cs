@@ -6,11 +6,9 @@ using BepInEx;
 
 namespace CustomMap.Loader;
 
-[BepInDependency(BuildModeGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public static class BuildModeSaveLoader
 {
     private const string LocaleKeyPre = "build_mode_save_loader.";
-    private const string BuildModeGuid = "com.alexx_.buildmode";
 
     public static void SpawnBuildModeSave(Map map)
     {

@@ -77,6 +77,8 @@ All commands use the `cm` prefix (or `custommap`).
 | `cm waypoint`           | List or teleport to waypoints                   |
 | `cm save <start> <end>` | Save an area to current map                     |
 | `cm save as [name]`     | Save an area as a new map (click two positions) |
+| `cm level`              | Show current level number                       |
+| `cm level <n>`          | Switch to level n (reloads world if loaded)     |
 | `cm exit`               | Exit custom map and return to vanilla           |
 
 ---
@@ -90,7 +92,8 @@ Maps/
 └── YourMapName/
     ├── map.json                      # Map metadata (name, id, version, author, description)
     ├── level/
-    │   └── level1.json               # Level data (map grid, key, spawn, items, waypoints)
+    │   ├── level_1.json              # Level data (map grid, key, spawn, items, waypoints)
+    │   └── level_2.json              # (optional) Additional levels
     ├── feature/
     │   ├── world/
     │   │   ├── settings.json         # World settings (gravity, full bright, skip flags)

@@ -15,9 +15,12 @@ using HarmonyLib;
 
 namespace CustomMap;
 
-[BepInPlugin(Guid, Name, Version)]
 [BepInDependency("org.cncumc.bark", "1.0.2")]
 [BepInDependency("net.cucorelib", "1.0.2")]
+[BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("com.Jimmyking.morestructures", BepInDependency.DependencyFlags.SoftDependency)]
+
+[BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin
 {
     public const string Guid = "org.cncumc.custommap";
@@ -278,7 +281,7 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception ex)
         {
-            Logger.LogWarning($"Failed to scan maps directory '{mapsDir}': {ex.Message}");
+            Logger.LogWarning(BetterLocale.GetLog("world_generation.scan_maps_failed", mapsDir, ex.Message));
         }
 
         var arr = choices.ToArray();

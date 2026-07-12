@@ -46,6 +46,7 @@ public class ModCommand
                         "waypoint",
                         "save",
                         "config",
+                        "level",
                         "exit"
                     ]
                 }
@@ -158,6 +159,9 @@ public class ModCommand
                     break;
                 case "save":
                     HandleSave(args);
+                    break;
+                case "level":
+                    HandleLevel(args);
                     break;
                 case "exit":
                     HandleExit(args);
@@ -553,6 +557,53 @@ public class ModCommand
         InfoCommand("save.area_success",
             cMinX, cMinY, cMaxX, cMaxY,
             regionW, regionH, uniqueBlockIds.Count, directoryPath);
+    }
+
+    private static void HandleLevel(string[] args)
+    {
+        var map = MapCheck.CurrentMap;
+        if (map == null)
+        {
+            Error("no_current_map");
+            return;
+        }
+
+        var totalLevels = map.Levels.Count;
+        if (totalLevels == 0)
+        {
+            ErrorCommand("level.no_levels");
+            return;
+        }
+
+        if (args.Length < 3)
+        {
+            var current = map.CurrentLevelIndex + 1;
+            InfoCommand("level.current", current, totalLevels);
+            return;
+        }
+
+        if (!int.TryParse(args[2], out var target) || target < 1 || target > totalLevels)
+        {
+            ErrorCommand("level.invalid", totalLevels);
+            return;
+        }
+
+        var newIndex = target - 1;
+        if (newIndex == map.CurrentLevelIndex)
+        {
+            InfoCommand("level.already", target);
+            return;
+        }
+
+        map.CurrentLevelIndex = newIndex;
+
+        if (HasWorldLoaded())
+        {
+            MapLoader.ReloadMap(map);
+            MapLoader.LogMapInfo();
+        }
+
+        InfoCommand("level.switched", target);
     }
 
     private static void HandleExit(string[] args)
@@ -969,6 +1020,7 @@ public class ModCommand
             ("feature", LocaleCommand("help.feature")),
             ("waypoint", LocaleCommand("help.waypoint")),
             ("save", LocaleCommand("help.save")),
+            ("level", LocaleCommand("help.level")),
             ("exit", LocaleCommand("help.exit"))
         };
 
@@ -999,7 +1051,7 @@ public class ModCommand
 
     private static void Error(string key, params object[] args) =>
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
-    
+
     private static void Warning(string key, params object[] args) =>
         LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 

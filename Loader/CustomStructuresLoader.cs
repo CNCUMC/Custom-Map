@@ -11,11 +11,9 @@ using Newtonsoft.Json.Linq;
 
 namespace CustomMap.Loader;
 
-[BepInDependency(CustomStructuresGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public static class CustomStructuresLoader
 {
     private const string LocaleKeyPre = "custom_structures_loader.";
-    private const string CustomStructuresGuid = "com.Jimmyking.morestructures";
 
     private static readonly Regex V1NameRegex =
         new("StructureDefinitions\\[\"(.*?)\"\\]", RegexOptions.Compiled);
@@ -24,7 +22,7 @@ public static class CustomStructuresLoader
     {
         try
         {
-            if (!Chainloader.PluginInfos.TryGetValue(CustomStructuresGuid, out var targetPlugin))
+            if (!Chainloader.PluginInfos.TryGetValue("com.Jimmyking.morestructures", out var targetPlugin))
                 return;
 
             var assembly = targetPlugin.Instance.GetType().Assembly;
@@ -60,7 +58,7 @@ public static class CustomStructuresLoader
 
         try
         {
-            if (!Chainloader.PluginInfos.TryGetValue(CustomStructuresGuid, out var targetPlugin))
+            if (!Chainloader.PluginInfos.TryGetValue("com.Jimmyking.morestructures", out var targetPlugin))
             {
                 Error("not_found", "Custom Structures mod");
                 return;

@@ -98,6 +98,7 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.help.waypoint", "Manage waypoints (list/get)");
         Command("custommap.help.save", "Save current Map");
         Command("custommap.help.save_as", "Interactively select area and save as map data");
+        Command("custommap.help.level", "Switch map level");
         Command("custommap.help.exit", "Exit Map");
 
         // Command - Map - Info
@@ -136,6 +137,13 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.select.without_world",
             "Selected {0}, but world is not loaded. Map will be loaded when you start a game.");
         Command("custommap.select.invalid_index", "Invalid index {0}, please enter a number between 1 and {1}");
+
+        // Command - Map - Level
+        Command("custommap.level.current", "Current level: {0}/{1}");
+        Command("custommap.level.switched", "Switched to level {0}");
+        Command("custommap.level.already", "Already on level {0}");
+        Command("custommap.level.invalid", "Invalid level, please enter a number between 1 and {0}");
+        Command("custommap.level.no_levels", "No levels available for this map");
 
         // Command - Map - Config
         Command("custommap.config.set_missing_params", "Please specify configuration name and value to set");
@@ -211,6 +219,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.start_game_map", "Starting game with configured Map: {0} (ID: {1})");
         Log("world_generation.start_game_map_not_found",
             "Configured Map (ID: {0}) not found, using default");
+        Log("world_generation.scan_maps_failed", "Failed to scan maps directory '{0}': {1}");
         Log("world_generation.no_map_selected", "No Map selected, generating vanilla world");
         Log("world_generation.no_valid_directories",
             "No valid Map directories, please check the Maps folder");

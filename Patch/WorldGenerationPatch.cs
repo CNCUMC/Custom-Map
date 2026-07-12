@@ -293,6 +293,8 @@ public static class WorldGenerationPatch
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
 
+        MapLoader.PickItems(map);
+
         if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
             Warning("no_content_type", MapLocale.GetName(map));
 

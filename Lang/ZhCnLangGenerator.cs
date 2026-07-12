@@ -95,6 +95,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Command("custommap.help.waypoint", "管理路径点 (list/get)");
         Command("custommap.help.save", "保存当前地图");
         Command("custommap.help.save_as", "交互式选取区域并保存为地图数据");
+        Command("custommap.help.level", "切换地图层级");
         Command("custommap.help.exit", "退出地图");
 
         // Command - Map - Info
@@ -132,6 +133,13 @@ public class ZhCnLangGenerator : ModLangGenBase
         Command("custommap.select.success", "已选择 {0} (ID: {1})");
         Command("custommap.select.without_world", "已选择 {0}，但世界未加载。地图将在开始游戏时加载。");
         Command("custommap.select.invalid_index", "无效的索引 {0}，请输入 1 到 {1} 之间的数字");
+
+        // Command - Map - Level
+        Command("custommap.level.current", "当前层级: {0}/{1}");
+        Command("custommap.level.switched", "已切换到层级 {0}");
+        Command("custommap.level.already", "已在层级 {0}");
+        Command("custommap.level.invalid", "无效的层级，请输入 1 到 {0} 之间的数字");
+        Command("custommap.level.no_levels", "此地图没有可用的层级");
 
         // Command - Map - Config
         Command("custommap.config.set_missing_params", "请指定配置名称和值来设置");
@@ -201,6 +209,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("world_generation.executing_loop_command", "执行循环 {0}: '{1}'");
         Log("world_generation.start_game_map", "开始游戏时自动使用配置的地图: {0} (ID: {1})");
         Log("world_generation.start_game_map_not_found", "未找到配置的地图 (ID: {0})，将使用默认");
+        Log("world_generation.scan_maps_failed", "扫描地图目录 '{0}' 失败: {1}");
         Log("world_generation.no_map_selected", "未选择地图，生成原版世界");
         Log("world_generation.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");
         Log("world_generation.applying_settings_overrides", "正在应用 Settings 覆盖，共 {0} 项");

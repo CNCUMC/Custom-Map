@@ -34,7 +34,9 @@ public class Map
     [JsonIgnore] public GeyserData GeyserData { get; set; }
     [JsonIgnore] public BearTrapData BearTrapData { get; set; }
 
-    [JsonIgnore] public LevelData CurrentLevel => Levels.FirstOrDefault();
+    [JsonIgnore] public int CurrentLevelIndex { get; set; }
+
+    [JsonIgnore] public LevelData CurrentLevel => Levels.ElementAtOrDefault(CurrentLevelIndex);
 
     [JsonIgnore] public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
 

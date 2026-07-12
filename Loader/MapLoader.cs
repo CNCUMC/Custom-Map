@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
-using BepInEx.Logging;
 using CustomMap.Patch;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -16,7 +15,6 @@ namespace CustomMap.Loader;
 public static class MapLoader
 {
     private const string LocaleKeyPre = "map_loader.";
-    private static readonly ManualLogSource Logger = Plugin.Logger;
 
     private static void LogFeatureInfo(Map map)
     {
@@ -397,13 +395,13 @@ public static class MapLoader
         }
 
         LogUtil.Divider();
-        Info("info.name", MapLocale.GetName(map));
-        Info("info.id", map.Id);
-        Info("info.version", map.Version);
-        Info("info.authors", MapLocale.GetAuthor(map));
-        Info("info.description", MapLocale.GetDescription(map));
-        Info("info.features", map.ActiveFeatures);
-        Info("info.spawn", map.SpawnPosition);
+        LocaleCommand("info.name", MapLocale.GetName(map));
+        LocaleCommand("info.id", map.Id);
+        LocaleCommand("info.version", map.Version);
+        LocaleCommand("info.authors", MapLocale.GetAuthor(map));
+        LocaleCommand("info.description", MapLocale.GetDescription(map));
+        LocaleCommand("info.features", map.ActiveFeatures);
+        LocaleCommand("info.spawn", map.SpawnPosition);
         LogUtil.Divider();
         LogUtil.NewLine();
     }
@@ -415,12 +413,12 @@ public static class MapLoader
         if (maps == null
             || maps.Count == 0)
         {
-            Info("list.empty");
+            LocaleCommand("list.empty");
             return;
         }
 
         LogUtil.Divider();
-        Info("list.header", maps.Count);
+        LocaleCommand("list.header", maps.Count);
 
         for (var i = 0; i < maps.Count; i++)
         {
@@ -435,7 +433,7 @@ public static class MapLoader
         LogUtil.NewLine();
     }
 
-    private static void PickItems(Map map)
+    internal static void PickItems(Map map)
     {
         var items = map.Items;
         foreach (var item in items) PlayerUtil.PickItem(item.Id, item.Slot, item.Force);
@@ -447,14 +445,17 @@ public static class MapLoader
             Info(key, args);
     }
 
+    private static void LocaleCommand(string key, params object[] args) =>
+        LogUtil.Info(BetterLocale.GetCommand($"custommap.{key}", args), Plugin.Logger);
+
     private static void Error(string key, params object[] args) =>
-        LogUtil.Error(LocaleLog(key, args), Logger);
+        LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
 
     private static void Info(string key, params object[] args) =>
-        LogUtil.Info(LocaleLog(key, args), Logger);
+        LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
 
     private static void Warning(string key, params object[] args) =>
-        LogUtil.Warning(LocaleLog(key, args), Logger);
+        LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);

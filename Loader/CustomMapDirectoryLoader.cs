@@ -61,8 +61,18 @@ public static class CustomMapDirectoryLoader
         if (!Directory.Exists(levelDir))
             return [];
 
-        var levelFiles = Directory.GetFiles(levelDir, "*.json")
-            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+        var levelFiles = Directory.GetFiles(levelDir, "level_*.json")
+            .Select(f =>
+            {
+                var name = Path.GetFileNameWithoutExtension(f);
+                var numStr = name.Substring("level_".Length);
+                var num = int.TryParse(numStr, out var n)
+                    ? n
+                    : int.MaxValue;
+                return (Path: f, Num: num);
+            })
+            .OrderBy(x => x.Num)
+            .Select(x => x.Path)
             .ToList();
 
         if (levelFiles.Count == 0)
