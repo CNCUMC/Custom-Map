@@ -17,7 +17,7 @@ using HarmonyLib;
 
 namespace CustomMap;
 
-[BepInDependency("org.cncumc.bark", "1.0.2")]
+[BepInDependency("org.cncumc.bark", "1.0.3")]
 [BepInDependency("net.cucorelib", "1.0.2")]
 [BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.Jimmyking.morestructures", BepInDependency.DependencyFlags.SoftDependency)]

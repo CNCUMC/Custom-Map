@@ -26,21 +26,16 @@ public static class CustomStructuresLoader
                 return;
 
             var assembly = targetPlugin.Instance.GetType().Assembly;
-            var structureLoaderType = assembly.GetType("Custom_Structures.StructureLoader");
-            if (structureLoaderType == null)
-            {
-                Warning("suppress.structure_loader_not_found");
-                return;
-            }
+            
+            // StructureDefinitions 在 WorldGenerationPatcher 类中
+            var worldGenPatcherType = assembly.GetType("Custom_Structures.WorldGenerationPatcher");
+            if (worldGenPatcherType == null) return;
 
-            var definitionsField = structureLoaderType.GetField("StructureDefinitions",
+            var definitionsField = worldGenPatcherType.GetField("StructureDefinitions",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-            if (definitionsField == null)
-            {
-                Info("suppress.no_registry");
-                return;
-            }
+            // 找不到 StructureDefinitions 是正常情况，静默返回
+            if (definitionsField == null) return;
 
             if (definitionsField.GetValue(null) is not IDictionary { Count: > 0 } dict) return;
             dict.Clear();

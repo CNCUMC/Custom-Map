@@ -293,8 +293,6 @@ public static class WorldGenerationPatch
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
 
-        MapLoader.PickItems(map);
-
         if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
             Warning("no_content_type", MapLocale.GetName(map));
 
@@ -323,6 +321,9 @@ public static class WorldGenerationPatch
             PlayerCamera.main.body.rb.simulated = true;
             if (ConsoleScript.instance) ConsoleScript.instance.noClip = false;
         }
+
+        // 在玩家完全就绪后再给予物品，避免物品掉落在地上
+        MapLoader.PickItems(map);
 
         _loading = false;
         yield return null;

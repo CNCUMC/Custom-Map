@@ -141,7 +141,6 @@ public static class MapLoader
         WorldGenerationPatch.SuccessCount = successCount;
         WorldGenerationPatch.FailCount = failCount;
         MoreLogs("string_map_applied", successCount, failCount);
-        PickItems(map);
     }
 
     public static IEnumerator LoadAndApplyMapFromMapAsync(Map map)
