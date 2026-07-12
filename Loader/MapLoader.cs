@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
-using CUCoreLib.Helpers;
 using CustomMap.Patch;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -433,7 +432,7 @@ public static class MapLoader
             if (map.MissingMods.Count > 0)
             {
                 var missingInfo = BetterLocale.GetLog("map_check.requires_mod", string.Join(", ", map.MissingMods));
-                displayName = $"<color=grey>{displayName}</color> {missingInfo}";
+                displayName = $"<color=grey>{displayName} {missingInfo}";
             }
             
             LocaleCommand("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
