@@ -1053,7 +1053,7 @@ public class ModCommand
 
     private static void CheckArg(string[] args, int index)
     {
-        ToolsUtil.CheckArgumentCount(args, index);
+        CheckUtil.CheckArgumentCount(args, index, Plugin.Logger);
     }
 
     private static void Spawn()
