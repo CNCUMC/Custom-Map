@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
-_A custom map loader for [Casualties Unknown](https://store.steampowered.com/app/3624440/Casualties_Unknown_Demo/), built on top of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
+_A custom map loader for [Casualties Unknown](https://store.steampowered.com/app/4576490/), built on top of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
 
 ---
 

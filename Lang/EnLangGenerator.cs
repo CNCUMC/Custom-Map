@@ -166,7 +166,7 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.save.failed", "Failed to save Map '{0}': {1}");
         Command("custommap.save.no_directory", "Current Map has no associated directory path, cannot save");
         Command("custommap.save.invalid_position",
-            "Invalid position format. Use Vector2 format: \"x,y\" (e.g. \"86,-11\")");
+            "Invalid position format. Use Vector2 format: 'x,y' (e.g. '86,-11')");
         Command("custommap.save.area_empty", "Specified area is outside world bounds or empty");
         Command("custommap.save.area_success",
             "Area block map saved: ({0},{1}) to ({2},{3}), size {4}x{5}, {6} block types → {7}");
@@ -254,11 +254,11 @@ public class EnLangGenerator : ModLangGenBase
         Log("validation.features_element_invalid", "features element {0} format is incorrect, skipped");
         Log("validation.no_data", "No {1} data in {0}");
         Log("validation.row_data_empty", "{0} row data is empty");
-        Log("validation.field_missing_default", "Missing required field: {0}, using default value \"{1}\"");
-        Log("validation.field_null_default", "Field is null: {0}, using default value \"{1}\"");
-        Log("validation.field_empty_string_default", "Field is empty string: {0}, using default value \"{1}\"");
-        Log("validation.field_must_be_array_default", "Missing required field: {0}, using default value [\"{1}\"]");
-        Log("validation.field_null_array_default", "Field is null: {0}, using default value [\"{1}\"]");
+        Log("validation.field_missing_default", "Missing required field: {0}, using default value '{1}'");
+        Log("validation.field_null_default", "Field is null: {0}, using default value '{1}'");
+        Log("validation.field_empty_string_default", "Field is empty string: {0}, using default value '{1}'");
+        Log("validation.field_must_be_array_default", "Missing required field: {0}, using default value ['{1}']");
+        Log("validation.field_null_array_default", "Field is null: {0}, using default value ['{1}']");
         Log("validation.field_convert_to_array", "{0} field must be an array, converted to array");
         Log("validation.array_empty_default", "{0} array is empty, set default value");
         Log("validation.array_empty_removed", "{0} array is empty, removed");
@@ -267,7 +267,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("map_loader.load_error", "Map or map data is null");
         Log("map_loader.invalid_format", "Invalid map format, missing map field");
         Log("map_loader.key_missing", "Error: String map format missing 'key' definition");
-        Log("map_loader.string_map_applied", "String map applied, placed {0} blocks, {1} items, {2} failed");
+        Log("map_loader.string_map_applied", "String map applied, {0} successes, {1} failures");
         Log("map_loader.load_success", "Successfully loaded map: start position({0}, {1}), size({2}x{3})");
         Log("map_loader.load_failed", "Failed to load map: {0}");
         Log("map_loader.place_failed", "Failed to place {2} {3} at ({0}, {1}): {4}");

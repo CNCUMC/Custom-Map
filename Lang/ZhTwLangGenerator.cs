@@ -11,7 +11,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         // Config - 設置標籤和描述
         Option("custommap.custommap.more_logs", "更多日誌", "顯示更多日誌");
         Option("custommap.custommap.start_game_use_map", "開始遊戲使用地圖", "開啟新遊戲時使用選中的地圖");
-        Option("custommap.custommap.first_use_map", "首選地圖", "開始新遊戲時使用的地圖ID。需要啟用\"開始遊戲使用地圖\"");
+        Option("custommap.custommap.first_use_map", "首選地圖", "開始新遊戲時使用的地圖ID。需要啟用'開始遊戲使用地圖'");
         Option("custommap.custommap.progress_update_interval", "進度更新間隔", "放置方塊時每 N 個方塊更新一次進度顯示。數值越小更新越頻繁，但可能影響生成效能");
 
         // Map Format
@@ -161,7 +161,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.save.success", "已將地圖 '{0}' 保存到: {1}");
         Command("custommap.save.failed", "保存地圖 '{0}' 失敗: {1}");
         Command("custommap.save.no_directory", "當前地圖沒有關聯的目錄路徑，無法保存");
-        Command("custommap.save.invalid_position", "無效的位置格式，請使用 Vector2 格式：\"x,y\" (例如 \"86,-11\")");
+        Command("custommap.save.invalid_position", "無效的位置格式，請使用 Vector2 格式：'x,y' (例如 '86,-11')");
         Command("custommap.save.area_empty", "指定區域超出世界邊界或為空");
         Command("custommap.save.area_success", "已保存區域物塊地圖: ({0},{1}) 到 ({2},{3}), 尺寸 {4}x{5}, {6} 種物塊類型 → {7}");
         Command("custommap.save.target_not_found", "目標地圖文件夾 '{0}' 未找到");
@@ -241,11 +241,11 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("validation.features_element_invalid", "features 第 {0} 個元素格式不正確，已跳過");
         Log("validation.no_data", "{0} 中沒有 {1} 數據");
         Log("validation.row_data_empty", "{0} 行數據為空");
-        Log("validation.field_missing_default", "缺少必需字段: {0}，已使用默認值 \"{1}\"");
-        Log("validation.field_null_default", "字段為空: {0}，已使用默認值 \"{1}\"");
-        Log("validation.field_empty_string_default", "字段為空字符串: {0}，已使用默認值 \"{1}\"");
-        Log("validation.field_must_be_array_default", "缺少必需字段: {0}，已使用默認值 [\"{1}\"]");
-        Log("validation.field_null_array_default", "字段為空: {0}，已使用默認值 [\"{1}\"]");
+        Log("validation.field_missing_default", "缺少必需字段: {0}，已使用默認值 '{1}'");
+        Log("validation.field_null_default", "字段為空: {0}，已使用默認值 '{1}'");
+        Log("validation.field_empty_string_default", "字段為空字符串: {0}，已使用默認值 '{1}'");
+        Log("validation.field_must_be_array_default", "缺少必需字段: {0}，已使用默認值 ['{1}']");
+        Log("validation.field_null_array_default", "字段為空: {0}，已使用默認值 ['{1}']");
         Log("validation.field_convert_to_array", "{0} 字段必須是數組，已轉換為數組");
         Log("validation.array_empty_default", "{0} 數組為空，已設置默認值");
         Log("validation.array_empty_removed", "{0} 數組為空，已移除");

@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
-_一个为 [Casualties Unknown](https://store.steampowered.com/app/3624440/Casualties_Unknown_Demo/) 打造的自定义地图加载器，基于 [Bark](https://github.com/CNCUMC/Bark) 和 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)。_
+_一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/) 打造的自定义地图加载器，基于 [Bark](https://github.com/CNCUMC/Bark) 和 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)。_
 
 ---
 
