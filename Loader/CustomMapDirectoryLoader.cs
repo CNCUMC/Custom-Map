@@ -184,7 +184,6 @@ public static class CustomMapDirectoryLoader
             var layersDir = Path.Combine(directoryPath, "layers");
             Directory.CreateDirectory(layersDir);
 
-            // 清理旧的文件，防止重�?
             foreach (var oldFile in Directory.GetFiles(layersDir, "*.json"))
                 try
                 {
@@ -222,7 +221,7 @@ public static class CustomMapDirectoryLoader
         Plugin.Logger?.LogInfo(
             $"[CustomMapDirectoryLoader.Debug] SaveToDirectory calling SaveToCurrentLang: dir={directoryPath}, Name={map.Name}, Id={map.Id}");
 
-        // �?name/description/author 写入当前语言�?lang 文件
+        // �?name/description/author 写入当前语言�?lang 文件
         MapLocale.SaveToCurrentLang(map, directoryPath);
 
         Plugin.Logger?.LogInfo(

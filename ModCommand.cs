@@ -225,13 +225,6 @@ public class ModCommand
 
     private static void HandleSave(string[] args)
     {
-        if (args.Length is 3 or 4 && args[2].Equals("as", StringComparison.OrdinalIgnoreCase))
-        {
-            var targetName = args.Length == 4 ? args[3] : null;
-            HandleSaveAs(targetName);
-            return;
-        }
-
         var map = MapCheck.CurrentMap;
 
         string targetPath = null;
@@ -294,65 +287,6 @@ public class ModCommand
         {
             ErrorCommand("save.failed", MapLocale.GetName(map), ex.Message);
         }
-    }
-
-    private static void HandleSaveAs(string targetName)
-    {
-        if (!EnsureWorldLoaded()) return;
-
-        CUCoreUtils.StartCoroutine(SaveAsCoroutine(targetName));
-    }
-
-    private static IEnumerator SaveAsCoroutine(string targetName)
-    {
-        yield return null;
-
-        var map = MapCheck.CurrentMap;
-        string targetPath = null;
-
-        if (!string.IsNullOrEmpty(targetName))
-        {
-            targetPath = ResolveTargetPath(targetName);
-            if (targetPath == null)
-            {
-                ErrorCommand("save.target_not_found", targetName);
-                yield break;
-            }
-
-            map ??= LoadOrCreateDefaultMap(targetPath);
-        }
-
-        if (map == null)
-        {
-            Error("no_map");
-            yield break;
-        }
-
-        var directoryPath = targetPath ?? map.DirectoryPath;
-        if (string.IsNullOrEmpty(directoryPath))
-        {
-            ErrorCommand("save.no_directory");
-            yield break;
-        }
-
-        LocaleCommand("save.as.start_position");
-
-        var waiter1 = new LeftClickYieldInstruction();
-        yield return waiter1;
-        var startPos = waiter1.Result;
-
-        yield return null;
-
-        LocaleCommand("save.as.end_position");
-
-        var waiter2 = new LeftClickYieldInstruction();
-        yield return waiter2;
-        var endPos = waiter2.Result;
-
-        var startStr = $"{startPos.x},{startPos.y}";
-        var endStr = $"{endPos.x},{endPos.y}";
-
-        // TODO: Implement structure placement saving
     }
 
     private static string ResolveTargetPath(string targetName)
@@ -949,33 +883,6 @@ public class ModCommand
 
     private static void ErrorCommand(string key, params object[] args) =>
         LogUtil.Error(LocaleCommand(key, args), Plugin.Logger);
-
-    private sealed class LeftClickYieldInstruction : CustomYieldInstruction
-    {
-        public Vector2 Result { get; private set; }
-
-        public override bool keepWaiting
-        {
-            get
-            {
-                if (field)
-                    return false;
-
-                if (!Input.GetMouseButtonDown(0))
-                    return true;
-
-                var camera = Camera.main;
-                if (camera != null)
-                {
-                    var worldPos = camera.ScreenToWorldPoint(Input.mousePosition);
-                    Result = new Vector2(worldPos.x, worldPos.y);
-                }
-
-                field = true;
-                return false;
-            }
-        }
-    }
 }
 
 
