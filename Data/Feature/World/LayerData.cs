@@ -7,9 +7,6 @@ namespace CustomMap.Data.Feature.World;
 
 public class LayerData
 {
-    [JsonProperty("map_data", NullValueHandling = NullValueHandling.Ignore)]
-    public MapData MapData { get; set; }
-
     [JsonProperty("structures", NullValueHandling = NullValueHandling.Ignore)]
     public List<StructurePlacement> Structures { get; set; } = [];
 

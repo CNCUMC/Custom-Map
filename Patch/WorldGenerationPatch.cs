@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +21,8 @@ public static class WorldGenerationPatch
     internal static Map CurrentMap;
     private static float _sLoopTimer;
     private static bool _loading;
-    internal static int SuccessCount;
-    internal static int FailCount;
-    internal static int TotalBlocks;
 
     private static TextMeshProUGUI _coverText;
-    internal static bool _isSpawningMap;
     private static GameObject _coverRoot;
 
     public static WorldGeneration.OverrideSceneType? ExitTargetScene;
@@ -42,9 +38,6 @@ public static class WorldGenerationPatch
             CurrentMap = MapCheck.CurrentMap;
             return;
         }
-
-        if (ExitTargetScene.HasValue)
-            return;
 
         if (!Plugin.StartGameUseMap)
             return;
@@ -68,7 +61,14 @@ public static class WorldGenerationPatch
         map ??= MapCheck.Maps.FirstOrDefault();
 
         if (map != null)
+        {
             CurrentMap = map;
+            Plugin.Logger.LogInfo($"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{map.Name}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
+        }
+        else
+        {
+            Plugin.Logger.LogWarning($"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
+        }
     }
 
     [HarmonyPatch("Awake")]
@@ -80,17 +80,9 @@ public static class WorldGenerationPatch
         if (map != null)
         {
             StartMapLoading(map);
-            SuppressCustomStructuresForMapData();
+            SuppressCustomStructuresForMap();
 
-            if (map.MapData != null)
-            {
-                WorldGeneration.biomeOverride = map.Type;
-                MoreLogs("scene_type_set", map.Type);
-            }
-            else
-            {
-                SetDefaultSceneType(WorldGeneration, map);
-            }
+            SetDefaultSceneType(WorldGeneration, map);
 
             return;
         }
@@ -110,14 +102,10 @@ public static class WorldGenerationPatch
     private static void StartMapLoading(Map map)
     {
         _loading = true;
-        _isSpawningMap = false;
-        SuccessCount = 0;
-        FailCount = 0;
-        TotalBlocks = 0;
         Info("loading_start", MapLocale.GetName(map));
     }
 
-    private static void SuppressCustomStructuresForMapData()
+    private static void SuppressCustomStructuresForMap()
     {
         CustomStructuresLoader.SuppressAutoGeneration();
     }
@@ -132,7 +120,7 @@ public static class WorldGenerationPatch
         var settings = CurrentMap?.WorldSettingsData;
         if (settings == null) return;
 
-        if (settings.ForgivingLevel)
+        if (settings.Forgivinglayer)
         {
             var mapBottom = -WorldGeneration.halfHeight + 10;
             var mapTop = WorldGeneration.halfHeight - 10;
@@ -218,6 +206,12 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool InitializationWorld(WorldGeneration __instance)
     {
+        if (CurrentMap != null)
+        {
+            __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
+            return false;
+        }
+
         if (ExitTargetScene.HasValue)
         {
             ExitTargetScene = null;
@@ -225,11 +219,7 @@ public static class WorldGenerationPatch
             return true;
         }
 
-        if (CurrentMap == null)
-            return true;
-
-        __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
-        return false;
+        return true;
     }
 
     private static IEnumerator ContentLoadingCoroutine(WorldGeneration instance)
@@ -245,41 +235,11 @@ public static class WorldGenerationPatch
             ApplySettingsOverrides(overrides);
         }
 
-        var hasMapData = map.MapData != null;
-        var hasCustomStructures = map.Structures != null && map.Structures.Count > 0;
+        var hasCustomStructures = map.Structures is { Count: > 0 };
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
+        var hasItems = map.Items is { Count: > 0 };
 
         WorldGeneration.world.generatingWorld = false;
-
-        if (hasMapData)
-        {
-            var mapData = map.MapData;
-            if (mapData?.Map is { Length: > 0 })
-                TotalBlocks = mapData.Map
-                    .Where(row => !string.IsNullOrEmpty(row))
-                    .Sum(row => row.Count(c => c != ' '));
-
-            _isSpawningMap = true;
-            RefreshLoadingText();
-
-            yield return MapLoader.LoadAndApplyMapFromMapAsync(map);
-            instance.UpdateWorld();
-
-            _isSpawningMap = false;
-
-            ExecuteCommands(map);
-
-            var modInfo = MapLocale.GetFormattedNameVersion(map);
-            var authorInfo = MapLocale.GetFormattedAuthor(map);
-            var description = MapLocale.GetDescription(map);
-
-            CUCoreUtils.Alert($"{modInfo}\n{authorInfo}", true);
-            CUCoreUtils.Alert(description, false, 6f);
-            MapLoader.LogMapInfo();
-            var finalPos = map.SpawnPosition;
-            if (PlayerCamera.main && PlayerCamera.main.body)
-                PlayerCamera.main.body.transform.position = new Vector3(finalPos.x, finalPos.y, 0);
-        }
 
         if (hasCustomStructures)
         {
@@ -288,7 +248,7 @@ public static class WorldGenerationPatch
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
 
-        if (!hasMapData && !hasCustomStructures && !hasBuildModeSave)
+        if (!hasCustomStructures && !hasBuildModeSave && !hasItems)
             Warning("no_content_type", MapLocale.GetName(map));
 
         GlobalDark.main.Darken();
@@ -317,7 +277,8 @@ public static class WorldGenerationPatch
             if (ConsoleScript.instance) ConsoleScript.instance.noClip = false;
         }
 
-        // 在玩家完全就绪后再给予物品，避免物品掉落在地上
+        MapLoader.LogMapInfo();
+        ExecuteCommands(map);
         MapLoader.PickItems(map);
 
         _loading = false;
@@ -328,13 +289,7 @@ public static class WorldGenerationPatch
     private static void UpdateCoverText()
     {
         if (!_coverText || CurrentMap == null) return;
-        var total = SuccessCount + FailCount;
-        var pct = TotalBlocks > 0
-            ? Mathf.Clamp((int)((float)Math.Min(total, TotalBlocks) / TotalBlocks * 100f), 0, 100)
-            : 0;
-        var bar = TotalBlocks > 0 ? new string('█', pct / 10) + new string('░', 10 - pct / 10) : "          ";
-        var line = _isSpawningMap ? $"{Math.Min(total, TotalBlocks)}/{TotalBlocks} ({pct}%)" : "正在应用...";
-        _coverText.text = $"{CurrentMap.Name}\n{bar}\n{line}";
+        _coverText.text = $"{CurrentMap.Name}\nLoading...";
     }
 
     private static void CreateLoadingCover()
@@ -359,8 +314,7 @@ public static class WorldGenerationPatch
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
         _coverText = textGo.AddComponent<TextMeshProUGUI>();
-        _coverText.font = Resources.FindObjectsOfTypeAll<TMP_FontAsset>().FirstOrDefault(f
-            => f.name.Contains("Retro Gaming SDF"));
+        _coverText.font = TextUtil.TMPUnifont;
         _coverText.alignment = TextAlignmentOptions.Center;
         _coverText.fontSize = 36;
         _coverText.color = Color.white;
@@ -441,10 +395,7 @@ public static class WorldGenerationPatch
             Info(key, args);
     }
 
-    private static void Error(string key, params object[] args) =>
-        LogUtil.Error(BetterLocale.GetLog($"error.{key}", args), Plugin.Logger);
-
-    private static void Info(string key, params object[] args) => 
+    private static void Info(string key, params object[] args) =>
         LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
 
     private static void Warning(string key, params object[] args) =>
@@ -453,3 +404,4 @@ public static class WorldGenerationPatch
     private static string LocaleLog(string key, params object[] args) =>
         BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
 }
+

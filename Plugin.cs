@@ -8,7 +8,6 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using CUCoreLib.Data;
-using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
 using CustomMap.Lang;
@@ -50,105 +49,6 @@ public class Plugin : BaseUnityPlugin
             {
                 X = -68,
                 Y = 62,
-                Spawn = [0, 0],
-                // Waypoints =
-                // [
-                //     new()
-                //     {
-                //         Id = "default",
-                //         X = 0,
-                //         Y = 0
-                //     }
-                // ],
-                MapData = new MapData
-                {
-                    Map =
-                    [
-                        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-                        "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                   1111111111111111111",
-                        "11                                                                                                                   1111111111111111111",
-                        "11                                                                                              11111111111111111    11               11",
-                        "11                                                                                              11111111111111111                     11",
-                        "11                                                                                              11             11                     11",
-                        "11                                                                                              11             11                     11",
-                        "11                                                                                              11                      p p p p p p p 11",
-                        "11                                                                                              11 b b b b b         1111111111111111111",
-                        "11                                                                                              11                   1111111111111111111",
-                        "11                                                                                              11111111111111111    11t             t1",
-                        "11                                                                                              11111111111111111    11               11",
-                        "11                                                                                              11111111111111111    11t             t11",
-                        "11                                                                                              11iiiiiiiiiiiii11                     11",
-                        "11                                                                                              11iiiiiiiiiiiii11                     11",
-                        "11                                                                                              11iiiiiiiiiiiii11                     11",
-                        "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
-                        "11                                                                                              11iiiiiiiiiiiii11          1111111111111",
-                        "11                                                                                              11iiiiiiiiiiiii11          11         11",
-                        "11                                                                                              11iiiiiiiiiiiii11          11         11",
-                        "11                                                                                              11iiiigiiiiiiii11          11         11",
-                        "11                                                                                              11111111111111111    11111111         11",
-                        "11                                                                                              11111111111111111    11111111         11",
-                        "11                                                                                                                                    11",
-                        "11                                                                                                                                    11",
-                        "11 s                                                                                                                                  11",
-                        "11                     l                                              7   8   9                                              jjjjjjjjj11",
-                        "1122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222211",
-                        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                    ],
-                    Key =
-                    {
-                        { " ", Blocks.Air.Id },
-                        { "1", Blocks.SteelTile.Id },
-                        { "2", Blocks.HeatResistantAlloy.Id },
-                        { "l", "landmine" },
-                        { "j", "jumppad" },
-                        { "t", "turret" },
-                        { "s", "soundcannon" },
-                        { "p", "spikestabber" },
-                        { "g", "geyser" },
-                        { "i", "lifepodpump" },
-                        { "b", "beartrap" },
-                        { "9", "trader1" },
-                        { "8", "trader2" },
-                        { "7", "trader3" }
-                    }
-                },
                 Items =
                 [
                     new ItemData
@@ -243,8 +143,7 @@ public class Plugin : BaseUnityPlugin
 
         BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
         BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
-        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
-            v => ProgressUpdateInterval = v);
+        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000, v => ProgressUpdateInterval = v);
         RegisterMapOption();
 
         BetterLocale.Flush();
@@ -273,17 +172,9 @@ public class Plugin : BaseUnityPlugin
                     {
                         var map = CustomMapDirectoryLoader.LoadFromDirectory(dir);
                         if (map == null) continue;
-                        
-                        // 检测缺失的模组
+
                         MapCheck.DetectMissingMods(map);
-                        
-                        // 跳过有缺失模组的地图
-                        if (map.MissingMods.Count > 0)
-                        {
-                            Logger.LogWarning(BetterLocale.GetLog("map_check.missing_mods_skipped", map.Name));
-                            continue;
-                        }
-                        
+
                         BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", map.Name);
                         AddMapChoice(choices, map.Id, MapLocale.GetName(map));
                     }

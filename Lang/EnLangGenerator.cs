@@ -140,12 +140,12 @@ public class EnLangGenerator : ModLangGenBase
             "Selected {0}, but world is not loaded. Map will be loaded when you start a game.");
         Command("custommap.select.invalid_index", "Invalid index {0}, please enter a number between 1 and {1}");
 
-        // Command - Map - Level
-        Command("custommap.level.current", "Current level: {0}/{1}");
-        Command("custommap.level.switched", "Switched to level {0}");
-        Command("custommap.level.already", "Already on level {0}");
-        Command("custommap.level.invalid", "Invalid level, please enter a number between 1 and {0}");
-        Command("custommap.level.no_levels", "No levels available for this map");
+        // Command - Map - Layer
+        Command("custommap.layer.current", "Current layer: {0}/{1}");
+        Command("custommap.layer.switched", "Switched to layer {0}");
+        Command("custommap.layer.already", "Already on layer {0}");
+        Command("custommap.layer.invalid", "Invalid layer, please enter a number between 1 and {0}");
+        Command("custommap.layer.no_layers", "No layers available for this map");
 
         // Command - Map - Config
         Command("custommap.config.set_missing_params", "Please specify configuration name and value to set");

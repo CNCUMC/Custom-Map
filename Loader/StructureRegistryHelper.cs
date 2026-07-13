@@ -3,14 +3,8 @@ using System.Reflection;
 
 namespace CustomMap.Loader;
 
-/// <summary>
-/// CUCoreLib StructureRegistry 辅助类
-/// </summary>
 public static class StructureRegistryHelper
 {
-    /// <summary>
-    /// 注册结构 JSON
-    /// </summary>
     public static bool RegisterFromJson(string structureId, string json)
     {
         try
@@ -24,9 +18,6 @@ public static class StructureRegistryHelper
         }
     }
 
-    /// <summary>
-    /// 注册文件中的结构
-    /// </summary>
     public static bool RegisterFromFile(string structureId, string filePath)
     {
         try
@@ -40,9 +31,6 @@ public static class StructureRegistryHelper
         }
     }
 
-    /// <summary>
-    /// 设置生成数量
-    /// </summary>
     public static bool TrySetSpawnCounts(string structureId, params int[] counts)
     {
         try
@@ -55,10 +43,7 @@ public static class StructureRegistryHelper
             return false;
         }
     }
-
-    /// <summary>
-    /// 清除所有注册的结构
-    /// </summary>
+    
     public static bool Clear()
     {
         try
@@ -67,8 +52,7 @@ public static class StructureRegistryHelper
                 BindingFlags.NonPublic | BindingFlags.Static);
             if (field == null) return false;
 
-            var dict = field.GetValue(null) as IDictionary;
-            if (dict == null || dict.Count == 0) return false;
+            if (field.GetValue(null) is not IDictionary dict || dict.Count == 0) return false;
 
             dict.Clear();
             return true;
@@ -79,3 +63,4 @@ public static class StructureRegistryHelper
         }
     }
 }
+

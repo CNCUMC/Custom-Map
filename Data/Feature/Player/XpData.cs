@@ -12,7 +12,7 @@ public class XpData
     private const int ResIndex = 1;
     private const int IntIndex = 2;
 
-    private static readonly int[] DefaultBaseLevels = Skills.BaseSkills(0);
+    private static readonly int[] DefaultBaselayers = Skills.BaseSkills(0);
 
     public XpData()
     {
@@ -39,9 +39,9 @@ public class XpData
 
     public void ResetToDefaults()
     {
-        StrXp = DefaultBaseLevels[StrIndex];
-        ResXp = DefaultBaseLevels[ResIndex];
-        IntXp = DefaultBaseLevels[IntIndex];
+        StrXp = DefaultBaselayers[StrIndex];
+        ResXp = DefaultBaselayers[ResIndex];
+        IntXp = DefaultBaselayers[IntIndex];
         RecalculateMinMax();
     }
 
@@ -74,3 +74,4 @@ public class XpData
         return Math.Max(0, value);
     }
 }
+

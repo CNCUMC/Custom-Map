@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
@@ -34,11 +34,11 @@ public class Map
     [JsonIgnore] public GeyserData GeyserData { get; set; }
     [JsonIgnore] public BearTrapData BearTrapData { get; set; }
 
-    [JsonIgnore] public int CurrentLevelIndex { get; set; }
+    [JsonIgnore] public int CurrentLayerIndex { get; set; }
 
     [JsonIgnore] public IList<string> MissingMods { get; } = [];
 
-    [JsonIgnore] public LayerData CurrentLayer => Layers.ElementAtOrDefault(CurrentLevelIndex);
+    [JsonIgnore] public LayerData CurrentLayer => Layers.ElementAtOrDefault(CurrentLayerIndex);
 
     [JsonIgnore] public Vector2 MapPosition => CurrentLayer is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
 
@@ -52,7 +52,6 @@ public class Map
         ? string.Join(", ", Author)
         : "Unknown";
 
-    [JsonIgnore] public MapData MapData => CurrentLayer?.MapData;
     [JsonIgnore] public List<StructurePlacement> Structures => CurrentLayer?.Structures;
     [JsonIgnore] public string BuildModeSave => CurrentLayer?.BuildModeSave;
     [JsonIgnore] public float[] Spawn => CurrentLayer?.Spawn;
@@ -77,8 +76,8 @@ public class Map
             if (WorldSettingsData?.FullBright == true)
                 items.Add("full_bright");
 
-            if (WorldSettingsData?.ForgivingLevel == true)
-                items.Add("forgiving_level");
+            if (WorldSettingsData?.Forgivinglayer == true)
+                items.Add("forgiving_layer");
 
             if (!Mathf.Approximately(WorldSettingsData?.Gravity ?? Physics2D.gravity.y, Physics2D.gravity.y))
                 items.Add($"gravity={WorldSettingsData?.Gravity}");
@@ -110,3 +109,4 @@ public class Map
         }
     }
 }
+

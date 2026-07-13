@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Bark.Tool;
-using CustomMap.Data;
+using CustomMap.Data.Feature.World;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -66,7 +66,7 @@ public class SpikeStabberScriptPatch
                     break;
             }
 
-            if (!data.NoLight) 
+            if (!data.NoLight)
                 return;
             if (LightField?.GetValue(__instance) is Light2D light)
                 light.enabled = false;
@@ -87,7 +87,7 @@ public class SpikeStabberScriptPatch
         if (cooldown > 0f)
             yield return new WaitForSeconds(cooldown);
 
-        if (!instance || !WorldGeneration.world) 
+        if (!instance || !WorldGeneration.world)
             yield break;
 
         WorldUtil.PlaceItem(instance.transform.position, "spikestabber");

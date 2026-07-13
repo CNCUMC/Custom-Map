@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace CustomMap.Data;
+namespace CustomMap.Data.Feature.World;
 
 [UsedImplicitly]
 public class SpikeStabberData

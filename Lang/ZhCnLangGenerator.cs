@@ -136,12 +136,12 @@ public class ZhCnLangGenerator : ModLangGenBase
         Command("custommap.select.without_world", "已选择 {0}，但世界未加载。地图将在开始游戏时加载。");
         Command("custommap.select.invalid_index", "无效的索引 {0}，请输入 1 到 {1} 之间的数字");
 
-        // Command - Map - Level
-        Command("custommap.level.current", "当前层级: {0}/{1}");
-        Command("custommap.level.switched", "已切换到层级 {0}");
-        Command("custommap.level.already", "已在层级 {0}");
-        Command("custommap.level.invalid", "无效的层级，请输入 1 到 {0} 之间的数字");
-        Command("custommap.level.no_levels", "此地图没有可用的层级");
+        // Command - Map - Layer
+        Command("custommap.layer.current", "当前层级: {0}/{1}");
+        Command("custommap.layer.switched", "已切换到层级 {0}");
+        Command("custommap.layer.already", "已在层级 {0}");
+        Command("custommap.layer.invalid", "无效的层级，请输入 1 到 {0} 之间的数字");
+        Command("custommap.layer.no_layers", "此地图没有可用的层级");
 
         // Command - Map - Config
         Command("custommap.config.set_missing_params", "请指定配置名称和值来设置");

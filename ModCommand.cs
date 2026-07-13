@@ -46,7 +46,7 @@ public class ModCommand
                         "feature",
                         "waypoint",
                         "save",
-                        "level",
+                        "layer",
                         "exit"
                     ]
                 }
@@ -169,9 +169,9 @@ public class ModCommand
                     if (!EnsureWorldLoaded()) return;
                     HandleSave(args);
                     break;
-                case "level":
+                case "layer":
                     if (!EnsureWorldLoaded()) return;
-                    HandleLevel(args);
+                    HandleLayer(args);
                     break;
                 case "exit":
                     HandleExit(args);
@@ -285,12 +285,6 @@ public class ModCommand
 
         try
         {
-            if (args.Length is 4 or 5)
-            {
-                SaveAreaAsMapData(map, directoryPath, args[2], args[3]);
-                return;
-            }
-
             CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
             MapLocale.SaveToCurrentLang(map, directoryPath);
 
@@ -358,7 +352,7 @@ public class ModCommand
         var startStr = $"{startPos.x},{startPos.y}";
         var endStr = $"{endPos.x},{endPos.y}";
 
-        SaveAreaAsMapData(map, directoryPath, startStr, endStr);
+        // TODO: Implement structure placement saving
     }
 
     private static string ResolveTargetPath(string targetName)
@@ -458,118 +452,7 @@ public class ModCommand
         return null;
     }
 
-    private static void SaveAreaAsMapData(Map map, string directoryPath, string startStr, string endStr)
-    {
-        if (!EnsureWorldLoaded()) return;
-
-        var startParts = startStr.Split(',');
-        var endParts = endStr.Split(',');
-
-        if (startParts.Length != 2
-            || endParts.Length != 2
-            || !float.TryParse(startParts[0].Trim(), out var wx1)
-            || !float.TryParse(startParts[1].Trim(), out var wy1)
-            || !float.TryParse(endParts[0].Trim(), out var wx2)
-            || !float.TryParse(endParts[1].Trim(), out var wy2))
-        {
-            ErrorCommand("save.invalid_position");
-            return;
-        }
-
-        var world = WorldGeneration.world;
-        var blockA = world.WorldToBlockPos(new Vector2(wx1, wy1));
-        var blockB = world.WorldToBlockPos(new Vector2(wx2, wy2));
-
-        var minX = Mathf.Min(blockA.x, blockB.x);
-        var maxX = Mathf.Max(blockA.x, blockB.x);
-        var minY = Mathf.Min(blockA.y, blockB.y);
-        var maxY = Mathf.Max(blockA.y, blockB.y);
-
-        var cMinX = Mathf.Clamp(minX, 0, (int)world.width - 1);
-        var cMaxX = Mathf.Clamp(maxX, 0, (int)world.width - 1);
-        var cMinY = Mathf.Clamp(minY, 0, (int)world.height - 1);
-        var cMaxY = Mathf.Clamp(maxY, 0, (int)world.height - 1);
-
-        var regionW = cMaxX - cMinX + 1;
-        var regionH = cMaxY - cMinY + 1;
-
-        if (regionW <= 0 || regionH <= 0)
-        {
-            ErrorCommand("save.area_empty");
-            return;
-        }
-
-        var blockIds = new ushort[regionW][];
-        for (var index = 0; index < regionW; index++) blockIds[index] = new ushort[regionH];
-
-        var uniqueBlockIds = new List<ushort>();
-        var blockToChar = new Dictionary<ushort, string>();
-
-        uniqueBlockIds.Add(0);
-        blockToChar[0] = "0";
-
-        for (var x = 0; x < regionW; x++)
-        for (var y = 0; y < regionH; y++)
-        {
-            var bx = cMinX + x;
-            var by = cMaxY - y;
-            var id = world.GetBlock(new Vector2Int(bx, by));
-
-            blockIds[x][y] = id;
-
-            if (id <= 0 || blockToChar.ContainsKey(id)) continue;
-            blockToChar[id] = EncodeBlockIndex(uniqueBlockIds.Count);
-            uniqueBlockIds.Add(id);
-        }
-
-        var mapRows = new string[regionH];
-        for (var y = 0; y < regionH; y++)
-        {
-            var chars = new char[regionW];
-            for (var x = 0; x < regionW; x++)
-            {
-                var id = blockIds[x][y];
-                chars[x] = blockToChar.TryGetValue(id, out var ch)
-                    ? ch[0]
-                    : '0';
-            }
-
-            mapRows[y] = new string(chars);
-        }
-
-        var keyDict = new Dictionary<string, object>();
-        for (var i = 0; i < uniqueBlockIds.Count; i++) keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
-
-        var newLevel = map.CurrentLayer != null
-            ? new LayerData
-            {
-                X = map.CurrentLayer.X,
-                Y = map.CurrentLayer.Y,
-                Spawn = map.CurrentLayer.Spawn,
-                MapData = new MapData { Map = mapRows, Key = keyDict },
-                Structures = [],
-                BuildModeSave = null,
-                SceneType = map.CurrentLayer.SceneType,
-                Items = map.CurrentLayer.Items
-            }
-            : new LayerData
-            {
-                X = cMinX,
-                Y = cMinY,
-                MapData = new MapData { Map = mapRows, Key = keyDict }
-            };
-
-        map.Layers = [newLevel];
-
-        CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
-        MapLocale.SaveToCurrentLang(map, directoryPath);
-
-        InfoCommand("save.area_success",
-            cMinX, cMinY, cMaxX, cMaxY,
-            regionW, regionH, uniqueBlockIds.Count, directoryPath);
-    }
-
-    private static void HandleLevel(string[] args)
+    private static void HandleLayer(string[] args)
     {
         var map = MapCheck.CurrentMap;
         if (map == null)
@@ -578,34 +461,34 @@ public class ModCommand
             return;
         }
 
-        var totalLevels = map.Layers.Count;
-        if (totalLevels == 0)
+        var totalLayers = map.Layers.Count;
+        if (totalLayers == 0)
         {
-            ErrorCommand("level.no_levels");
+            ErrorCommand("layer.no_layers");
             return;
         }
 
         if (args.Length < 3)
         {
-            var current = map.CurrentLevelIndex + 1;
-            InfoCommand("level.current", current, totalLevels);
+            var current = map.CurrentLayerIndex + 1;
+            InfoCommand("layer.current", current, totalLayers);
             return;
         }
 
-        if (!int.TryParse(args[2], out var target) || target < 1 || target > totalLevels)
+        if (!int.TryParse(args[2], out var target) || target < 1 || target > totalLayers)
         {
-            ErrorCommand("level.invalid", totalLevels);
+            ErrorCommand("layer.invalid", totalLayers);
             return;
         }
 
         var newIndex = target - 1;
-        if (newIndex == map.CurrentLevelIndex)
+        if (newIndex == map.CurrentLayerIndex)
         {
-            InfoCommand("level.already", target);
+            InfoCommand("layer.already", target);
             return;
         }
 
-        map.CurrentLevelIndex = newIndex;
+        map.CurrentLayerIndex = newIndex;
 
         if (HasWorldLoaded())
         {
@@ -613,7 +496,7 @@ public class ModCommand
             MapLoader.LogMapInfo();
         }
 
-        InfoCommand("level.switched", target);
+        InfoCommand("layer.switched", target);
     }
 
     private static void HandleExit(string[] args)
@@ -653,16 +536,6 @@ public class ModCommand
 
         var currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
-    }
-
-    private static string EncodeBlockIndex(int index)
-    {
-        return index switch
-        {
-            < 10 => ((char)('0' + index)).ToString(),
-            < 36 => ((char)('a' + index - 10)).ToString(),
-            _ => ((char)('A' + index - 36)).ToString()
-        };
     }
 
     private static void TeleportToWaypointById(List<WaypointData> waypoints, string waypointId)
@@ -1036,7 +909,7 @@ public class ModCommand
             ("feature", LocaleCommand("help.feature")),
             ("waypoint", LocaleCommand("help.waypoint")),
             ("save", LocaleCommand("help.save")),
-            ("level", LocaleCommand("help.level")),
+            ("layer", LocaleCommand("help.layer")),
             ("exit", LocaleCommand("help.exit"))
         };
 
@@ -1104,3 +977,5 @@ public class ModCommand
         }
     }
 }
+
+

@@ -1,4 +1,4 @@
-Ôªøusing System.Reflection;
+using System.Reflection;
 using Bark.Constant;
 using CustomMap.Data.Feature.World;
 using HarmonyLib;
@@ -38,8 +38,8 @@ public static class BodyPatch
         HandleMultiJump(__instance);
         HandleMultiClimb(__instance);
 
-        // Ê≤°ËêΩÂú∞
-        // ÂàùÂßãÂåñ
+        // √ª¬‰µÿ
+        // ≥ı ºªØ
         if (!__instance.grounded) return;
         _jumpCount = 0;
         _climbCount = 0;
@@ -47,15 +47,15 @@ public static class BodyPatch
 
     private static void HandleMultiJump(Body __instance)
     {
-        // ËêΩÂú∞
+        // ¬‰µÿ
         if (__instance.grounded)
             return;
 
-        // Ê≤°ÊåâË∑≥ Âà∞Â§¥‰∫Ü
+        // √ª∞¥Ã¯ µΩÕ∑¡À
         if (!JumpKey || _jumpCount >= WorldSettings.JumpLimit)
             return;
 
-        // ÊÅ¢Â§ç
+        // ª÷∏¥
         JumpCooldownField.SetValue(__instance, 0f);
         __instance.grounded = true;
         __instance.Jump();
@@ -64,14 +64,14 @@ public static class BodyPatch
 
     private static void HandleMultiClimb(Body __instance)
     {
-        // // ËêΩÂú∞
+        // // ¬‰µÿ
         if (__instance.grounded) return;
 
-        // Ê≤°ÊåâË∑≥ Âà∞Â§¥‰∫Ü
+        // √ª∞¥Ã¯ µΩÕ∑¡À
         if (!JumpKey || _climbCount >= WorldSettings.ClimbLimit)
             return;
 
-        // ÊÅ¢Â§ç
+        // ª÷∏¥
         FirstWallJumpField.SetValue(__instance, true);
         __instance.grounded = true;
         _climbCount++;

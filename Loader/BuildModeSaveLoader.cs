@@ -13,6 +13,7 @@ public static class BuildModeSaveLoader
     public static void SpawnBuildModeSave(Map map)
     {
         if (map == null || string.IsNullOrEmpty(map.BuildModeSave)) return;
+        if (!Plugin.BuildModeLoaded) return;
 
         try
         {
@@ -34,7 +35,7 @@ public static class BuildModeSaveLoader
         }
     }
 
-    private static void Error(string key, params object[] args) => 
+    private static void Error(string key, params object[] args) =>
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
 
     private static string LocaleLog(string key, params object[] args) =>

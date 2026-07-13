@@ -136,12 +136,12 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.select.without_world", "已選擇 {0}，但世界未加載。地圖將在開始遊戲時加載。");
         Command("custommap.select.invalid_index", "無效的索引 {0}，請輸入 1 到 {1} 之間的數字");
 
-        // Command - Map - Level
-        Command("custommap.level.current", "當前層級: {0}/{1}");
-        Command("custommap.level.switched", "已切換到層級 {0}");
-        Command("custommap.level.already", "已在層級 {0}");
-        Command("custommap.level.invalid", "無效的層級，請輸入 1 到 {0} 之間的數字");
-        Command("custommap.level.no_levels", "此地圖沒有可用的層級");
+        // Command - Map - Layer
+        Command("custommap.layer.current", "當前層級: {0}/{1}");
+        Command("custommap.layer.switched", "已切換到層級 {0}");
+        Command("custommap.layer.already", "已在層級 {0}");
+        Command("custommap.layer.invalid", "無效的層級，請輸入 1 到 {0} 之間的數字");
+        Command("custommap.layer.no_layers", "此地圖沒有可用的層級");
 
         // Command - Map - Config
         Command("custommap.config.set_missing_params", "請指定配置名稱和值來設置");
