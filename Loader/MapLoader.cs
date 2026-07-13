@@ -5,7 +5,6 @@ using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
 using CustomMap.Patch;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CustomMap.Loader;
@@ -225,18 +224,28 @@ public static class MapLoader
             Info(key, args);
     }
 
-    private static void LocaleCommand(string key, params object[] args) =>
+    private static void LocaleCommand(string key, params object[] args)
+    {
         LogUtil.Info(BetterLocale.GetCommand($"custommap.{key}", args), Plugin.Logger);
+    }
 
-    private static void Error(string key, params object[] args) =>
+    private static void Error(string key, params object[] args)
+    {
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static void Info(string key, params object[] args) =>
+    private static void Info(string key, params object[] args)
+    {
         LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static void Warning(string key, params object[] args) =>
+    private static void Warning(string key, params object[] args)
+    {
         LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static string LocaleLog(string key, params object[] args) =>
-        BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    private static string LocaleLog(string key, params object[] args)
+    {
+        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
@@ -13,6 +13,18 @@ namespace CustomMap.Loader;
 
 public static class CustomMapDirectoryLoader
 {
+    private static readonly (string PropName, string SubDir, string FileName, string TypeCheck)[] FeatureDescriptors =
+    [
+        (nameof(Map.MineData), "world", "mine.json", "feature.world.mine"),
+        (nameof(Map.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
+        (nameof(Map.TurretData), "world", "turret.json", "feature.world.turret"),
+        (nameof(Map.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
+        (nameof(Map.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
+        (nameof(Map.GeyserData), "world", "geyser.json", "feature.world.geyser"),
+        (nameof(Map.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
+        (nameof(Map.XpData), "player", "xp.json", "feature.player.xp")
+    ];
+
     public static Map LoadFromDirectory(string directoryPath)
     {
         if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
@@ -101,18 +113,6 @@ public static class CustomMapDirectoryLoader
             ? null
             : LoadJsonWithTypeCheck<WorldSettingsData>(settingsPath, "feature.world.settings");
     }
-
-    private static readonly (string PropName, string SubDir, string FileName, string TypeCheck)[] FeatureDescriptors =
-    [
-        (nameof(Map.MineData), "world", "mine.json", "feature.world.mine"),
-        (nameof(Map.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
-        (nameof(Map.TurretData), "world", "turret.json", "feature.world.turret"),
-        (nameof(Map.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
-        (nameof(Map.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
-        (nameof(Map.GeyserData), "world", "geyser.json", "feature.world.geyser"),
-        (nameof(Map.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
-        (nameof(Map.XpData), "player", "xp.json", "feature.player.xp"),
-    ];
 
     private static object LoadFeatureFileByType(Type dataType, string directoryPath, string subDir, string fileName,
         string expectedType)
@@ -265,4 +265,3 @@ public static class CustomMapDirectoryLoader
         SaveJsonWithTypeCheck(filePath, obj, expectedType);
     }
 }
-

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using CUCoreLib.Registries;
 
 namespace CustomMap.Loader;
 
@@ -9,7 +10,7 @@ public static class StructureRegistryHelper
     {
         try
         {
-            CUCoreLib.Registries.StructureRegistry.RegisterFromJson(structureId, json);
+            StructureRegistry.RegisterFromJson(structureId, json);
             return true;
         }
         catch
@@ -22,7 +23,7 @@ public static class StructureRegistryHelper
     {
         try
         {
-            CUCoreLib.Registries.StructureRegistry.RegisterFromFile(structureId, filePath);
+            StructureRegistry.RegisterFromFile(structureId, filePath);
             return true;
         }
         catch
@@ -35,7 +36,7 @@ public static class StructureRegistryHelper
     {
         try
         {
-            CUCoreLib.Registries.StructureRegistry.TrySetSpawnCounts(structureId, counts);
+            StructureRegistry.TrySetSpawnCounts(structureId, counts);
             return true;
         }
         catch
@@ -43,12 +44,12 @@ public static class StructureRegistryHelper
             return false;
         }
     }
-    
+
     public static bool Clear()
     {
         try
         {
-            var field = typeof(CUCoreLib.Registries.StructureRegistry).GetField("RegisteredDefinitions",
+            var field = typeof(StructureRegistry).GetField("RegisteredDefinitions",
                 BindingFlags.NonPublic | BindingFlags.Static);
             if (field == null) return false;
 
@@ -63,4 +64,3 @@ public static class StructureRegistryHelper
         }
     }
 }
-

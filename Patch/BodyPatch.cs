@@ -38,8 +38,8 @@ public static class BodyPatch
         HandleMultiJump(__instance);
         HandleMultiClimb(__instance);
 
-        // Ã»ÂäµØ
-        // ³õÊ¼»¯
+        // Ã»ï¿½ï¿½ï¿½
+        // ï¿½ï¿½Ê¼ï¿½ï¿½
         if (!__instance.grounded) return;
         _jumpCount = 0;
         _climbCount = 0;
@@ -47,15 +47,15 @@ public static class BodyPatch
 
     private static void HandleMultiJump(Body __instance)
     {
-        // ÂäµØ
+        // ï¿½ï¿½ï¿½
         if (__instance.grounded)
             return;
 
-        // Ã»°´Ìø µ½Í·ÁË
+        // Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Í·ï¿½ï¿½
         if (!JumpKey || _jumpCount >= WorldSettings.JumpLimit)
             return;
 
-        // »Ö¸´
+        // ï¿½Ö¸ï¿½
         JumpCooldownField.SetValue(__instance, 0f);
         __instance.grounded = true;
         __instance.Jump();
@@ -64,14 +64,14 @@ public static class BodyPatch
 
     private static void HandleMultiClimb(Body __instance)
     {
-        // // ÂäµØ
+        // // ï¿½ï¿½ï¿½
         if (__instance.grounded) return;
 
-        // Ã»°´Ìø µ½Í·ÁË
+        // Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Í·ï¿½ï¿½
         if (!JumpKey || _climbCount >= WorldSettings.ClimbLimit)
             return;
 
-        // »Ö¸´
+        // ï¿½Ö¸ï¿½
         FirstWallJumpField.SetValue(__instance, true);
         __instance.grounded = true;
         _climbCount++;

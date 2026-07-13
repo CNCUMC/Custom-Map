@@ -74,4 +74,3 @@ public class XpData
         return Math.Max(0, value);
     }
 }
-

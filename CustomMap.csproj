@@ -39,7 +39,7 @@
     </ItemGroup>
 
     <!-- Build Mode -->
-    
+
     <!-- Custom Structures -->
     <ItemGroup>
         <Reference Include="Custom Structures">

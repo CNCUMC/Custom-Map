@@ -6,7 +6,9 @@
 
 [GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
-_一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/) 打造的自定义地图加载器，基于 [Bark](https://github.com/CNCUMC/Bark) 和 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)。_
+_一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/)
+打造的自定义地图加载器，基于 [Bark](https://github.com/CNCUMC/Bark)
+和 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)。_
 
 ---
 
@@ -33,7 +35,9 @@ _一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/) 打
 - **自定义加载界面** — 地图生成时显示实时进度
 - **指令接口** — 完整的 `cm` 指令集用于管理地图
 - **多语言支持** — English、简体中文、繁體中文
-- **模组兼容** — 软集成 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) 和 [Build Mode](https://www.nexusmods.com/scavprototype/mods/24) — 加载 `.txt` / `.ms.json` / `.ms2.json` 结构和 `.alexx_BMsave` 存档
+- **模组兼容** — 软集成 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)
+  和 [Build Mode](https://www.nexusmods.com/scavprototype/mods/24) — 加载 `.txt` / `.ms.json` / `.ms2.json` 结构和
+  `.alexx_BMsave` 存档
 
 ---
 
@@ -65,23 +69,23 @@ Custom Map 内置了一个模板地图。在模组设置中启用 **Start Game U
 
 所有指令使用 `cm` 前缀（或 `custommap`）。
 
-| 指令                  | 描述                |
-|---------------------|-------------------|
-| `cm help`           | 显示帮助              |
-| `cm list`           | 列出所有可用地图          |
-| `cm list <id>`      | 按 ID 或序号选择并加载地图   |
-| `cm select <id>`    | 选择地图（世界已加载时重载）    |
-| `cm reload`         | 从磁盘重新加载当前地图       |
+| 指令                  | 描述                  |
+|---------------------|---------------------|
+| `cm help`           | 显示帮助                |
+| `cm list`           | 列出所有可用地图            |
+| `cm list <id>`      | 按 ID 或序号选择并加载地图     |
+| `cm select <id>`    | 选择地图（世界已加载时重载）      |
+| `cm reload`         | 从磁盘重新加载当前地图         |
 | `cm load`           | 重新加载 Maps 文件夹中的所有地图 |
-| `cm info`           | 显示当前地图详情          |
-| `cm spawn`          | 传送到地图出生点          |
-| `cm feature`        | 列出或修改地图特性         |
-| `cm waypoint`       | 列出或传送到坐标点         |
-| `cm save <起点> <终点>` | 将区域保存到当前地图        |
-| `cm save as [名称]`   | 将区域保存为新地图（点击两个位置） |
-| `cm level`          | 显示当前层级            |
-| `cm level <n>`      | 切换到层级 n（世界已加载时重载） |
-| `cm exit`           | 退出自定义地图，返回原版      |
+| `cm info`           | 显示当前地图详情            |
+| `cm spawn`          | 传送到地图出生点            |
+| `cm feature`        | 列出或修改地图特性           |
+| `cm waypoint`       | 列出或传送到坐标点           |
+| `cm save <起点> <终点>` | 将区域保存到当前地图          |
+| `cm save as [名称]`   | 将区域保存为新地图（点击两个位置）   |
+| `cm level`          | 显示当前层级              |
+| `cm level <n>`      | 切换到层级 n（世界已加载时重载）   |
+| `cm exit`           | 退出自定义地图，返回原版        |
 
 ---
 
@@ -191,12 +195,12 @@ Maps/
 
 ## 模组设置
 
-| 设置                         | 描述              | 默认值        |
-|----------------------------|-----------------|------------|
-| `More Logs`                | 启用详细调试日志        | `false`    |
-| `Start Game Use Map`       | 开始新游戏时自动加载地图    | `false`    |
-| `First Use Map`            | 首次开始游戏时加载的地图    | `template` |
-| `Progress Update Interval` | 进度更新间隔（毫秒）      | `333`      |
+| 设置                         | 描述           | 默认值        |
+|----------------------------|--------------|------------|
+| `More Logs`                | 启用详细调试日志     | `false`    |
+| `Start Game Use Map`       | 开始新游戏时自动加载地图 | `false`    |
+| `First Use Map`            | 首次开始游戏时加载的地图 | `template` |
+| `Progress Update Interval` | 进度更新间隔（毫秒）   | `333`      |
 
 ---
 
@@ -209,7 +213,8 @@ Custom Map 支持与以下模组的软集成：
 | [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) | `com.Jimmyking.morestructures` | 将 `.txt` / `.ms.json` / `.ms2.json` 文件放在地图根目录。自动检测扩展名。 |
 | [Build Mode](https://www.nexusmods.com/scavprototype/mods/24)       | `com.alexx_.buildmode`         | 将 `.alexx_BMsave` 文件放在地图根目录。委托给 Build Mode 自身的加载代码。    |
 
-两个模组均非必需 — Custom Map 可完全独立运行。在 `level1.json` 中通过 `custom_structures` 和 `build_mode_save` 字段引用对应文件（可省略扩展名）。
+两个模组均非必需 — Custom Map 可完全独立运行。在 `level1.json` 中通过 `custom_structures` 和 `build_mode_save`
+字段引用对应文件（可省略扩展名）。
 
 ---
 

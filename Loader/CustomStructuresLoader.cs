@@ -3,10 +3,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Bark.BetterCCL;
 using Bark.Tool;
-using BepInEx;
 using CUCoreLib.Registries;
-using CustomMap.Data.Feature.World;
-using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace CustomMap.Loader;
 
@@ -49,15 +47,15 @@ public static class CustomStructuresLoader
 
                 var text = File.ReadAllText(filePath);
 
-                // 注册结构�?CUCoreLib
+                // 注册结构�?CUCoreLib
                 if (!StructureRegistryHelper.RegisterFromJson(structureId, text))
                 {
                     Error("failed", structureId, "注册失败");
                     continue;
                 }
 
-                // 放置结构到指定坐�?
-                var position = new UnityEngine.Vector2(placement.X, placement.Y);
+                // 放置结构到指定坐�?
+                var position = new Vector2(placement.X, placement.Y);
                 StructureRegistry.Place(structureId, position);
 
                 MoreInfo("loading", structureId);
@@ -75,7 +73,7 @@ public static class CustomStructuresLoader
         var path = Path.Combine(basePath, structureId + ".ms2.json");
         if (File.Exists(path)) return path;
 
-        // 尝试不带扩展名（如果用户已经包含了扩展名�?
+        // 尝试不带扩展名（如果用户已经包含了扩展名�?
         path = Path.Combine(basePath, structureId);
         if (File.Exists(path)) return path;
 
@@ -92,13 +90,19 @@ public static class CustomStructuresLoader
             Info(key, args);
     }
 
-    private static void Info(string key, params object[] args) =>
+    private static void Info(string key, params object[] args)
+    {
         LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
+    }
 
 
-    private static void Error(string key, params object[] args) =>
+    private static void Error(string key, params object[] args)
+    {
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static string LocaleLog(string key, params object[] args) =>
-        BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    private static string LocaleLog(string key, params object[] args)
+    {
+        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    }
 }

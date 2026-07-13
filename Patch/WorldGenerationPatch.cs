@@ -63,11 +63,13 @@ public static class WorldGenerationPatch
         if (map != null)
         {
             CurrentMap = map;
-            Plugin.Logger.LogInfo($"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{map.Name}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
+            Plugin.Logger.LogInfo(
+                $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{map.Name}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
         }
         else
         {
-            Plugin.Logger.LogWarning($"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
+            Plugin.Logger.LogWarning(
+                $"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
         }
     }
 
@@ -241,10 +243,7 @@ public static class WorldGenerationPatch
 
         WorldGeneration.world.generatingWorld = false;
 
-        if (hasCustomStructures)
-        {
-            CustomStructuresLoader.SpawnCustomStructures(map);
-        }
+        if (hasCustomStructures) CustomStructuresLoader.SpawnCustomStructures(map);
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
 
@@ -395,13 +394,18 @@ public static class WorldGenerationPatch
             Info(key, args);
     }
 
-    private static void Info(string key, params object[] args) =>
+    private static void Info(string key, params object[] args)
+    {
         LogUtil.Info(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static void Warning(string key, params object[] args) =>
+    private static void Warning(string key, params object[] args)
+    {
         LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static string LocaleLog(string key, params object[] args) =>
-        BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    private static string LocaleLog(string key, params object[] args)
+    {
+        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    }
 }
-

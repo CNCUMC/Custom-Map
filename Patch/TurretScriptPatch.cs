@@ -21,7 +21,10 @@ public class TurretScriptPatch
 
     private static TurretData TurretData => MapCheck.CurrentMap?.TurretData;
 
-    private static float GetCooldown() => TurretData?.Cooldown ?? 15f;
+    private static float GetCooldown()
+    {
+        return TurretData?.Cooldown ?? 15f;
+    }
 
     [HarmonyPatch("Update")]
     [HarmonyTranspiler]

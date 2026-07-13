@@ -99,7 +99,6 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.help.feature", "Manage features");
         Command("custommap.help.waypoint", "Manage waypoints (list/get)");
         Command("custommap.help.save", "Save current Map");
-        Command("custommap.help.save_as", "Interactively select area and save as map data");
         Command("custommap.help.level", "Switch map level");
         Command("custommap.help.exit", "Exit Map");
 
@@ -116,9 +115,7 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.spawn", "Teleporting back to the spawn point {0} now...");
 
         // Command - Map - Waypoint
-        Command("custommap.waypoint.help", "Waypoint subcommands:\n  " +
-                                           "list - List all waypoints\n  " +
-                                           "get <id or name> - Teleport to waypoint");
+        Command("custommap.waypoint.help", "Waypoint subcommands: list, get <id or name>");
         Command("custommap.waypoint.list_header", "Available waypoints ({0}):");
         Command("custommap.waypoint.list_item", "  {0}. {1} - Position: {2}");
         Command("custommap.waypoint.teleport", "Teleporting to waypoint '{0}' at position {1}...");
@@ -165,18 +162,7 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.save.success", "Map '{0}' saved to: {1}");
         Command("custommap.save.failed", "Failed to save Map '{0}': {1}");
         Command("custommap.save.no_directory", "Current Map has no associated directory path, cannot save");
-        Command("custommap.save.invalid_position",
-            "Invalid position format. Use Vector2 format: 'x,y' (e.g. '86,-11')");
-        Command("custommap.save.area_empty", "Specified area is outside world bounds or empty");
-        Command("custommap.save.area_success",
-            "Area block map saved: ({0},{1}) to ({2},{3}), size {4}x{5}, {6} block types → {7}");
         Command("custommap.save.target_not_found", "Target Map folder '{0}' not found");
-        Command("custommap.save.missing_end_position",
-            "Missing end position, please provide both positions (e.g. fg save 86,-11 2,45)");
-        Command("custommap.save.as.default_description", "Saved from area scan");
-        Command("custommap.save.as.start_position", "Left-click to select the start position...");
-        Command("custommap.save.as.end_position", "Left-click to select the end position...");
-        Command("custommap.save.as.confirm", "Position recorded. Re-enter the same command to confirm and save.");
 
         // Command - Map - Feature
         Command("custommap.feature.unknown_subcommand", "Unknown feature subcommand: {0}");
@@ -213,9 +199,8 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.phase.spawning_build_mode_save", "{0} - Spawning build mode save...");
         Log("world_generation.phase.applying_settings", "{0} - Applying settings...");
         Log("world_generation.loading_start", "Started loading Map: {0}");
-        Log("world_generation.no_map_data", "Map {0} does not contain map data");
         Log("world_generation.no_content_type",
-            "Map '{0}' has no content type defined (MapData, Structures, or BuildModeSave)");
+            "Map '{0}' has no content type defined (Structures, or BuildModeSave)");
         Log("world_generation.no_commands", "No {0} enabled");
         Log("world_generation.exited_map", "Exited Map");
         Log("world_generation.executing_command", "Executing {0}: {1}");
@@ -233,32 +218,10 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.settings_override_failed", "Failed to apply settings override: {0}");
 
         // Log - Validation
-        Log("validation.map_invalid_type", "map field format is incorrect");
-        Log("validation.map_missing_field", "Map missing required field: {0}");
-        Log("validation.map_field_type_error", "Map {0} field must be {1}");
-        Log("validation.map_map_empty", "Map map array cannot be empty");
-        Log("validation.map_row_not_string", "Map map row {0} must be a string");
-        Log("validation.map_item_row_not_array", "Map items row {0} must be an array");
-        Log("validation.map_item_not_string", "Map items[{0}][{1}] must be a string");
         Log("validation.multiple_content_types",
-            "Cannot use multiple content types (map_data, custom_structures, build_mode_save) at the same time, only one is allowed");
+            "Cannot use multiple content types (custom_structures, build_mode_save) at the same time, only one is allowed");
         Log("validation.missing_content_type",
-            "Missing content type (map_data, custom_structures, or build_mode_save)");
-        Log("validation.custom_structures_without_mod",
-            "Detected custom_structures field, but Custom Structures mod is not installed. Please install the mod first.");
-        Log("validation.features_invalid_type", "features field must be an array or object");
-        Log("validation.features_empty", "features array is empty, will be ignored");
-        Log("validation.features_element_invalid", "features element {0} format is incorrect, skipped");
-        Log("validation.no_data", "No {1} data in {0}");
-        Log("validation.row_data_empty", "{0} row data is empty");
-        Log("validation.field_missing_default", "Missing required field: {0}, using default value '{1}'");
-        Log("validation.field_null_default", "Field is null: {0}, using default value '{1}'");
-        Log("validation.field_empty_string_default", "Field is empty string: {0}, using default value '{1}'");
-        Log("validation.field_must_be_array_default", "Missing required field: {0}, using default value ['{1}']");
-        Log("validation.field_null_array_default", "Field is null: {0}, using default value ['{1}']");
-        Log("validation.field_convert_to_array", "{0} field must be an array, converted to array");
-        Log("validation.array_empty_default", "{0} array is empty, set default value");
-        Log("validation.array_empty_removed", "{0} array is empty, removed");
+            "Missing content type (custom_structures, or build_mode_save)");
 
         // Log - Map Loader
         Log("map_loader.load_error", "Map or map data is null");
@@ -297,10 +260,8 @@ public class EnLangGenerator : ModLangGenBase
         // Log - Error
         Log("error.no_map_file", "Cannot find map.json file: {0}");
         Log("error.no_valid_directories", "No valid Map directories, please check the Maps folder");
-        Log("error.custom_structures_mod_not_loaded",
-            "Map '{0}' requires Custom Structures mod, but the mod is not loaded");
         Log("error.multiple_content_types",
-            "Map '{0}' has multiple content types defined (MapData, Structures, BuildModeSave). Only one type is allowed.");
+            "Map '{0}' has multiple content types defined (Structures, BuildModeSave). Only one type is allowed.");
 
         // Log - Map Load
         Log("map_load.empty_target_path", "Target path cannot be null or empty");

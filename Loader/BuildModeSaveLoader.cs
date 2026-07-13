@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Bark.BetterCCL;
 using Bark.Tool;
-using BepInEx;
 
 namespace CustomMap.Loader;
 
@@ -35,9 +34,13 @@ public static class BuildModeSaveLoader
         }
     }
 
-    private static void Error(string key, params object[] args) =>
+    private static void Error(string key, params object[] args)
+    {
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static string LocaleLog(string key, params object[] args) =>
-        BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    private static string LocaleLog(string key, params object[] args)
+    {
+        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    }
 }

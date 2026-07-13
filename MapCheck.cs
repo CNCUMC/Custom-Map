@@ -14,9 +14,9 @@ public static class MapCheck
     public static readonly List<string> ValidDirectories = [];
     public static readonly List<string> CheckFailDirectories = [];
     public static readonly List<Map> Maps = [];
+    private static bool _initialized;
     public static Map CurrentMap => WorldGenerationPatch.CurrentMap;
     public static bool HasRunningMap => CurrentMap != null;
-    private static bool _initialized;
 
     public static void Initialize()
     {
@@ -26,7 +26,7 @@ public static class MapCheck
     }
 
     /// <summary>
-    /// 重新加载 Maps 文件夹中的所有地�?
+    ///     重新加载 Maps 文件夹中的所有地�?
     /// </summary>
     public static void Reload()
     {
@@ -108,6 +108,8 @@ public static class MapCheck
             : target.DirectoryPath;
     }
 
-    private static void UninitializedWarning(string key) =>
+    private static void UninitializedWarning(string key)
+    {
         Plugin.Logger.LogWarning($"{key}");
+    }
 }

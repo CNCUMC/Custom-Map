@@ -96,7 +96,6 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.help.feature", "管理特性");
         Command("custommap.help.waypoint", "管理路徑點 (list/get)");
         Command("custommap.help.save", "保存當前地圖");
-        Command("custommap.help.save_as", "交互式選取區域並保存為地圖數據");
         Command("custommap.help.level", "切換地圖層級");
         Command("custommap.help.exit", "退出地圖");
 
@@ -113,9 +112,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.spawn", "傳送回出生點{0}中...");
 
         // Command - Map - Waypoint
-        Command("custommap.waypoint.help", "路徑點子命令:\n  " +
-                                           "list - 列出所有路徑點\n  " +
-                                           "get <id或名稱> - 傳送到指定路徑點");
+        Command("custommap.waypoint.help", "路徑點子命令: list, get <id或名稱>");
         Command("custommap.waypoint.list_header", "可用路徑點 ({0}):");
         Command("custommap.waypoint.list_item", "  {0}. {1} - 位置: {2}");
         Command("custommap.waypoint.teleport", "正在傳送到路徑點'{0}'，位置 {1}...");
@@ -161,15 +158,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.save.success", "已將地圖 '{0}' 保存到: {1}");
         Command("custommap.save.failed", "保存地圖 '{0}' 失敗: {1}");
         Command("custommap.save.no_directory", "當前地圖沒有關聯的目錄路徑，無法保存");
-        Command("custommap.save.invalid_position", "無效的位置格式，請使用 Vector2 格式：'x,y' (例如 '86,-11')");
-        Command("custommap.save.area_empty", "指定區域超出世界邊界或為空");
-        Command("custommap.save.area_success", "已保存區域物塊地圖: ({0},{1}) 到 ({2},{3}), 尺寸 {4}x{5}, {6} 種物塊類型 → {7}");
         Command("custommap.save.target_not_found", "目標地圖文件夾 '{0}' 未找到");
-        Command("custommap.save.missing_end_position", "缺少結束位置，請提供兩個位置參數 (例如: fg save 86,-11 2,45)");
-        Command("custommap.save.as.default_description", "區域掃描保存");
-        Command("custommap.save.as.start_position", "請鼠標左鍵點擊選擇起始位置...");
-        Command("custommap.save.as.end_position", "請鼠標左鍵點擊選擇結束位置...");
-        Command("custommap.save.as.confirm", "位置已記錄，再次輸入相同指令以確認保存。");
 
         // Command - Map - Feature
         Command("custommap.feature.unknown_subcommand", "未知的特性子命令：{0}");
@@ -204,9 +193,8 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("world_generation.phase.spawning_build_mode_save", "{0} - 正在生成建築模式存檔...");
         Log("world_generation.phase.applying_settings", "{0} - 正在應用設置...");
         Log("world_generation.loading_start", "開始加載地圖: {0}");
-        Log("world_generation.no_map_data", "地圖 {0} 不包含地圖數據");
         Log("world_generation.no_content_type",
-            "地圖 '{0}' 未定義任何內容類型（MapData、Structures 或 BuildModeSave）");
+            "地圖 '{0}' 未定義任何內容類型（Structures 或 BuildModeSave）");
         Log("world_generation.no_commands", "未啟用任何 {0}");
         Log("world_generation.exited_map", "已退出地圖");
         Log("world_generation.executing_command", "執行 {0}: '{1}'");
@@ -222,30 +210,8 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("world_generation.settings_override_failed", "應用 Settings 覆蓋失敗: {0}");
 
         // Log - Validation
-        Log("validation.map_invalid_type", "map 字段格式不正確");
-        Log("validation.map_missing_field", "地圖缺少必需字段: {0}");
-        Log("validation.map_field_type_error", "地圖 {0} 字段必須是{1}");
-        Log("validation.map_map_empty", "地圖 map 數組不能為空");
-        Log("validation.map_row_not_string", "地圖 map 第 {0} 行必須是字符串");
-        Log("validation.map_item_row_not_array", "地圖 items 第 {0} 行必須是數組");
-        Log("validation.map_item_not_string", "地圖 items[{0}][{1}] 必須是字符串");
-        Log("validation.multiple_content_types", "不能同時使用多種內容類型（map_data、custom_structures、build_mode_save），只能選擇一種");
-        Log("validation.missing_content_type", "缺少內容類型（map_data、custom_structures 或 build_mode_save）");
-        Log("validation.custom_structures_without_mod",
-            "檢測到 custom_structures 字段，但未安裝自定義結構模組（Custom Structures），請先安裝該模組");
-        Log("validation.features_invalid_type", "features 字段必須是數組或對象");
-        Log("validation.features_empty", "features 數組為空，將被忽略");
-        Log("validation.features_element_invalid", "features 第 {0} 個元素格式不正確，已跳過");
-        Log("validation.no_data", "{0} 中沒有 {1} 數據");
-        Log("validation.row_data_empty", "{0} 行數據為空");
-        Log("validation.field_missing_default", "缺少必需字段: {0}，已使用默認值 '{1}'");
-        Log("validation.field_null_default", "字段為空: {0}，已使用默認值 '{1}'");
-        Log("validation.field_empty_string_default", "字段為空字符串: {0}，已使用默認值 '{1}'");
-        Log("validation.field_must_be_array_default", "缺少必需字段: {0}，已使用默認值 ['{1}']");
-        Log("validation.field_null_array_default", "字段為空: {0}，已使用默認值 ['{1}']");
-        Log("validation.field_convert_to_array", "{0} 字段必須是數組，已轉換為數組");
-        Log("validation.array_empty_default", "{0} 數組為空，已設置默認值");
-        Log("validation.array_empty_removed", "{0} 數組為空，已移除");
+        Log("validation.multiple_content_types", "不能同時使用多種內容類型（custom_structures、build_mode_save），只能選擇一種");
+        Log("validation.missing_content_type", "缺少內容類型（custom_structures 或 build_mode_save）");
 
         // Log - Map Loader
         Log("map_loader.load_error", "地圖或地圖數據為空");
@@ -282,9 +248,8 @@ public class ZhTwLangGenerator : ModLangGenBase
         // Log - Error
         Log("error.no_map_file", "找不到 map.json 文件: {0}");
         Log("error.no_valid_directories", "沒有有效的地圖目錄，請檢查 Maps 文件夾");
-        Log("error.custom_structures_mod_not_loaded", "地圖 '{0}' 需要自定義結構模組，但該模組未加載");
         Log("error.multiple_content_types",
-            "地圖 '{0}' 同時定義了多種內容類型（MapData、Structures、BuildModeSave），只允許定義一種");
+            "地圖 '{0}' 同時定義了多種內容類型（Structures、BuildModeSave），只允許定義一種");
 
         // Log - Map Load
         Log("map_load.empty_target_path", "目標路徑不能為空");

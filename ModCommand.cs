@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,6 @@ using CustomMap.Loader;
 using CustomMap.Patch;
 using HarmonyLib;
 using Newtonsoft.Json;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CustomMap;
@@ -863,26 +861,38 @@ public class ModCommand
         PlayerUtil.Tp(map.SpawnPosition);
     }
 
-    private static string LocaleLog(string key, params object[] args) =>
-        BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    private static string LocaleLog(string key, params object[] args)
+    {
+        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+    }
 
-    private static string LocaleOther(string key, params object[] args) =>
-        BetterLocale.GetOther(key, args);
+    private static string LocaleOther(string key, params object[] args)
+    {
+        return BetterLocale.GetOther(key, args);
+    }
 
-    private static string LocaleCommand(string key, params object[] args) =>
-        BetterLocale.GetCommand($"custommap.{key}", args);
+    private static string LocaleCommand(string key, params object[] args)
+    {
+        return BetterLocale.GetCommand($"custommap.{key}", args);
+    }
 
-    private static void Error(string key, params object[] args) =>
+    private static void Error(string key, params object[] args)
+    {
         LogUtil.Error(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static void Warning(string key, params object[] args) =>
+    private static void Warning(string key, params object[] args)
+    {
         LogUtil.Warning(LocaleLog(key, args), Plugin.Logger);
+    }
 
-    private static void InfoCommand(string key, params object[] args) =>
+    private static void InfoCommand(string key, params object[] args)
+    {
         LogUtil.Info(LocaleCommand(key, args), Plugin.Logger);
+    }
 
-    private static void ErrorCommand(string key, params object[] args) =>
+    private static void ErrorCommand(string key, params object[] args)
+    {
         LogUtil.Error(LocaleCommand(key, args), Plugin.Logger);
+    }
 }
-
-

@@ -11,41 +11,57 @@ public static class MapLocale
 {
     private const string MapType = "map";
 
-    public static string GetName(Map map) =>
-        map == null
+    public static string GetName(Map map)
+    {
+        return map == null
             ? string.Empty
             : ReadFromMapLang(map, "name") ?? map.Name ?? string.Empty;
+    }
 
-    public static string GetDescription(Map map) =>
-        map == null
+    public static string GetDescription(Map map)
+    {
+        return map == null
             ? string.Empty
             : ReadFromMapLang(map, "description") ?? map.Description ?? string.Empty;
+    }
 
-    public static string GetAuthor(Map map) =>
-        map?.Authors ?? string.Empty;
+    public static string GetAuthor(Map map)
+    {
+        return map?.Authors ?? string.Empty;
+    }
 
-    public static string GetFormatted(string formatKey, params object[] args) =>
-        BetterLocale.GetOther($"format.{formatKey}", args);
+    public static string GetFormatted(string formatKey, params object[] args)
+    {
+        return BetterLocale.GetOther($"format.{formatKey}", args);
+    }
 
-    public static string GetFormattedNameVersion(Map map) =>
-        map == null
+    public static string GetFormattedNameVersion(Map map)
+    {
+        return map == null
             ? string.Empty
             : $"{GetName(map)} v{map.Version ?? "1.0.0"}";
+    }
 
-    public static string GetFormattedAuthor(Map map) =>
-        map == null
+    public static string GetFormattedAuthor(Map map)
+    {
+        return map == null
             ? string.Empty
             : GetFormatted("author", GetAuthor(map));
+    }
 
-    public static string GetFormattedInfo(Map map) =>
-        map == null
+    public static string GetFormattedInfo(Map map)
+    {
+        return map == null
             ? string.Empty
             : $"{GetFormattedNameVersion(map)}\n{GetFormattedAuthor(map)}";
+    }
 
-    public static string GetFormattedFeatures(Map map) =>
-        map == null
+    public static string GetFormattedFeatures(Map map)
+    {
+        return map == null
             ? string.Empty
             : GetFormatted("features", map.ActiveFeatures);
+    }
 
     public static void SaveToCurrentLang(Map map, string directoryPath = null)
     {

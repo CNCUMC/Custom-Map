@@ -34,8 +34,6 @@ public class Plugin : BaseUnityPlugin
     public static float ProgressUpdateInterval;
     public static string FirstUseMap;
 
-    internal static bool BuildModeLoaded => Chainloader.PluginInfos.ContainsKey("com.alexx_.buildmode");
-
     public static readonly Map TemplateMap = new()
     {
         Name = $"{Name} Template",
@@ -133,6 +131,8 @@ public class Plugin : BaseUnityPlugin
 
     private readonly Harmony _harmony = new(Guid);
 
+    internal static bool BuildModeLoaded => Chainloader.PluginInfos.ContainsKey("com.alexx_.buildmode");
+
     public void Awake()
     {
         Logger = base.Logger;
@@ -143,7 +143,8 @@ public class Plugin : BaseUnityPlugin
 
         BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
         BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
-        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000, v => ProgressUpdateInterval = v);
+        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
+            v => ProgressUpdateInterval = v);
         RegisterMapOption();
 
         BetterLocale.Flush();
@@ -199,6 +200,8 @@ public class Plugin : BaseUnityPlugin
                 : TemplateMap.Id);
     }
 
-    private static void AddMapChoice(List<ModDropdownChoice> choices, string id, string displayName) =>
+    private static void AddMapChoice(List<ModDropdownChoice> choices, string id, string displayName)
+    {
         choices.Add(new ModDropdownChoice(id, displayName));
+    }
 }
