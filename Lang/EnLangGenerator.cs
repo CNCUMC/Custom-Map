@@ -194,10 +194,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("map_check.version_format_warning",
             "Version format '{0}' is incorrect, will use default version '1.0.0'");
         Log("map_check.missing_build_mode_mod", "Map '{0}' requires Build Mode mod but it is not installed");
-        Log("map_check.missing_custom_structures_mod", "Map '{0}' requires Custom Structures mod but it is not installed");
         Log("map_check.requires_mod", "[requires {0}]");
-        Log("map_check.missing_mods_skipped", "Map '{0}' skipped due to missing required mods");
-        Command("custommap.select.missing_mods", "Cannot select map '{0}': requires {1}");
 
         // Log - World Generation
         Log("world_generation.scene_type_set", "Set scene type to: {0}");
@@ -218,7 +215,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.loading_start", "Started loading Map: {0}");
         Log("world_generation.no_map_data", "Map {0} does not contain map data");
         Log("world_generation.no_content_type",
-            "Map '{0}' has no content type defined (MapData, CustomStructures, or BuildModeSave)");
+            "Map '{0}' has no content type defined (MapData, Structures, or BuildModeSave)");
         Log("world_generation.no_commands", "No {0} enabled");
         Log("world_generation.exited_map", "Exited Map");
         Log("world_generation.executing_command", "Executing {0}: {1}");
@@ -303,7 +300,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("error.custom_structures_mod_not_loaded",
             "Map '{0}' requires Custom Structures mod, but the mod is not loaded");
         Log("error.multiple_content_types",
-            "Map '{0}' has multiple content types defined (MapData, CustomStructures, BuildModeSave). Only one type is allowed.");
+            "Map '{0}' has multiple content types defined (MapData, Structures, BuildModeSave). Only one type is allowed.");
 
         // Log - Map Load
         Log("map_load.empty_target_path", "Target path cannot be null or empty");
@@ -336,17 +333,10 @@ public class EnLangGenerator : ModLangGenBase
         // Log - Custom Structures Loader
         Log("custom_structures_loader.loading", "Loading custom structure: {0}");
         Log("custom_structures_loader.failed", "Failed to load custom structure ({0}): {1}");
-        Log("custom_structures_loader.not_found", "{0} not found, reflection failed");
         Log("custom_structures_loader.not_found_custom_structures", "Custom structure file not found");
-        Log("custom_structures_loader.suppress.structure_loader_not_found", "Could not find StructureLoader type");
         Log("custom_structures_loader.suppress.cleared_definitions",
             "Suppressed Custom Structures auto-generation (cleared StructureDefinitions)");
-        Log("custom_structures_loader.suppress.cleared_field",
-            "Suppressed Custom Structures auto-generation (cleared {0})");
-        Log("custom_structures_loader.suppress.no_registry",
-            "Custom Structures mod found but no structure registry to clear");
-        Log("custom_structures_loader.suppress.failed",
-            "Failed to suppress Custom Structures auto-generation: {0}");
+        Log("custom_structures_loader.structure_registry.registered", "Structure '{0}' registered via StructureRegistry");
 
         // Log - Build Mode Save Loader
         Log("build_mode_save_loader.loading",

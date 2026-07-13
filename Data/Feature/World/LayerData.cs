@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace CustomMap.Data.Feature.World;
 
-public class LevelData
+public class LayerData
 {
     [JsonProperty("map_data", NullValueHandling = NullValueHandling.Ignore)]
     public MapData MapData { get; set; }
 
-    [JsonProperty("custom_structures", NullValueHandling = NullValueHandling.Ignore)]
-    public string CustomStructures { get; set; }
+    [JsonProperty("structures", NullValueHandling = NullValueHandling.Ignore)]
+    public List<StructurePlacement> Structures { get; set; } = [];
 
     [JsonProperty("build_mode_save", NullValueHandling = NullValueHandling.Ignore)]
     public string BuildModeSave { get; set; }

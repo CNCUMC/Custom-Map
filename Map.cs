@@ -18,7 +18,7 @@ public class Map
 
     [JsonIgnore] public string DirectoryPath { get; set; }
 
-    [JsonIgnore] public List<LevelData> Levels { get; set; } = [];
+    [JsonIgnore] public List<LayerData> Layers { get; set; } = [];
 
     [JsonIgnore] public WorldSettingsData WorldSettingsData { get; set; } = new();
 
@@ -38,12 +38,12 @@ public class Map
 
     [JsonIgnore] public IList<string> MissingMods { get; } = [];
 
-    [JsonIgnore] public LevelData CurrentLevel => Levels.ElementAtOrDefault(CurrentLevelIndex);
+    [JsonIgnore] public LayerData CurrentLayer => Layers.ElementAtOrDefault(CurrentLevelIndex);
 
-    [JsonIgnore] public Vector2 MapPosition => CurrentLevel is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
+    [JsonIgnore] public Vector2 MapPosition => CurrentLayer is { } l ? new Vector2(l.X, l.Y) : Vector2.zero;
 
     [JsonIgnore]
-    public Vector2 SpawnPosition => CurrentLevel is { Spawn: { Length: >= 2 } s }
+    public Vector2 SpawnPosition => CurrentLayer is { Spawn: { Length: >= 2 } s }
         ? new Vector2(s[0], s[1])
         : Vector2.zero;
 
@@ -52,20 +52,20 @@ public class Map
         ? string.Join(", ", Author)
         : "Unknown";
 
-    [JsonIgnore] public MapData MapData => CurrentLevel?.MapData;
-    [JsonIgnore] public string CustomStructures => CurrentLevel?.CustomStructures;
-    [JsonIgnore] public string BuildModeSave => CurrentLevel?.BuildModeSave;
-    [JsonIgnore] public float[] Spawn => CurrentLevel?.Spawn;
-    [JsonIgnore] public List<ItemData> Items => CurrentLevel?.Items;
-    [JsonIgnore] public List<WaypointData> Waypoints => CurrentLevel?.Waypoints;
-    [JsonIgnore] public int X => CurrentLevel?.X ?? 0;
-    [JsonIgnore] public int Y => CurrentLevel?.Y ?? 0;
+    [JsonIgnore] public MapData MapData => CurrentLayer?.MapData;
+    [JsonIgnore] public List<StructurePlacement> Structures => CurrentLayer?.Structures;
+    [JsonIgnore] public string BuildModeSave => CurrentLayer?.BuildModeSave;
+    [JsonIgnore] public float[] Spawn => CurrentLayer?.Spawn;
+    [JsonIgnore] public List<ItemData> Items => CurrentLayer?.Items;
+    [JsonIgnore] public List<WaypointData> Waypoints => CurrentLayer?.Waypoints;
+    [JsonIgnore] public int X => CurrentLayer?.X ?? 0;
+    [JsonIgnore] public int Y => CurrentLayer?.Y ?? 0;
     [JsonIgnore] public bool SkipTerrain => WorldSettingsData?.SkipTerrain ?? true;
     [JsonIgnore] public bool SkipStructures => WorldSettingsData?.SkipStructures ?? true;
     [JsonIgnore] public bool SkipBackground => WorldSettingsData?.SkipBackground ?? true;
 
     [JsonIgnore]
-    public WorldGeneration.OverrideSceneType Type => CurrentLevel?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
+    public WorldGeneration.OverrideSceneType Type => CurrentLayer?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
 
     [JsonIgnore]
     public string ActiveFeatures

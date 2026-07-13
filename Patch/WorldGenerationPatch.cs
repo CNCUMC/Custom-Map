@@ -246,7 +246,7 @@ public static class WorldGenerationPatch
         }
 
         var hasMapData = map.MapData != null;
-        var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
+        var hasCustomStructures = map.Structures != null && map.Structures.Count > 0;
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
 
         WorldGeneration.world.generatingWorld = false;
@@ -283,12 +283,7 @@ public static class WorldGenerationPatch
 
         if (hasCustomStructures)
         {
-            var hasCustomStructuresMod = Type.GetType(
-                "Custom_Structures.Plugin, Custom Structures") != null;
-            if (hasCustomStructuresMod)
-                CustomStructuresLoader.SpawnCustomStructures(map);
-            else
-                Error("custom_structures_mod_not_loaded", MapLocale.GetName(map));
+            CustomStructuresLoader.SpawnCustomStructures(map);
         }
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);

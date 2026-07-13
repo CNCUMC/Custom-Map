@@ -39,11 +39,6 @@
     </ItemGroup>
 
     <!-- Build Mode -->
-    <ItemGroup>
-        <Reference Include="buildmodBetter">
-            <HintPath>$(BuildModDll)</HintPath>
-        </Reference>
-    </ItemGroup>
     
     <!-- Custom Structures -->
     <ItemGroup>

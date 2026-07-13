@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Bark.BetterCCL;
 using Bark.Tool;
 using BepInEx;
-using BepInEx.Bootstrap;
+using CUCoreLib.Registries;
+using CustomMap.Data.Feature.World;
 using Newtonsoft.Json.Linq;
 
 namespace CustomMap.Loader;
@@ -15,159 +14,85 @@ public static class CustomStructuresLoader
 {
     private const string LocaleKeyPre = "custom_structures_loader.";
 
-    private static readonly Regex V1NameRegex =
-        new("StructureDefinitions\\[\"(.*?)\"\\]", RegexOptions.Compiled);
+    private static readonly Regex StructureFileRegex = new(@"\.ms2\.json$", RegexOptions.IgnoreCase);
 
+    /// <summary>
+    /// 清除所有已注册的结构定义
+    /// </summary>
     public static void SuppressAutoGeneration()
     {
-        try
-        {
-            if (!Chainloader.PluginInfos.TryGetValue("com.Jimmyking.morestructures", out var targetPlugin))
-                return;
-
-            var assembly = targetPlugin.Instance.GetType().Assembly;
-            
-            // StructureDefinitions 在 WorldGenerationPatcher 类中
-            var worldGenPatcherType = assembly.GetType("Custom_Structures.WorldGenerationPatcher");
-            if (worldGenPatcherType == null) return;
-
-            var definitionsField = worldGenPatcherType.GetField("StructureDefinitions",
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-            // 找不到 StructureDefinitions 是正常情况，静默返回
-            if (definitionsField == null) return;
-
-            if (definitionsField.GetValue(null) is not IDictionary { Count: > 0 } dict) return;
-            dict.Clear();
-            Info("suppress.cleared_definitions");
-        }
-        catch (Exception ex)
-        {
-            Warning("suppress.failed", ex.Message);
-        }
+        StructureRegistryHelper.Clear();
     }
 
+    /// <summary>
+    /// 生成地图中的所有自定义结构
+    /// </summary>
     public static void SpawnCustomStructures(Map map)
     {
-        if (map == null || string.IsNullOrEmpty(map.CustomStructures)) return;
+        if (map?.Structures == null || map.Structures.Count == 0) return;
 
         try
         {
-            if (!Chainloader.PluginInfos.TryGetValue("com.Jimmyking.morestructures", out var targetPlugin))
+            var basePath = map.DirectoryPath;
+            if (string.IsNullOrEmpty(basePath))
             {
-                Error("not_found", "Custom Structures mod");
+                Error("not_found_custom_structures");
                 return;
             }
 
-            var customStructuresAssembly = targetPlugin.Instance.GetType().Assembly;
-
-            var basePath = Path.Combine(map.DirectoryPath, map.CustomStructures);
-            var filePath = basePath;
-            if (!File.Exists(filePath))
+            foreach (var placement in map.Structures)
             {
-                filePath = basePath + ".txt";
-                if (!File.Exists(filePath))
+                if (placement == null || string.IsNullOrWhiteSpace(placement.Structure)) continue;
+
+                var structureId = placement.Structure.Trim();
+                var filePath = FindStructureFile(basePath, structureId);
+
+                if (filePath == null)
                 {
-                    filePath = basePath + ".ms.json";
-                    if (!File.Exists(filePath))
-                    {
-                        filePath = basePath + ".ms2.json";
-                        if (!File.Exists(filePath))
-                        {
-                            Error("not_found_custom_structures");
-                            return;
-                        }
-                    }
+                    Error("not_found_custom_structures");
+                    continue;
                 }
+
+                var text = File.ReadAllText(filePath);
+
+                // 注册结构到 CUCoreLib
+                if (!StructureRegistryHelper.RegisterFromJson(structureId, text))
+                {
+                    Error("failed", structureId, "注册失败");
+                    continue;
+                }
+
+                // 放置结构到指定坐标
+                var position = new UnityEngine.Vector2(placement.X, placement.Y);
+                StructureRegistry.Place(structureId, position);
+
+                MoreInfo("loading", structureId);
             }
-
-            var text = File.ReadAllText(filePath);
-            var fileName = Path.GetFileName(filePath);
-            var isV2 = !text.TrimStart().StartsWith("StructureDefinitions");
-
-            var structureLoaderType = customStructuresAssembly.GetType("Custom_Structures.StructureLoader");
-            if (structureLoaderType == null)
-            {
-                Error("not_found", "StructureLoader");
-                return;
-            }
-
-            var parseMethodName = isV2
-                ? "ParseAndRegisterV2"
-                : "ParseAndRegister";
-            var parseMethod = structureLoaderType.GetMethod(
-                parseMethodName,
-                BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (parseMethod == null)
-            {
-                Error("not_found", parseMethodName);
-                return;
-            }
-
-            parseMethod.Invoke(null, [text, fileName]);
-
-            var structName = ExtractStructureName(text, fileName, isV2);
-            if (string.IsNullOrEmpty(structName))
-            {
-                Error("not_found", "structure name");
-                return;
-            }
-
-            var worldGenPatcherType = customStructuresAssembly.GetType("Custom_Structures.WorldGenerationPatcher");
-            if (worldGenPatcherType == null)
-            {
-                Error("not_found", "WorldGenerationPatcher");
-                return;
-            }
-
-            var generateMethod = worldGenPatcherType.GetMethod(
-                "GenerateStructure",
-                BindingFlags.Public | BindingFlags.Static);
-
-            if (generateMethod == null)
-            {
-                Error("not_found", "GenerateStructure");
-                return;
-            }
-
-            var position = map.MapPosition;
-            generateMethod.Invoke(null, [structName, position]);
-
-            MoreInfo("loading", map.CustomStructures);
         }
         catch (Exception e)
         {
-            Error("failed", map, e);
+            Error("failed", map.Name, e);
         }
     }
 
-    private static string ExtractStructureName(string text, string fileName, bool isV2)
+    /// <summary>
+    /// 查找结构文件，自动检测 .ms2.json 扩展名
+    /// </summary>
+    private static string FindStructureFile(string basePath, string structureId)
     {
-        if (isV2)
-        {
-            try
-            {
-                var json = JObject.Parse(text);
-                var name = json["metadata"]?["name"]?.Value<string>();
-                if (!string.IsNullOrWhiteSpace(name))
-                    return name.Trim();
-            }
-            catch
-            {
-                // ignored
-            }
+        // 直接尝试 .ms2.json
+        var path = Path.Combine(basePath, structureId + ".ms2.json");
+        if (File.Exists(path)) return path;
 
-            var nameFromFile = Path.GetFileNameWithoutExtension(fileName);
-            if (nameFromFile.EndsWith(".ms2", StringComparison.OrdinalIgnoreCase))
-                nameFromFile = Path.GetFileNameWithoutExtension(nameFromFile);
-            return nameFromFile;
-        }
+        // 尝试不带扩展名（如果用户已经包含了扩展名）
+        path = Path.Combine(basePath, structureId);
+        if (File.Exists(path)) return path;
 
-        var match = V1NameRegex.Match(text);
-        return match.Success
-            ? match.Groups[1].Value
-            : Path.GetFileNameWithoutExtension(fileName);
+        // 尝试旧版扩展名（兼容性）
+        path = Path.Combine(basePath, structureId + ".ms.json");
+        if (File.Exists(path)) return path;
+
+        return null;
     }
 
     private static void MoreInfo(string key, params object[] args)

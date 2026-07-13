@@ -93,9 +93,14 @@ Custom Map 内置了一个模板地图。在模组设置中启用 **Start Game U
 Maps/
 └── 你的地图名/
     ├── map.json                      # 地图元数据（名称、ID、版本、作者、描述）
-    ├── level/
-    │   ├── level_1.json              # 关卡数据（地图网格、键值表、出生点、物品、坐标点）
-    │   └── level_2.json              # （可选）更多层级
+    ├── layers/
+    │   ├── layer_1
+    │   │   ├── layer.json
+    │   │   ├── 结构文件1.m2.json
+    │   │   └── 结构文件2.m2.json
+    │   └── layer_2
+    │       ├── layer.json
+    │       └── 结构文件3.m2.json
     ├── feature/
     │   ├── world/
     │   │   ├── settings.json         # 世界设置（重力、全亮、跳过标志）
@@ -110,8 +115,6 @@ Maps/
     │       └── xp.json               # XP 倍率设置
     ├── lang/
     │   └── zh-CN.json                # 地图名称/描述本地化
-    ├── AbandonedLab.ms.json          # （可选）Custom Structures 文件
-    └── MyBuild.alexx_BMsave          # （可选）Build Mode 存档文件
 ```
 
 ### map.json

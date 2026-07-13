@@ -152,7 +152,7 @@ public static class MapLoader
         }
 
         var hasMapData = map.MapData != null;
-        var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
+        var hasCustomStructures = map.Structures != null && map.Structures.Count > 0;
 
         switch (hasMapData)
         {

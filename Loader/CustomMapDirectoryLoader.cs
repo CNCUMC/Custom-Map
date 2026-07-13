@@ -30,7 +30,7 @@ public static class CustomMapDirectoryLoader
 
             map.DirectoryPath = directoryPath;
 
-            map.Levels = LoadLevels(directoryPath);
+            map.Layers = LoadLevels(directoryPath);
 
             map.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
@@ -55,7 +55,7 @@ public static class CustomMapDirectoryLoader
         }
     }
 
-    private static List<LevelData> LoadLevels(string directoryPath)
+    private static List<LayerData> LoadLevels(string directoryPath)
     {
         var levelDir = Path.Combine(directoryPath, "level");
         if (!Directory.Exists(levelDir))
@@ -78,11 +78,11 @@ public static class CustomMapDirectoryLoader
         if (levelFiles.Count == 0)
             return [];
 
-        var levels = new List<LevelData>();
+        var levels = new List<LayerData>();
         foreach (var levelFile in levelFiles)
             try
             {
-                var levelData = LoadJsonWithTypeCheck<LevelData>(levelFile, "level");
+                var levelData = LoadJsonWithTypeCheck<LayerData>(levelFile, "level");
                 if (levelData != null)
                     levels.Add(levelData);
             }
@@ -179,7 +179,7 @@ public static class CustomMapDirectoryLoader
         // 恢复原始 Id
         map.Id = originalId;
 
-        if (map.Levels is { Count: > 0 })
+        if (map.Layers is { Count: > 0 })
         {
             var levelDir = Path.Combine(directoryPath, "level");
             Directory.CreateDirectory(levelDir);
@@ -195,10 +195,10 @@ public static class CustomMapDirectoryLoader
                     /* ignore */
                 }
 
-            for (var i = 0; i < map.Levels.Count; i++)
+            for (var i = 0; i < map.Layers.Count; i++)
             {
                 var levelPath = Path.Combine(levelDir, $"level{i + 1}.json");
-                SaveJsonWithTypeCheck(levelPath, map.Levels[i], "level");
+                SaveJsonWithTypeCheck(levelPath, map.Layers[i], "level");
             }
         }
 

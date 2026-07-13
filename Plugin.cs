@@ -17,10 +17,10 @@ using HarmonyLib;
 
 namespace CustomMap;
 
-[BepInDependency("org.cncumc.bark", "1.0.3")]
 [BepInDependency("net.cucorelib", "1.0.2")]
+[BepInDependency("org.cncumc.bark", "1.0.3")]
+[BepInDependency("com.Jimmyking.morestructures", "1.2.1")]
 [BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("com.Jimmyking.morestructures", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(Guid, Name, Version)]
 public class Plugin : BaseUnityPlugin
 {
@@ -36,7 +36,6 @@ public class Plugin : BaseUnityPlugin
     public static string FirstUseMap;
 
     internal static bool BuildModeLoaded => Chainloader.PluginInfos.ContainsKey("com.alexx_.buildmode");
-    internal static bool CustomStructuresLoaded => Chainloader.PluginInfos.ContainsKey("com.Jimmyking.morestructures");
 
     public static readonly Map TemplateMap = new()
     {
@@ -45,9 +44,9 @@ public class Plugin : BaseUnityPlugin
         Version = Version,
         Author = ["Black_Moss"],
         Description = "a map template",
-        Levels =
+        Layers =
         [
-            new LevelData
+            new LayerData
             {
                 X = -68,
                 Y = 62,

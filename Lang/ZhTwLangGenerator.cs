@@ -186,10 +186,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("map_check.author_empty", "作者數組為空，已設置默認值");
         Log("map_check.version_format_warning", "版本格式'{0}'不正確，將使用默認版本'1.0.0'");
         Log("map_check.missing_build_mode_mod", "地圖 '{0}' 需要 Build Mode 模組，但未安裝");
-        Log("map_check.missing_custom_structures_mod", "地圖 '{0}' 需要 Custom Structures 模組，但未安裝");
         Log("map_check.requires_mod", "[需要 {0}]");
-        Log("map_check.missing_mods_skipped", "地圖 '{0}' 因缺少所需模組已被跳過");
-        Command("custommap.select.missing_mods", "無法選擇地圖 '{0}'：需要安裝 {1}");
 
         // Log - World Generation
         Log("world_generation.scene_type_set", "設置場景類型為: {0}");
@@ -209,7 +206,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("world_generation.loading_start", "開始加載地圖: {0}");
         Log("world_generation.no_map_data", "地圖 {0} 不包含地圖數據");
         Log("world_generation.no_content_type",
-            "地圖 '{0}' 未定義任何內容類型（MapData、CustomStructures 或 BuildModeSave）");
+            "地圖 '{0}' 未定義任何內容類型（MapData、Structures 或 BuildModeSave）");
         Log("world_generation.no_commands", "未啟用任何 {0}");
         Log("world_generation.exited_map", "已退出地圖");
         Log("world_generation.executing_command", "執行 {0}: '{1}'");
@@ -287,7 +284,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("error.no_valid_directories", "沒有有效的地圖目錄，請檢查 Maps 文件夾");
         Log("error.custom_structures_mod_not_loaded", "地圖 '{0}' 需要自定義結構模組，但該模組未加載");
         Log("error.multiple_content_types",
-            "地圖 '{0}' 同時定義了多種內容類型（MapData、CustomStructures、BuildModeSave），只允許定義一種");
+            "地圖 '{0}' 同時定義了多種內容類型（MapData、Structures、BuildModeSave），只允許定義一種");
 
         // Log - Map Load
         Log("map_load.empty_target_path", "目標路徑不能為空");
@@ -319,13 +316,9 @@ public class ZhTwLangGenerator : ModLangGenBase
         // Log - Custom Structures Loader
         Log("custom_structures_loader.loading", "正在加載自定義結構: {0}");
         Log("custom_structures_loader.failed", "加載自定義結構({0})失敗: {1}");
-        Log("custom_structures_loader.not_found", "未找到 {0}, 反射失敗");
         Log("custom_structures_loader.not_found_custom_structures", "未找到自定義結構文件");
-        Log("custom_structures_loader.suppress.structure_loader_not_found", "未找到 StructureLoader 類型");
         Log("custom_structures_loader.suppress.cleared_definitions", "已清除自定義結構註冊表（StructureDefinitions），已抑制自動生成");
-        Log("custom_structures_loader.suppress.cleared_field", "已清除 {0}，已抑制 Custom Structures 自動生成");
-        Log("custom_structures_loader.suppress.no_registry", "找到 Custom Structures 模組但無可清除的結構註冊表");
-        Log("custom_structures_loader.suppress.failed", "抑制 Custom Structures 自動生成失敗: {0}");
+        Log("custom_structures_loader.structure_registry.registered", "結構 '{0}' 已通過 StructureRegistry 註冊");
 
         // Log - Build Mode Save Loader
         Log("build_mode_save_loader.loading", "正在加載 Build Mode 存檔: {0} (方塊: {1}, 液體: {2}, 背景: {3})");

@@ -92,18 +92,11 @@ public static class MapCheck
 
         var missingMods = map.MissingMods;
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
-        var hasCustomStructures = !string.IsNullOrEmpty(map.CustomStructures);
 
         if (hasBuildModeSave && !Plugin.BuildModeLoaded)
         {
             missingMods.Add("Build Mode");
             Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", map.Name));
-        }
-
-        if (hasCustomStructures && !Plugin.CustomStructuresLoaded)
-        {
-            missingMods.Add("Custom Structures");
-            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_custom_structures_mod", map.Name));
         }
     }
 

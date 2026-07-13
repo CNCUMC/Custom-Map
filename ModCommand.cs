@@ -540,26 +540,26 @@ public class ModCommand
         var keyDict = new Dictionary<string, object>();
         for (var i = 0; i < uniqueBlockIds.Count; i++) keyDict[EncodeBlockIndex(i)] = (long)uniqueBlockIds[i];
 
-        var newLevel = map.CurrentLevel != null
-            ? new LevelData
+        var newLevel = map.CurrentLayer != null
+            ? new LayerData
             {
-                X = map.CurrentLevel.X,
-                Y = map.CurrentLevel.Y,
-                Spawn = map.CurrentLevel.Spawn,
+                X = map.CurrentLayer.X,
+                Y = map.CurrentLayer.Y,
+                Spawn = map.CurrentLayer.Spawn,
                 MapData = new MapData { Map = mapRows, Key = keyDict },
-                CustomStructures = null,
+                Structures = [],
                 BuildModeSave = null,
-                SceneType = map.CurrentLevel.SceneType,
-                Items = map.CurrentLevel.Items
+                SceneType = map.CurrentLayer.SceneType,
+                Items = map.CurrentLayer.Items
             }
-            : new LevelData
+            : new LayerData
             {
                 X = cMinX,
                 Y = cMinY,
                 MapData = new MapData { Map = mapRows, Key = keyDict }
             };
 
-        map.Levels = [newLevel];
+        map.Layers = [newLevel];
 
         CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
         MapLocale.SaveToCurrentLang(map, directoryPath);
@@ -578,7 +578,7 @@ public class ModCommand
             return;
         }
 
-        var totalLevels = map.Levels.Count;
+        var totalLevels = map.Layers.Count;
         if (totalLevels == 0)
         {
             ErrorCommand("level.no_levels");
@@ -1005,13 +1005,6 @@ public class ModCommand
         if (map == null)
         {
             InfoCommand("select.not_found", key);
-            return;
-        }
-
-        // 检查地图是否有缺失的模组
-        if (map.MissingMods.Count > 0)
-        {
-            ErrorCommand("select.missing_mods", MapLocale.GetName(map), string.Join(", ", map.MissingMods));
             return;
         }
 
