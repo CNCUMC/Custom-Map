@@ -57,9 +57,9 @@ public class Map
     [JsonIgnore] public List<WaypointData> Waypoints => CurrentLayer?.Waypoints;
     [JsonIgnore] public int X => CurrentLayer?.X ?? 0;
     [JsonIgnore] public int Y => CurrentLayer?.Y ?? 0;
-    [JsonIgnore] public bool SkipTerrain => WorldSettingsData?.SkipTerrain ?? true;
-    [JsonIgnore] public bool SkipStructures => WorldSettingsData?.SkipStructures ?? true;
-    [JsonIgnore] public bool SkipBackground => WorldSettingsData?.SkipBackground ?? true;
+    [JsonIgnore] public bool SkipTerrain => CurrentLayer?.SkipTerrain ?? true;
+    [JsonIgnore] public bool SkipStructures => CurrentLayer?.SkipStructures ?? true;
+    [JsonIgnore] public bool SkipBackground => CurrentLayer?.SkipBackground ?? true;
 
     [JsonIgnore]
     public WorldGeneration.OverrideSceneType Type => CurrentLayer?.SceneType ?? WorldGeneration.OverrideSceneType.Debug;
@@ -74,8 +74,8 @@ public class Map
             if (WorldSettingsData?.FullBright == true)
                 items.Add("full_bright");
 
-            if (WorldSettingsData?.Forgivinglayer == true)
-                items.Add("forgiving_layer");
+            if (WorldSettingsData?.ForgivingLevel == true)
+                items.Add("forgiving_level");
 
             if (!Mathf.Approximately(WorldSettingsData?.Gravity ?? Physics2D.gravity.y, Physics2D.gravity.y))
                 items.Add($"gravity={WorldSettingsData?.Gravity}");

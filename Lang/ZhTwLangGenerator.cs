@@ -210,8 +210,8 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("world_generation.settings_override_failed", "應用 Settings 覆蓋失敗: {0}");
 
         // Log - Validation
-        Log("validation.multiple_content_types", "不能同時使用多種內容類型（custom_structures、build_mode_save），只能選擇一種");
-        Log("validation.missing_content_type", "缺少內容類型（custom_structures 或 build_mode_save）");
+        Log("validation.multiple_content_types", "不能同時使用多種內容類型（Structures、BuildModeSave），只能選擇一種");
+        Log("validation.missing_content_type", "缺少內容類型（Structures 或 BuildModeSave）");
 
         // Log - Map Loader
         Log("map_loader.load_error", "地圖或地圖數據為空");

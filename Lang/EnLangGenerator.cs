@@ -297,7 +297,8 @@ public class EnLangGenerator : ModLangGenBase
         Log("custom_structures_loader.not_found_custom_structures", "Custom structure file not found");
         Log("custom_structures_loader.suppress.cleared_definitions",
             "Suppressed Custom Structures auto-generation (cleared StructureDefinitions)");
-        Log("custom_structures_loader.structure_registry.registered", "Structure '{0}' registered via StructureRegistry");
+        Log("custom_structures_loader.structure_registry.registered",
+            "Structure '{0}' registered via StructureRegistry");
 
         // Log - Build Mode Save Loader
         Log("build_mode_save_loader.loading",

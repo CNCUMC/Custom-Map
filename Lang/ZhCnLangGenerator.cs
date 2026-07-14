@@ -210,8 +210,8 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("world_generation.settings_override_failed", "应用 Settings 覆盖失败: {0}");
 
         // Log - Validation
-        Log("validation.multiple_content_types", "不能同时使用多种内容类型（custom_structures、build_mode_save），只能选择一种");
-        Log("validation.missing_content_type", "缺少内容类型（custom_structures 或 build_mode_save）");
+        Log("validation.multiple_content_types", "不能同时使用多种内容类型（Structures、BuildModeSave），只能选择一种");
+        Log("validation.missing_content_type", "缺少内容类型（Structures 或 BuildModeSave）");
 
         // Log - Map Loader
         Log("map_loader.load_error", "地图或地图数据为空");
@@ -251,7 +251,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_load.deserialize_null", "文件 '{0}' 反序列化失败（返回 null），将创建默认配置");
         Log("map_load.invalid_json", "文件 '{0}' JSON 格式无效: {1}");
         Log("map_load.no_folder_name", "无法从路径 '{0}' 解析有效的文件夹名称");
-        
+
         // Log - Error
         Log("error.no_map_file", "找不到 map.json 文件: {0}");
         Log("error.no_valid_directories", "没有有效的地图目录，请检查 Maps 文件夹");

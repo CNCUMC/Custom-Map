@@ -122,7 +122,7 @@ public static class WorldGenerationPatch
         var settings = CurrentMap?.WorldSettingsData;
         if (settings == null) return;
 
-        if (settings.Forgivinglayer)
+        if (settings.ForgivingLevel)
         {
             var mapBottom = -WorldGeneration.halfHeight + 10;
             var mapTop = WorldGeneration.halfHeight - 10;
@@ -214,12 +214,9 @@ public static class WorldGenerationPatch
             return false;
         }
 
-        if (ExitTargetScene.HasValue)
-        {
-            ExitTargetScene = null;
-            Info("exited_map");
-            return true;
-        }
+        if (!ExitTargetScene.HasValue) return true;
+        ExitTargetScene = null;
+        Info("exited_map");
 
         return true;
     }
@@ -313,7 +310,7 @@ public static class WorldGenerationPatch
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
         _coverText = textGo.AddComponent<TextMeshProUGUI>();
-        _coverText.font = TextUtil.TMPUnifont;
+        _coverText.font = TextUtil.UnifontTMP;
         _coverText.alignment = TextAlignmentOptions.Center;
         _coverText.fontSize = 36;
         _coverText.color = Color.white;

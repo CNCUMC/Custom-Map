@@ -24,6 +24,9 @@ public class LayerData
     [JsonProperty("y")] public int Y { get; set; }
     [JsonProperty("waypoints")] public List<WaypointData> Waypoints { get; set; } = [];
     [JsonProperty("items")] public List<ItemData> Items { get; set; } = [];
+    [JsonProperty("skip_terrain")] public bool SkipTerrain { get; set; } = true;
+    [JsonProperty("skip_structures")] public bool SkipStructures { get; set; } = true;
+    [JsonProperty("skip_background")] public bool SkipBackground { get; set; } = true;
 
     [JsonIgnore]
     public Vector2 SpawnPosition => Spawn is { Length: >= 2 } ? new Vector2(Spawn[0], Spawn[1]) : Vector2.zero;

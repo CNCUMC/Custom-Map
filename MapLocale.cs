@@ -17,6 +17,27 @@ public static class MapLocale
         return ReadFromMapLang(map, "name") ?? map.Id ?? string.Empty;
     }
 
+    public static string GetNameForLang(Map map, string lang)
+    {
+        if (map == null) return string.Empty;
+        return ReadFromMapLangForLang(map, "name", lang) ?? map.Id ?? string.Empty;
+    }
+
+    public static string GetDisplayName(Map map)
+    {
+        if (map == null) return string.Empty;
+        var currentLang = PlayerPrefs.GetString("locale", "EN");
+        var name = ReadFromMapLangForLang(map, "name", currentLang);
+        if (!string.IsNullOrEmpty(name)) return name;
+        if (currentLang != "EN")
+        {
+            name = ReadFromMapLangForLang(map, "name", "EN");
+            if (!string.IsNullOrEmpty(name)) return name;
+        }
+
+        return map.Id ?? string.Empty;
+    }
+
     public static string GetDescription(Map map)
     {
         return map == null
@@ -112,10 +133,8 @@ public static class MapLocale
                 langJson[MapType] = mapObj;
             }
 
-            if (mapObj["name"] == null)
-                mapObj["name"] = name;
-            if (mapObj["description"] == null)
-                mapObj["description"] = desc;
+            mapObj["name"] ??= name;
+            mapObj["description"] ??= desc;
 
             var jsonContent = JsonConvert.SerializeObject(langJson, Formatting.Indented);
             File.WriteAllText(langFile, jsonContent + Environment.NewLine);
@@ -134,7 +153,22 @@ public static class MapLocale
                 return null;
 
             var currentLang = PlayerPrefs.GetString("locale", "EN");
-            var langFile = Path.Combine(map.DirectoryPath, "lang", $"{currentLang}.json");
+            return ReadFromMapLangForLang(map, key, currentLang);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string ReadFromMapLangForLang(Map map, string key, string lang)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(map.DirectoryPath))
+                return null;
+
+            var langFile = Path.Combine(map.DirectoryPath, "lang", $"{lang}.json");
 
             if (!File.Exists(langFile))
                 return null;

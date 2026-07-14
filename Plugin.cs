@@ -43,8 +43,10 @@ public class Plugin : BaseUnityPlugin
         [
             new LayerData
             {
+                SceneType = WorldGeneration.OverrideSceneType.Debug,
                 X = -68,
                 Y = 62,
+                SkipBackground = false,
                 Items =
                 [
                     new ItemData
@@ -120,10 +122,6 @@ public class Plugin : BaseUnityPlugin
             StrXp = 999,
             ResXp = 999,
             IntXp = 999
-        },
-        WorldSettingsData = new WorldSettingsData
-        {
-            SkipBackground = false
         }
     };
 
@@ -156,10 +154,15 @@ public class Plugin : BaseUnityPlugin
     private static void RegisterMapOption()
     {
         var choices = new List<ModDropdownChoice>();
-        var templateDisplayName = $"{Name} Template";
-        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{TemplateMap.Id}", templateDisplayName);
-        AddMapChoice(choices, TemplateMap.Id, templateDisplayName);
         var mapsDir = MapCheck.MapsPath;
+
+        // Add TemplateMap - register English default and use localized name
+        var templateKey = $"custommap.custommap.first_use_map{TemplateMap.Id}";
+        BetterLocale.SetDefault("EN", "option", templateKey, $"{Name} Template");
+        BetterLocale.Flush();
+        var templateDisplayName = BetterLocale.GetOther(templateKey);
+        AddMapChoice(choices, TemplateMap.Id, templateDisplayName);
+
         Logger.LogInfo($"Maps directory: '{mapsDir}'");
         try
         {
@@ -173,18 +176,23 @@ public class Plugin : BaseUnityPlugin
                         var map = CustomMapDirectoryLoader.LoadFromDirectory(dir);
                         if (map == null) continue;
 
+                        // Skip if this map has the same Id as TemplateMap to avoid duplicates
+                        if (map.Id == TemplateMap.Id) continue;
+
                         MapCheck.DetectMissingMods(map);
 
-                        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", MapLocale.GetName(map));
-                        AddMapChoice(choices, map.Id, MapLocale.GetName(map));
+                        // Register English default and use localized name
+                        var key = $"custommap.custommap.first_use_map{map.Id}";
+                        BetterLocale.SetDefault("EN", "option", key, MapLocale.GetDisplayName(map));
+                        BetterLocale.Flush();
+                        var displayName = BetterLocale.GetOther(key);
+                        AddMapChoice(choices, map.Id, displayName);
                     }
                     catch
                     {
                         // ignored
                     }
                 }
-
-            BetterLocale.Flush();
         }
         catch (Exception ex)
         {

@@ -124,10 +124,15 @@ public class ModCommand
                     PrintHelp();
                     break;
                 case "reload":
-                    if (!EnsureWorldLoaded()) return;
                     CheckArg(args, 1);
-                    MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
-                    MapLoader.ReloadMap(MapCheck.CurrentMap);
+                    MapCheck.Reload();
+                    if (HasWorldLoaded() && MapCheck.CurrentMap != null)
+                    {
+                        MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
+                        MapLoader.ReloadMap(MapCheck.CurrentMap);
+                    }
+
+                    InfoCommand("reload.success");
                     break;
                 case "load":
                     CheckArg(args, 1);

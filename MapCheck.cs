@@ -25,9 +25,6 @@ public static class MapCheck
         LoadMapDirectories();
     }
 
-    /// <summary>
-    ///     重新加载 Maps 文件夹中的所有地�?
-    /// </summary>
     public static void Reload()
     {
         _initialized = false;
@@ -93,11 +90,9 @@ public static class MapCheck
         var missingMods = map.MissingMods;
         var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
 
-        if (hasBuildModeSave && !Plugin.BuildModeLoaded)
-        {
-            missingMods.Add("Build Mode");
-            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", MapLocale.GetName(map)));
-        }
+        if (!hasBuildModeSave || Plugin.BuildModeLoaded) return;
+        missingMods.Add("Build Mode");
+        Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", MapLocale.GetName(map)));
     }
 
     public static string GetMapPath(Map map = null)
