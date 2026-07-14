@@ -36,11 +36,9 @@ public class Plugin : BaseUnityPlugin
 
     public static readonly Map TemplateMap = new()
     {
-        Name = $"{Name} Template",
         Id = "template",
         Version = Version,
         Author = ["Black_Moss"],
-        Description = "a map template",
         Layers =
         [
             new LayerData
@@ -158,8 +156,9 @@ public class Plugin : BaseUnityPlugin
     private static void RegisterMapOption()
     {
         var choices = new List<ModDropdownChoice>();
-        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{TemplateMap.Id}", TemplateMap.Name);
-        AddMapChoice(choices, TemplateMap.Id, MapLocale.GetName(TemplateMap));
+        var templateDisplayName = $"{Name} Template";
+        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{TemplateMap.Id}", templateDisplayName);
+        AddMapChoice(choices, TemplateMap.Id, templateDisplayName);
         var mapsDir = MapCheck.MapsPath;
         Logger.LogInfo($"Maps directory: '{mapsDir}'");
         try
@@ -176,7 +175,7 @@ public class Plugin : BaseUnityPlugin
 
                         MapCheck.DetectMissingMods(map);
 
-                        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", map.Name);
+                        BetterLocale.SetDefault("EN", "option", $"custommap.custommap.first_use_map{map.Id}", MapLocale.GetName(map));
                         AddMapChoice(choices, map.Id, MapLocale.GetName(map));
                     }
                     catch

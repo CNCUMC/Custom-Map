@@ -373,11 +373,9 @@ public class ModCommand
         if (!string.IsNullOrWhiteSpace(folderName))
             return new Map
             {
-                Name = folderName,
                 Id = folderName.ToLowerInvariant(),
                 Version = "1.0.0",
                 Author = ["Unknown"],
-                Description = LocaleCommand("save.as.default_description"),
                 DirectoryPath = targetPath
             };
         Warning("map_load.no_folder_name", targetPath);
@@ -804,7 +802,7 @@ public class ModCommand
             map = MapCheck.Maps.Find(f =>
                 f != null &&
                 (f.Id?.Equals(key, StringComparison.OrdinalIgnoreCase) == true ||
-                 f.Name?.Equals(key, StringComparison.OrdinalIgnoreCase) == true));
+                 MapLocale.GetName(f)?.Equals(key, StringComparison.OrdinalIgnoreCase) == true));
         }
 
         if (map == null)

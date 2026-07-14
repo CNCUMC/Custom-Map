@@ -10,11 +10,9 @@ namespace CustomMap;
 
 public class Map
 {
-    [JsonProperty("name")] public string Name { get; set; }
     [JsonProperty("id")] public string Id { get; set; }
     [JsonProperty("version")] public string Version { get; set; }
     [JsonProperty("author")] public List<string> Author { get; set; }
-    [JsonProperty("description")] public string Description { get; set; }
 
     [JsonIgnore] public string DirectoryPath { get; set; }
 

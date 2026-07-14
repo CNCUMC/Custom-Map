@@ -96,7 +96,7 @@ public static class MapCheck
         if (hasBuildModeSave && !Plugin.BuildModeLoaded)
         {
             missingMods.Add("Build Mode");
-            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", map.Name));
+            Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", MapLocale.GetName(map)));
         }
     }
 

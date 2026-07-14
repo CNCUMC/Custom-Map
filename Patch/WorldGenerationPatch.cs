@@ -33,7 +33,7 @@ public static class WorldGenerationPatch
     {
         WorldGeneration = __instance;
 
-        if (MapCheck.HasRunningMap)
+        if (MapCheck.HasRunningMap && !ExitTargetScene.HasValue)
         {
             CurrentMap = MapCheck.CurrentMap;
             return;
@@ -50,7 +50,7 @@ public static class WorldGenerationPatch
             map = MapCheck.Maps.FirstOrDefault(f =>
                 f != null &&
                 (f.Id?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true ||
-                 f.Name?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
+                 MapLocale.GetName(f)?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
 
             if (map != null)
                 Info("start_game_map", MapLocale.GetName(map), map.Id);
@@ -64,7 +64,7 @@ public static class WorldGenerationPatch
         {
             CurrentMap = map;
             Plugin.Logger.LogInfo(
-                $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{map.Name}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
+                $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{MapLocale.GetName(map)}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
         }
         else
         {
@@ -288,7 +288,7 @@ public static class WorldGenerationPatch
     private static void UpdateCoverText()
     {
         if (!_coverText || CurrentMap == null) return;
-        _coverText.text = $"{CurrentMap.Name}\nLoading...";
+        _coverText.text = $"{MapLocale.GetName(CurrentMap)}\nLoading...";
     }
 
     private static void CreateLoadingCover()

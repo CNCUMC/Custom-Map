@@ -47,14 +47,14 @@ public static class CustomStructuresLoader
 
                 var text = File.ReadAllText(filePath);
 
-                // 注册结构�?CUCoreLib
+                // 注册结构到 CUCoreLib
                 if (!StructureRegistryHelper.RegisterFromJson(structureId, text))
                 {
                     Error("failed", structureId, "注册失败");
                     continue;
                 }
 
-                // 放置结构到指定坐�?
+                // 放置结构到指定坐标
                 var position = new Vector2(placement.X, placement.Y);
                 StructureRegistry.Place(structureId, position);
 
@@ -63,7 +63,7 @@ public static class CustomStructuresLoader
         }
         catch (Exception e)
         {
-            Error("failed", map.Name, e);
+            Error("failed", MapLocale.GetName(map), e);
         }
     }
 
@@ -73,7 +73,11 @@ public static class CustomStructuresLoader
         var path = Path.Combine(basePath, structureId + ".ms2.json");
         if (File.Exists(path)) return path;
 
-        // 尝试不带扩展名（如果用户已经包含了扩展名�?
+        // 尝试 layers 子目录
+        path = Path.Combine(basePath, "layers", structureId + ".ms2.json");
+        if (File.Exists(path)) return path;
+
+        // 尝试不带扩展名（如果用户已经包含了扩展名）
         path = Path.Combine(basePath, structureId);
         if (File.Exists(path)) return path;
 

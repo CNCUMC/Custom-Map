@@ -13,16 +13,15 @@ public static class MapLocale
 
     public static string GetName(Map map)
     {
-        return map == null
-            ? string.Empty
-            : ReadFromMapLang(map, "name") ?? map.Name ?? string.Empty;
+        if (map == null) return string.Empty;
+        return ReadFromMapLang(map, "name") ?? map.Id ?? string.Empty;
     }
 
     public static string GetDescription(Map map)
     {
         return map == null
             ? string.Empty
-            : ReadFromMapLang(map, "description") ?? map.Description ?? string.Empty;
+            : ReadFromMapLang(map, "description") ?? string.Empty;
     }
 
     public static string GetAuthor(Map map)
@@ -75,8 +74,10 @@ public static class MapLocale
             return;
         }
 
+        var name = GetName(map);
+        var desc = GetDescription(map);
         Plugin.Logger?.LogInfo(
-            $"[MapLocale.Debug] SaveToCurrentLang start: saveDir={saveDir}, Name={map.Name}, Desc={map.Description}");
+            $"[MapLocale.Debug] SaveToCurrentLang start: saveDir={saveDir}, Name={name}, Desc={desc}");
 
         try
         {
@@ -111,10 +112,10 @@ public static class MapLocale
                 langJson[MapType] = mapObj;
             }
 
-            if (!string.IsNullOrEmpty(map.Name))
-                mapObj["name"] = map.Name;
-            if (!string.IsNullOrEmpty(map.Description))
-                mapObj["description"] = map.Description;
+            if (mapObj["name"] == null)
+                mapObj["name"] = name;
+            if (mapObj["description"] == null)
+                mapObj["description"] = desc;
 
             var jsonContent = JsonConvert.SerializeObject(langJson, Formatting.Indented);
             File.WriteAllText(langFile, jsonContent + Environment.NewLine);

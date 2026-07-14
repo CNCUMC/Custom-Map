@@ -36,7 +36,7 @@ public static class CustomMapDirectoryLoader
 
         try
         {
-            var map = LoadJsonWithTypeCheck<Map>(MapJsonPath, "Map");
+            var map = LoadJsonWithTypeCheck<Map>(MapJsonPath, "map");
             if (map == null)
                 return null;
 
@@ -73,11 +73,11 @@ public static class CustomMapDirectoryLoader
         if (!Directory.Exists(layersDir))
             return [];
 
-        var layerFiles = Directory.GetFiles(layersDir, "layer_*.json")
+        var layerFiles = Directory.GetFiles(layersDir, "layer*.json")
             .Select(f =>
             {
                 var name = Path.GetFileNameWithoutExtension(f);
-                var numStr = name.Substring("layer_".Length);
+                var numStr = name.Substring("layer".Length);
                 var num = int.TryParse(numStr, out var n)
                     ? n
                     : int.MaxValue;
@@ -174,7 +174,7 @@ public static class CustomMapDirectoryLoader
 
         var MapJsonPath = Path.Combine(directoryPath, "map.json");
 
-        SaveJsonWithTypeCheck(MapJsonPath, map, "Map");
+        SaveJsonWithTypeCheck(MapJsonPath, map, "map");
 
         // 恢复原始 Id
         map.Id = originalId;
@@ -219,9 +219,9 @@ public static class CustomMapDirectoryLoader
             SaveFeatureFileToDisk(directoryPath, "player", "xp.json", map.XpData, "feature.player.xp");
 
         Plugin.Logger?.LogInfo(
-            $"[CustomMapDirectoryLoader.Debug] SaveToDirectory calling SaveToCurrentLang: dir={directoryPath}, Name={map.Name}, Id={map.Id}");
+            $"[CustomMapDirectoryLoader.Debug] SaveToDirectory calling SaveToCurrentLang: dir={directoryPath}, Name={MapLocale.GetName(map)}, Id={map.Id}");
 
-        // �?name/description/author 写入当前语言�?lang 文件
+        // name/description/author 写入当前语言 lang 文件
         MapLocale.SaveToCurrentLang(map, directoryPath);
 
         Plugin.Logger?.LogInfo(

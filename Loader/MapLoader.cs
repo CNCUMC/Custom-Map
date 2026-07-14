@@ -109,7 +109,7 @@ public static class MapLoader
 
             WorldGenerationPatch.CurrentMap = reloadedMap;
 
-            MoreLogs("map_reloaded_from_disk", reloadedMap.Name);
+            MoreLogs("map_reloaded_from_disk", MapLocale.GetName(reloadedMap));
         }
         catch (Exception ex)
         {
@@ -215,6 +215,7 @@ public static class MapLoader
     internal static void PickItems(Map map)
     {
         var items = map.Items;
+        if (items == null) return;
         foreach (var item in items) PlayerUtil.PickItem(item.Id, item.Slot, item.Force);
     }
 
