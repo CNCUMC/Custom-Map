@@ -88,6 +88,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Command("custommap.help.help", "顯示此幫助信息");
         Command("custommap.help.reload", "重新加載當前地圖");
         Command("custommap.help.load", "重新加載 Maps 文件夾");
+        Command("custommap.help.savereload", "保存並重新加載當前地圖");
         Command("custommap.load.success", "地圖重新加載成功");
         Command("custommap.help.info", "顯示地圖信息");
         Command("custommap.help.spawn", "傳送回出生點");
@@ -194,7 +195,7 @@ public class ZhTwLangGenerator : ModLangGenBase
         Log("world_generation.phase.applying_settings", "{0} - 正在應用設置...");
         Log("world_generation.loading_start", "開始加載地圖: {0}");
         Log("world_generation.no_content_type",
-            "地圖 '{0}' 未定義任何內容類型（Structures 或 BuildModeSave）");
+            "地圖 '{0}' 未定義任何內容類型（Structures、BuildModeSave 或 Items）");
         Log("world_generation.no_commands", "未啟用任何 {0}");
         Log("world_generation.exited_map", "已退出地圖");
         Log("world_generation.executing_command", "執行 {0}: '{1}'");

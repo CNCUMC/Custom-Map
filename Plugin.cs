@@ -163,7 +163,7 @@ public class Plugin : BaseUnityPlugin
         var templateDisplayName = BetterLocale.GetOther(templateKey);
         AddMapChoice(choices, TemplateMap.Id, templateDisplayName);
 
-        Logger.LogInfo($"Maps directory: '{mapsDir}'");
+        Logger.LogMessage($"Maps: '{mapsDir}'");
         try
         {
             if (Directory.Exists(mapsDir))

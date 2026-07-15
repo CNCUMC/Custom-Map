@@ -37,6 +37,7 @@ public class ModCommand
                         "help",
                         "reload",
                         "load",
+                        "savereload",
                         "info",
                         "spawn",
                         "select",
@@ -131,13 +132,15 @@ public class ModCommand
                         MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
                         MapLoader.ReloadMap(MapCheck.CurrentMap);
                     }
-
                     InfoCommand("reload.success");
                     break;
                 case "load":
                     CheckArg(args, 1);
                     MapCheck.Reload();
                     InfoCommand("load.success");
+                    break;
+                case "savereload":
+                    HandleSaveReload();
                     break;
                 case "info":
                     if (!EnsureWorldLoaded()) return;
@@ -180,6 +183,33 @@ public class ModCommand
                     HandleExit(args);
                     break;
             }
+    }
+
+    private static void HandleSaveReload()
+    {
+        if (!EnsureWorldLoaded()) return;
+
+        var map = MapCheck.CurrentMap;
+        if (map == null)
+        {
+            Error("no_map");
+            return;
+        }
+
+        var directoryPath = map.DirectoryPath;
+        if (string.IsNullOrEmpty(directoryPath))
+        {
+            ErrorCommand("save.no_directory");
+            return;
+        }
+
+        CustomMapDirectoryLoader.SaveToDirectory(map, directoryPath);
+        MapLocale.SaveToCurrentLang(map, directoryPath);
+        InfoCommand("save.success", MapLocale.GetName(map), directoryPath);
+
+        MapLoader.ReloadMapFromDisk(map);
+        MapLoader.ReloadMap(map);
+        InfoCommand("reload.success");
     }
 
     private static void HandleWaypoint(string[] args)
@@ -837,6 +867,8 @@ public class ModCommand
         {
             ("help", LocaleCommand("help.help")),
             ("reload", LocaleCommand("help.reload")),
+            ("load", LocaleCommand("help.load")),
+            ("savereload", LocaleCommand("help.savereload")),
             ("info", LocaleCommand("help.info")),
             ("spawn", LocaleCommand("help.spawn")),
             ("select", LocaleCommand("help.select")),

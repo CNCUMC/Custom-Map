@@ -91,6 +91,7 @@ public class EnLangGenerator : ModLangGenBase
         Command("custommap.help.help", "Show this help message");
         Command("custommap.help.reload", "Reload current map");
         Command("custommap.help.load", "Reload Maps folder");
+        Command("custommap.help.savereload", "Save and reload current map");
         Command("custommap.load.success", "Maps reloaded successfully");
         Command("custommap.help.info", "Show map info");
         Command("custommap.help.spawn", "Teleport to spawn");
@@ -200,7 +201,7 @@ public class EnLangGenerator : ModLangGenBase
         Log("world_generation.phase.applying_settings", "{0} - Applying settings...");
         Log("world_generation.loading_start", "Started loading Map: {0}");
         Log("world_generation.no_content_type",
-            "Map '{0}' has no content type defined (Structures, or BuildModeSave)");
+            "Map '{0}' has no content type defined (Structures, BuildModeSave, or Items)");
         Log("world_generation.no_commands", "No {0} enabled");
         Log("world_generation.exited_map", "Exited Map");
         Log("world_generation.executing_command", "Executing {0}: {1}");
@@ -219,9 +220,9 @@ public class EnLangGenerator : ModLangGenBase
 
         // Log - Validation
         Log("validation.multiple_content_types",
-            "Cannot use multiple content types (custom_structures, build_mode_save) at the same time, only one is allowed");
+            "Cannot use multiple content types (Structures, BuildModeSave) at the same time, only one is allowed");
         Log("validation.missing_content_type",
-            "Missing content type (custom_structures, or build_mode_save)");
+            "Missing content type (Structures, or BuildModeSave)");
 
         // Log - Map Loader
         Log("map_loader.load_error", "Map or map data is null");
