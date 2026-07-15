@@ -179,7 +179,7 @@ public class ZhCnLangGenerator : ModLangGenBase
         Log("map_check.requires_mod", "[需要 {0}]");
 
         // Log - World Generation
-        Log("world_generation.scene_type_set", "设置场景类型为: {0}");
+        Log("world_generation.type_set", "设置场景类型为: {0}");
         Log("world_generation.no_features_enabled", "未启用任何特性");
         Log("world_generation.feature_enabled", "已启用 {0}");
         Log("world_generation.feature_enabled_with_value", "已启用 {0}: {1}");

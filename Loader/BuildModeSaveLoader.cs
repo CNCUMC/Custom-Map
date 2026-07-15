@@ -11,14 +11,14 @@ public static class BuildModeSaveLoader
 
     public static void SpawnBuildModeSave(Map map)
     {
-        if (map == null || string.IsNullOrEmpty(map.BuildModeSave)) return;
+        if (map == null || string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave)) return;
         if (!Plugin.BuildModeLoaded) return;
 
         try
         {
             var saveFilePath = Path.Combine(
                 map.DirectoryPath,
-                $"{map.BuildModeSave}.alexx_BMsave");
+                $"{map.CurrentLayer.BuildModeSave}.alexx_BMsave");
 
             if (!File.Exists(saveFilePath))
             {

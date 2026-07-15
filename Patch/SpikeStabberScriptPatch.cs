@@ -16,7 +16,7 @@ public class SpikeStabberScriptPatch
         "light", BindingFlags.NonPublic | BindingFlags.Instance);
 
     private static readonly Dictionary<SpikeStabberScript, float> LastTriggerTime = new();
-    private static SpikeStabberData SpikeStabberData => MapCheck.CurrentMap?.SpikeStabberData;
+    private static SpikeStabberData SpikeStabberData => MapCheck.CurrentMap?.CurrentLayer.SpikeStabberData;
 
     [HarmonyPatch("OnTriggerEnter2D")]
     [HarmonyPrefix]

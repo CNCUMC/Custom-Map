@@ -6,7 +6,6 @@ namespace CustomMap.Data.Feature.World;
 [UsedImplicitly]
 public class TurretData
 {
-    [JsonProperty("type")] public string Type { get; internal set; }
     [JsonProperty("cooldown")] public float Cooldown { get; set; } = 15f;
 
     [JsonProperty("shot_power_multiplier")]

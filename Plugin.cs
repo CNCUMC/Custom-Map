@@ -8,6 +8,7 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using CUCoreLib.Data;
+using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
 using CustomMap.Lang;
@@ -41,9 +42,9 @@ public class Plugin : BaseUnityPlugin
         Author = ["Black_Moss"],
         Layers =
         [
-            new LayerData
+            new Layer
             {
-                SceneType = WorldGeneration.OverrideSceneType.Debug,
+                Type = WorldGeneration.OverrideSceneType.Debug,
                 X = -68,
                 Y = 62,
                 SkipBackground = false,
@@ -74,49 +75,49 @@ public class Plugin : BaseUnityPlugin
                         Id = Items.Lrd,
                         Slot = Slots.LowerBack
                     }
-                ]
+                ],
+                MineData = new MineData
+                {
+                    Undestroy = true,
+                    ExplosionParamsData = new ExplosionParamsData
+                    {
+                        Range = 3
+                    }
+                },
+                JumpPadData = new JumpPadData
+                {
+                    Force = 0.5f,
+                    NoLight = true,
+                    Cooldown = 0f
+                },
+                TurretData = new TurretData
+                {
+                    Cooldown = 0f,
+                    NoLight = true
+                },
+                SoundCannonData = new SoundCannonData
+                {
+                    MaxDistance = 20,
+                    Cooldown = 3,
+                    Undestroy = true
+                },
+                SpikeStabberData = new SpikeStabberData
+                {
+                    Undestroy = true,
+                    NoLight = true,
+                    Cooldown = 3
+                },
+                GeyserData = new GeyserData
+                {
+                    Cooldown = 1
+                },
+                BearTrapData = new BearTrapData
+                {
+                    Undestroy = true,
+                    Cooldown = 1
+                }
             }
         ],
-        MineData = new MineData
-        {
-            Undestroy = true,
-            ExplosionParamsData = new ExplosionParamsData
-            {
-                Range = 3
-            }
-        },
-        JumpPadData = new JumpPadData
-        {
-            Force = 0.5f,
-            NoLight = true,
-            Cooldown = 0f
-        },
-        TurretData = new TurretData
-        {
-            Cooldown = 0f,
-            NoLight = true
-        },
-        SoundCannonData = new SoundCannonData
-        {
-            MaxDistance = 20,
-            Cooldown = 3,
-            Undestroy = true
-        },
-        SpikeStabberData = new SpikeStabberData
-        {
-            Undestroy = true,
-            NoLight = true,
-            Cooldown = 3
-        },
-        GeyserData = new GeyserData
-        {
-            Cooldown = 1
-        },
-        BearTrapData = new BearTrapData
-        {
-            Undestroy = true,
-            Cooldown = 1
-        },
         XpData = new XpData
         {
             StrXp = 999,

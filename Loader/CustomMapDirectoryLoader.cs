@@ -15,13 +15,13 @@ public static class CustomMapDirectoryLoader
 {
     private static readonly (string PropName, string SubDir, string FileName, string TypeCheck)[] FeatureDescriptors =
     [
-        (nameof(Map.MineData), "world", "mine.json", "feature.world.mine"),
-        (nameof(Map.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
-        (nameof(Map.TurretData), "world", "turret.json", "feature.world.turret"),
-        (nameof(Map.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
-        (nameof(Map.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
-        (nameof(Map.GeyserData), "world", "geyser.json", "feature.world.geyser"),
-        (nameof(Map.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
+        (nameof(Map.CurrentLayer.MineData), "world", "mine.json", "feature.world.mine"),
+        (nameof(Map.CurrentLayer.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
+        (nameof(Map.CurrentLayer.TurretData), "world", "turret.json", "feature.world.turret"),
+        (nameof(Map.CurrentLayer.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
+        (nameof(Map.CurrentLayer.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
+        (nameof(Map.CurrentLayer.GeyserData), "world", "geyser.json", "feature.world.geyser"),
+        (nameof(Map.CurrentLayer.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
         (nameof(Map.XpData), "player", "xp.json", "feature.player.xp")
     ];
 
@@ -44,7 +44,7 @@ public static class CustomMapDirectoryLoader
 
             map.Layers = LoadLayers(directoryPath);
 
-            map.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
+            map.CurrentLayer.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
             foreach (var (propName, subDir, fileName, typeCheck) in FeatureDescriptors)
             {
@@ -57,7 +57,7 @@ public static class CustomMapDirectoryLoader
 
             map.XpData ??= new XpData();
 
-            map.CommandData = LoadCommandData(directoryPath);
+            map.CurrentLayer.CommandData = LoadCommandData(directoryPath);
 
             return map;
         }
@@ -67,7 +67,7 @@ public static class CustomMapDirectoryLoader
         }
     }
 
-    private static List<LayerData> LoadLayers(string directoryPath)
+    private static List<Layer> LoadLayers(string directoryPath)
     {
         var layersDir = Path.Combine(directoryPath, "layers");
         if (!Directory.Exists(layersDir))
@@ -90,11 +90,11 @@ public static class CustomMapDirectoryLoader
         if (layerFiles.Count == 0)
             return [];
 
-        var layers = new List<LayerData>();
+        var layers = new List<Layer>();
         foreach (var layerFile in layerFiles)
             try
             {
-                var layerData = LoadJsonWithTypeCheck<LayerData>(layerFile, "layer");
+                var layerData = LoadJsonWithTypeCheck<Layer>(layerFile, "layer");
                 if (layerData != null)
                     layers.Add(layerData);
             }
@@ -201,19 +201,23 @@ public static class CustomMapDirectoryLoader
             }
         }
 
-        if (map.WorldSettingsData != null)
-            SaveFeatureFileToDisk(directoryPath, "world", "settings.json", map.WorldSettingsData,
+        if (map.CurrentLayer.WorldSettingsData != null)
+            SaveFeatureFileToDisk(directoryPath, "world", "settings.json", map.CurrentLayer.WorldSettingsData,
                 "feature.world.settings");
 
-        SaveFeatureFileToDisk(directoryPath, "world", "mine.json", map.MineData, "feature.world.mine");
-        SaveFeatureFileToDisk(directoryPath, "world", "jump_pad.json", map.JumpPadData, "feature.world.jump_pad");
-        SaveFeatureFileToDisk(directoryPath, "world", "turret.json", map.TurretData, "feature.world.turret");
-        SaveFeatureFileToDisk(directoryPath, "world", "sound_cannon.json", map.SoundCannonData,
+        SaveFeatureFileToDisk(directoryPath, "world", "mine.json", map.CurrentLayer.MineData, "feature.world.mine");
+        SaveFeatureFileToDisk(directoryPath, "world", "jump_pad.json", map.CurrentLayer.JumpPadData,
+            "feature.world.jump_pad");
+        SaveFeatureFileToDisk(directoryPath, "world", "turret.json", map.CurrentLayer.TurretData,
+            "feature.world.turret");
+        SaveFeatureFileToDisk(directoryPath, "world", "sound_cannon.json", map.CurrentLayer.SoundCannonData,
             "feature.world.sound_cannon");
-        SaveFeatureFileToDisk(directoryPath, "world", "spike_stabber.json", map.SpikeStabberData,
+        SaveFeatureFileToDisk(directoryPath, "world", "spike_stabber.json", map.CurrentLayer.SpikeStabberData,
             "feature.world.spike_stabber");
-        SaveFeatureFileToDisk(directoryPath, "world", "geyser.json", map.GeyserData, "feature.world.geyser");
-        SaveFeatureFileToDisk(directoryPath, "world", "beartrap.json", map.BearTrapData, "feature.world.beartrap");
+        SaveFeatureFileToDisk(directoryPath, "world", "geyser.json", map.CurrentLayer.GeyserData,
+            "feature.world.geyser");
+        SaveFeatureFileToDisk(directoryPath, "world", "beartrap.json", map.CurrentLayer.BearTrapData,
+            "feature.world.beartrap");
 
         if (map.XpData != null)
             SaveFeatureFileToDisk(directoryPath, "player", "xp.json", map.XpData, "feature.player.xp");
@@ -225,11 +229,11 @@ public static class CustomMapDirectoryLoader
         MapLocale.SaveToCurrentLang(map, directoryPath);
 
         Plugin.Logger?.LogInfo(
-            $"[MapDirectoryLoader.Debug] SaveToDirectory after SaveToCurrentLang, CommandData is null? {map.CommandData == null}");
+            $"[MapDirectoryLoader.Debug] SaveToDirectory after SaveToCurrentLang, CommandData is null? {map.CurrentLayer.CommandData == null}");
 
-        if (map.CommandData == null) return;
+        if (map.CurrentLayer.CommandData == null) return;
         var commandPath = Path.Combine(directoryPath, "command.json");
-        SaveJsonWithTypeCheck(commandPath, map.CommandData, "command");
+        SaveJsonWithTypeCheck(commandPath, map.CurrentLayer.CommandData, "command");
     }
 
     private static void SaveJsonWithTypeCheck<T>(string filePath, T obj, string expectedType) where T : class

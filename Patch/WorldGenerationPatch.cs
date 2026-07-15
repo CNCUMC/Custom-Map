@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
 using CUCoreLib.Helpers;
+using CustomMap.Data.Feature.World;
 using CustomMap.Loader;
 using HarmonyLib;
 using TMPro;
@@ -36,6 +38,7 @@ public static class WorldGenerationPatch
         if (MapCheck.HasRunningMap && !ExitTargetScene.HasValue)
         {
             CurrentMap = MapCheck.CurrentMap;
+            ApplyWorldSettingsToRunSettings();
             return;
         }
 
@@ -63,6 +66,7 @@ public static class WorldGenerationPatch
         if (map != null)
         {
             CurrentMap = map;
+            ApplyWorldSettingsToRunSettings();
             Plugin.Logger.LogInfo(
                 $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{MapLocale.GetName(map)}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
         }
@@ -71,6 +75,36 @@ public static class WorldGenerationPatch
             Plugin.Logger.LogWarning(
                 $"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
         }
+    }
+
+    private static void ApplyWorldSettingsToRunSettings()
+    {
+        var map = CurrentMap;
+        if (map?.CurrentLayer?.WorldSettingsData == null) return;
+        
+        var settings = map.CurrentLayer.WorldSettingsData;
+        var overrides = new Dictionary<string, object>();
+        
+        // 将 WorldSettingsData 的属性值转换为 RunSettings 字典
+        var worldSettingsOverrides = settings.ToRunSettingsDictionary();
+        foreach (var kvp in worldSettingsOverrides)
+        {
+            overrides[kvp.Key] = kvp.Value;
+        }
+        
+        // 合并用户自定义的 settings_overrides（用户设置优先）
+        if (settings.SettingsOverrides != null)
+        {
+            foreach (var kvp in settings.SettingsOverrides)
+            {
+                overrides[kvp.Key] = kvp.Value;
+            }
+        }
+        
+        // 直接覆盖 runSettings，Awake 中的空检查会跳过默认预设初始化
+        if (overrides.Count <= 0) return;
+        WorldGeneration.runSettings = overrides;
+        MoreLogs("run_settings_overridden", $"count={overrides.Count}");
     }
 
     [HarmonyPatch("Awake")]
@@ -92,7 +126,7 @@ public static class WorldGenerationPatch
         if (ExitTargetScene.HasValue)
         {
             WorldGeneration.biomeOverride = ExitTargetScene.Value;
-            MoreLogs("scene_type_set", ExitTargetScene.Value);
+            MoreLogs("type_set", ExitTargetScene.Value);
             return;
         }
 
@@ -119,7 +153,7 @@ public static class WorldGenerationPatch
         if (_loading)
             UpdateLoadingText();
 
-        var settings = CurrentMap?.WorldSettingsData;
+        var settings = CurrentMap?.CurrentLayer.WorldSettingsData;
         if (settings == null) return;
 
         if (settings.ForgivingLevel)
@@ -143,8 +177,8 @@ public static class WorldGenerationPatch
 
     private static void SetDefaultSceneType(WorldGeneration __instance, Map map = null)
     {
-        __instance.biomeOverride = map?.Type ?? WorldGeneration.OverrideSceneType.Debug;
-        MoreLogs("scene_type_set", __instance.biomeOverride);
+        __instance.biomeOverride = map?.CurrentLayer.Type ?? WorldGeneration.OverrideSceneType.Debug;
+        MoreLogs("type_set", __instance.biomeOverride);
     }
 
     internal static void RefreshLoadingText()
@@ -162,7 +196,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldCreateBackground()
     {
-        if (CurrentMap is not { SkipBackground: true }) return true;
+        if (CurrentMap is not { CurrentLayer.SkipBackground: true }) return true;
         MoreLogs("skip_generation", BetterLocale.GetOther("common.background"));
         return false;
     }
@@ -171,7 +205,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateStructures()
     {
-        if (CurrentMap is not { SkipStructures: true }) return true;
+        if (CurrentMap is not { CurrentLayer.SkipStructures: true }) return true;
         MoreLogs("skip_generation", BetterLocale.GetOther("common.structure"));
         return false;
     }
@@ -187,7 +221,7 @@ public static class WorldGenerationPatch
     [HarmonyPrefix]
     public static bool SkipWorldGenerateTerrain()
     {
-        if (CurrentMap is not { SkipTerrain: true }) return true;
+        if (CurrentMap is not { CurrentLayer.SkipTerrain: true }) return true;
         MoreLogs("skip_generation", BetterLocale.GetOther("common.terrain"));
         return false;
     }
@@ -197,7 +231,7 @@ public static class WorldGenerationPatch
     public static void AfterWorldPlacePlayer()
     {
         if (CurrentMap == null) return;
-        var pos = CurrentMap.SpawnPosition;
+        var pos = CurrentMap.CurrentLayer.SpawnPosition;
         if (!PlayerCamera.main || !PlayerCamera.main.body) return;
         PlayerCamera.main.body.transform.position = new Vector3(pos.x, pos.y, 0);
         if (ConsoleScript.instance) ConsoleScript.instance.noClip = true;
@@ -227,16 +261,10 @@ public static class WorldGenerationPatch
         CreateLoadingCover();
         instance.loadingObject.SetActive(false);
         _loading = true;
-
-        if (map.WorldSettingsData?.SettingsOverrides is { Count: > 0 } overrides)
-        {
-            MoreLogs("applying_settings_overrides", $"count={overrides.Count}");
-            ApplySettingsOverrides(overrides);
-        }
-
-        var hasCustomStructures = map.Structures is { Count: > 0 };
-        var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
-        var hasItems = map.Items is { Count: > 0 };
+        
+        var hasCustomStructures = map.CurrentLayer.Structures is { Count: > 0 };
+        var hasBuildModeSave = !string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave);
+        var hasItems = map.CurrentLayer.Items is { Count: > 0 };
 
         WorldGeneration.world.generatingWorld = false;
 
@@ -259,7 +287,7 @@ public static class WorldGenerationPatch
         instance.DisableAllChunks();
         instance.UpdateChunkVisibility();
 
-        var safePos = map.SpawnPosition;
+        var safePos = map.CurrentLayer.SpawnPosition;
         if (PlayerCamera.main && PlayerCamera.main.body)
         {
             var body = PlayerCamera.main.body;
@@ -319,7 +347,7 @@ public static class WorldGenerationPatch
 
     private static void ExecuteCommands(Map map)
     {
-        var commands = map.CommandData;
+        var commands = map.CurrentLayer.CommandData;
         if (commands == null || ((commands.OnceCommands == null || commands.OnceCommands.Count == 0) &&
                                  (commands.LoopCommands == null || commands.LoopCommands.Count == 0)))
         {
@@ -339,11 +367,11 @@ public static class WorldGenerationPatch
 
     private static void HandleLoopCommands()
     {
-        var loopCommands = CurrentMap?.CommandData?.LoopCommands;
+        var loopCommands = CurrentMap?.CurrentLayer.CommandData?.LoopCommands;
         if (loopCommands == null || loopCommands.Count == 0) return;
 
-        var interval = CurrentMap.CommandData.LoopInterval > 0
-            ? CurrentMap.CommandData.LoopInterval
+        var interval = CurrentMap.CurrentLayer.CommandData.LoopInterval > 0
+            ? CurrentMap.CurrentLayer.CommandData.LoopInterval
             : 10f;
 
         _sLoopTimer += Time.deltaTime;
@@ -355,33 +383,6 @@ public static class WorldGenerationPatch
         {
             MoreLogs("executing_loop_command", BetterLocale.GetLog("common.loop_command"), command);
             CUCoreUtils.ConsoleRunCommand(ConsoleScript.instance, command);
-        }
-    }
-
-    private static void ApplySettingsOverrides(Dictionary<string, object> overrides)
-    {
-        Settings.EnsureLoaded();
-        var allSettings = Settings.GetAllSettings();
-        foreach (var kvp in overrides)
-        {
-            var setting = allSettings.Find(s =>
-                string.Equals(s.name, kvp.Key, StringComparison.OrdinalIgnoreCase));
-            if (setting == null)
-            {
-                MoreLogs("settings_override_not_found", kvp.Key);
-                continue;
-            }
-
-            try
-            {
-                setting.SetValue(kvp.Value);
-                setting.Apply();
-                MoreLogs("settings_override_applied", kvp.Key, kvp.Value);
-            }
-            catch (Exception ex)
-            {
-                Warning("settings_override_failed", $"key={kvp.Key} error={ex.Message}");
-            }
         }
     }
 

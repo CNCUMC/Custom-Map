@@ -88,7 +88,7 @@ public static class MapCheck
         if (map == null) return;
 
         var missingMods = map.MissingMods;
-        var hasBuildModeSave = !string.IsNullOrEmpty(map.BuildModeSave);
+        var hasBuildModeSave = !string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave);
 
         if (!hasBuildModeSave || Plugin.BuildModeLoaded) return;
         missingMods.Add("Build Mode");

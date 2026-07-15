@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace CustomMap.Data.Feature.World;
+namespace CustomMap.Data;
 
 public class StructurePlacement
 {

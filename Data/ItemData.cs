@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace CustomMap.Data.Feature.World;
+namespace CustomMap.Data;
 
 [UsedImplicitly]
 public class ItemData

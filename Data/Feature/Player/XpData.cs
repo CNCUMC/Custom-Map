@@ -19,7 +19,6 @@ public class XpData
         ResetToDefaults();
     }
 
-    [JsonProperty("type")] public string Type { get; internal set; }
     [JsonProperty("str_xp")] public int StrXp { get; set; }
     [JsonProperty("res_xp")] public int ResXp { get; set; }
     [JsonProperty("int_xp")] public int IntXp { get; set; }

@@ -11,7 +11,7 @@ public class GeyserScriptPatch
     private static readonly FieldInfo ActivateTimeField = typeof(GeyserScript).GetField(
         "activateTime", BindingFlags.NonPublic | BindingFlags.Instance);
 
-    private static GeyserData GeyserData => MapCheck.CurrentMap?.GeyserData;
+    private static GeyserData GeyserData => MapCheck.CurrentMap?.CurrentLayer.GeyserData;
 
     [HarmonyPatch("TryRumble")]
     [HarmonyPrefix]

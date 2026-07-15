@@ -21,7 +21,7 @@ public static class CustomStructuresLoader
 
     public static void SpawnCustomStructures(Map map)
     {
-        if (map?.Structures == null || map.Structures.Count == 0) return;
+        if (map?.CurrentLayer.Structures == null || map.CurrentLayer.Structures.Count == 0) return;
 
         try
         {
@@ -32,7 +32,7 @@ public static class CustomStructuresLoader
                 return;
             }
 
-            foreach (var placement in map.Structures)
+            foreach (var placement in map.CurrentLayer.Structures)
             {
                 if (placement == null || string.IsNullOrWhiteSpace(placement.Structure)) continue;
 

@@ -132,6 +132,7 @@ public class ModCommand
                         MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
                         MapLoader.ReloadMap(MapCheck.CurrentMap);
                     }
+
                     InfoCommand("reload.success");
                     break;
                 case "load":
@@ -552,8 +553,8 @@ public class ModCommand
 
     private static List<WaypointData> GetWaypoints(Map map)
     {
-        return map.Waypoints is { Count: > 0 }
-            ? map.Waypoints
+        return map.CurrentLayer.Waypoints is { Count: > 0 }
+            ? map.CurrentLayer.Waypoints
             : [];
     }
 
@@ -607,7 +608,7 @@ public class ModCommand
     {
         var groups = new List<(string groupName, IList<string> items)>();
 
-        var settings = map.WorldSettingsData;
+        var settings = map.CurrentLayer.WorldSettingsData;
         if (settings != null)
         {
             var wsDisplay = LocaleOther("feature.world_settings_data");
@@ -625,13 +626,13 @@ public class ModCommand
 
         var featureDataTypes = new Dictionary<string, object>
         {
-            ["mine"] = map.MineData,
-            ["jump_pad"] = map.JumpPadData,
-            ["turret"] = map.TurretData,
-            ["sound_cannon"] = map.SoundCannonData,
-            ["spike_stabber"] = map.SpikeStabberData,
-            ["geyser"] = map.GeyserData,
-            ["beartrap"] = map.BearTrapData,
+            ["mine"] = map.CurrentLayer.MineData,
+            ["jump_pad"] = map.CurrentLayer.JumpPadData,
+            ["turret"] = map.CurrentLayer.TurretData,
+            ["sound_cannon"] = map.CurrentLayer.SoundCannonData,
+            ["spike_stabber"] = map.CurrentLayer.SpikeStabberData,
+            ["geyser"] = map.CurrentLayer.GeyserData,
+            ["beartrap"] = map.CurrentLayer.BearTrapData,
             ["xp"] = map.XpData
         };
 
@@ -892,8 +893,8 @@ public class ModCommand
     private static void Spawn()
     {
         var map = MapCheck.CurrentMap;
-        InfoCommand("spawn", map.SpawnPosition);
-        PlayerUtil.Tp(map.SpawnPosition);
+        InfoCommand("spawn", map.CurrentLayer.SpawnPosition);
+        PlayerUtil.Tp(map.CurrentLayer.SpawnPosition);
     }
 
     private static string LocaleLog(string key, params object[] args)

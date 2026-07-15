@@ -172,8 +172,8 @@ public static class MapLoader
         LocaleCommand("info.version", map.Version);
         LocaleCommand("info.authors", MapLocale.GetAuthor(map));
         LocaleCommand("info.description", MapLocale.GetDescription(map));
-        LocaleCommand("info.features", map.ActiveFeatures);
-        LocaleCommand("info.spawn", map.SpawnPosition);
+        LocaleCommand("info.features", map.CurrentLayer.ActiveFeatures);
+        LocaleCommand("info.spawn", map.CurrentLayer.SpawnPosition);
         LogUtil.Divider();
         LogUtil.NewLine();
     }
@@ -214,7 +214,7 @@ public static class MapLoader
 
     internal static void PickItems(Map map)
     {
-        var items = map.Items;
+        var items = map.CurrentLayer.Items;
         if (items == null) return;
         foreach (var item in items) PlayerUtil.PickItem(item.Id, item.Slot, item.Force);
     }

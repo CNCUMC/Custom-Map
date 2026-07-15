@@ -19,7 +19,7 @@ public static class BodyPatch
 
     private static int _jumpCount;
     private static int _climbCount;
-    private static WorldSettingsData WorldSettings => MapCheck.CurrentMap?.WorldSettingsData;
+    private static WorldSettingsData WorldSettings => MapCheck.CurrentMap?.CurrentLayer.WorldSettingsData;
 
     private static bool IsPatchActive =>
         WorldSettings != null

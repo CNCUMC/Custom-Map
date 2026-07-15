@@ -80,7 +80,7 @@ public static class MapLocale
     {
         return map == null
             ? string.Empty
-            : GetFormatted("features", map.ActiveFeatures);
+            : GetFormatted("features", map.CurrentLayer.ActiveFeatures);
     }
 
     public static void SaveToCurrentLang(Map map, string directoryPath = null)

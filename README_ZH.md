@@ -153,7 +153,7 @@ Maps/
   },
   "custom_structures": "MyStructure",
   "build_mode_save": "MyBuild",
-  "scene_type": "Debug",
+  "type": "Debug",
   "spawn": [
     0.0,
     0.0
@@ -161,8 +161,7 @@ Maps/
   "x": -68,
   "y": 62,
   "waypoints": [],
-  "items": [],
-  "type": "level"
+  "items": []
 }
 ```
 
@@ -170,7 +169,7 @@ Maps/
 - `key` — 将每个字符映射到方块 ID（数字）或实体 ID（字符串）
 - `custom_structures` — （可选）地图根目录下的 `.txt` / `.ms.json` / `.ms2.json` 结构文件名。省略扩展名时自动检测
 - `build_mode_save` — （可选）地图根目录下的 Build Mode `.alexx_BMsave` 文件名（不含扩展名）
-- `scene_type` — `"Debug"`、`"Wasteland"`、`"TemperateForest"`、`"RockDesert"` 或 `"None"`
+- `type` — `"Debug"`、`"Wasteland"`、`"TemperateForest"`、`"RockDesert"` 或 `"None"`
 - `x`、`y` — 地图左下角的世界坐标
 
 ---

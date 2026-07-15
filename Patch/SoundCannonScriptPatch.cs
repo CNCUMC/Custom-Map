@@ -19,7 +19,7 @@ public class SoundCannonScriptPatch
         "chargeTime", BindingFlags.NonPublic | BindingFlags.Instance);
 
     private static readonly Dictionary<SoundCannon, float> ChargingSince = new();
-    private static SoundCannonData SoundCannonData => MapCheck.CurrentMap?.SoundCannonData;
+    private static SoundCannonData SoundCannonData => MapCheck.CurrentMap?.CurrentLayer.SoundCannonData;
 
     [HarmonyPatch("Update")]
     [HarmonyPrefix]
