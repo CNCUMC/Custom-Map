@@ -125,7 +125,7 @@ public static class MapLoader
             return;
         }
 
-        WorldUtil.CheckForWorld();
+        CheckUtil.CheckWorld(Plugin.Logger);
         LogUtil.Divider();
         try
         {
@@ -167,13 +167,13 @@ public static class MapLoader
         }
 
         LogUtil.Divider();
-        LocaleCommand("info.name", MapLocale.GetName(map));
-        LocaleCommand("info.id", map.Id);
-        LocaleCommand("info.version", map.Version);
-        LocaleCommand("info.authors", MapLocale.GetAuthor(map));
-        LocaleCommand("info.description", MapLocale.GetDescription(map));
-        LocaleCommand("info.features", map.CurrentLayer.ActiveFeatures);
-        LocaleCommand("info.spawn", map.CurrentLayer.SpawnPosition);
+        InfoCommand("info.name", MapLocale.GetName(map));
+        InfoCommand("info.id", map.Id);
+        InfoCommand("info.version", map.Version);
+        InfoCommand("info.authors", MapLocale.GetAuthor(map));
+        InfoCommand("info.description", MapLocale.GetDescription(map));
+        InfoCommand("info.features", map.CurrentLayer.ActiveFeatures);
+        InfoCommand("info.spawn", map.CurrentLayer.SpawnPosition);
         LogUtil.Divider();
         LogUtil.NewLine();
     }
@@ -185,12 +185,12 @@ public static class MapLoader
         if (maps == null
             || maps.Count == 0)
         {
-            LocaleCommand("list.empty");
+            InfoCommand("list.empty");
             return;
         }
 
         LogUtil.Divider();
-        LocaleCommand("list.header", maps.Count);
+        InfoCommand("list.header", maps.Count);
 
         for (var i = 0; i < maps.Count; i++)
         {
@@ -206,7 +206,7 @@ public static class MapLoader
                 displayName = $"<color=grey>{displayName} {missingInfo}";
             }
 
-            LocaleCommand("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
+            InfoCommand("list.item", marker, i + 1, displayName, map.Id, map.Version, map.Authors);
         }
 
         LogUtil.NewLine();
@@ -225,7 +225,7 @@ public static class MapLoader
             Info(key, args);
     }
 
-    private static void LocaleCommand(string key, params object[] args)
+    private static void InfoCommand(string key, params object[] args)
     {
         LogUtil.Info(BetterLocale.GetCommand($"custommap.{key}", args), Plugin.Logger);
     }

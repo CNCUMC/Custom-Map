@@ -11,14 +11,13 @@ using CUCoreLib.Data;
 using CustomMap.Data;
 using CustomMap.Data.Feature.Player;
 using CustomMap.Data.Feature.World;
-using CustomMap.Lang;
 using CustomMap.Loader;
 using HarmonyLib;
 
 namespace CustomMap;
 
 [BepInDependency("net.cucorelib", "1.0.2")]
-[BepInDependency("org.cncumc.bark", "1.0.3")]
+[BepInDependency("org.cncumc.bark", "1.1.0")]
 [BepInDependency("com.Jimmyking.morestructures", "1.2.1")]
 [BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(Guid, Name, Version)]
@@ -27,7 +26,7 @@ public class Plugin : BaseUnityPlugin
     public const string Guid = "org.cncumc.custommap";
     public const string Name = "Custom Map";
     public const string Version = "1.0.0";
-    private const string NameSpace = "custommap";
+    internal const string NameSpace = "custommap";
     internal new static ManualLogSource Logger;
 
     public static bool MoreLogs;
@@ -134,9 +133,7 @@ public class Plugin : BaseUnityPlugin
     {
         Logger = base.Logger;
 
-        new EnLangGenerator().Initialize(Logger);
-        new ZhCnLangGenerator().Initialize(Logger);
-        new ZhTwLangGenerator().Initialize(Logger);
+        new LangGenerator().Initialize(Logger);
 
         BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
         BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
@@ -158,8 +155,8 @@ public class Plugin : BaseUnityPlugin
         var mapsDir = MapCheck.MapsPath;
 
         // Add TemplateMap - register English default and use localized name
-        var templateKey = $"custommap.custommap.first_use_map{TemplateMap.Id}";
-        BetterLocale.SetDefault("EN", "option", templateKey, $"{Name} Template");
+        var templateKey = $"custommap.first_use_map{TemplateMap.Id}";
+        BetterLocale.SetDefault("EN", NameSpace, "option", templateKey, $"{Name} Template");
         BetterLocale.Flush();
         var templateDisplayName = BetterLocale.GetOther(templateKey);
         AddMapChoice(choices, TemplateMap.Id, templateDisplayName);
@@ -184,7 +181,7 @@ public class Plugin : BaseUnityPlugin
 
                         // Register English default and use localized name
                         var key = $"custommap.custommap.first_use_map{map.Id}";
-                        BetterLocale.SetDefault("EN", "option", key, MapLocale.GetDisplayName(map));
+                        BetterLocale.SetDefault("EN", NameSpace, "option", key, MapLocale.GetDisplayName(map));
                         BetterLocale.Flush();
                         var displayName = BetterLocale.GetOther(key);
                         AddMapChoice(choices, map.Id, displayName);

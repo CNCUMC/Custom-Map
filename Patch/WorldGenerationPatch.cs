@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Bark.BetterCCL;
@@ -9,6 +8,7 @@ using CUCoreLib.Helpers;
 using CustomMap.Data.Feature.World;
 using CustomMap.Loader;
 using HarmonyLib;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,7 +38,6 @@ public static class WorldGenerationPatch
         if (MapCheck.HasRunningMap && !ExitTargetScene.HasValue)
         {
             CurrentMap = MapCheck.CurrentMap;
-            ApplyWorldSettingsToRunSettings();
             return;
         }
 
@@ -66,7 +65,6 @@ public static class WorldGenerationPatch
         if (map != null)
         {
             CurrentMap = map;
-            ApplyWorldSettingsToRunSettings();
             Plugin.Logger.LogInfo(
                 $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{MapLocale.GetName(map)}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
         }
@@ -75,36 +73,6 @@ public static class WorldGenerationPatch
             Plugin.Logger.LogWarning(
                 $"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
         }
-    }
-
-    private static void ApplyWorldSettingsToRunSettings()
-    {
-        var map = CurrentMap;
-        if (map?.CurrentLayer?.WorldSettingsData == null) return;
-        
-        var settings = map.CurrentLayer.WorldSettingsData;
-        var overrides = new Dictionary<string, object>();
-        
-        // 将 WorldSettingsData 的属性值转换为 RunSettings 字典
-        var worldSettingsOverrides = settings.ToRunSettingsDictionary();
-        foreach (var kvp in worldSettingsOverrides)
-        {
-            overrides[kvp.Key] = kvp.Value;
-        }
-        
-        // 合并用户自定义的 settings_overrides（用户设置优先）
-        if (settings.SettingsOverrides != null)
-        {
-            foreach (var kvp in settings.SettingsOverrides)
-            {
-                overrides[kvp.Key] = kvp.Value;
-            }
-        }
-        
-        // 直接覆盖 runSettings，Awake 中的空检查会跳过默认预设初始化
-        if (overrides.Count <= 0) return;
-        WorldGeneration.runSettings = overrides;
-        MoreLogs("run_settings_overridden", $"count={overrides.Count}");
     }
 
     [HarmonyPatch("Awake")]
@@ -117,8 +85,17 @@ public static class WorldGenerationPatch
         {
             StartMapLoading(map);
             SuppressCustomStructuresForMap();
-
             SetDefaultSceneType(WorldGeneration, map);
+
+            // Initialize fluid array early to prevent NullReferenceException in FluidManager
+            if (FluidManager.main != null)
+            {
+                var chunkWidth = 16u;
+                var chunkHeight = 16u;
+                __instance.width = chunkWidth * (uint) WorldGeneration.CHUNKSIZE;
+                __instance.height = chunkHeight * (uint) WorldGeneration.CHUNKSIZE;
+                FluidManager.main.fluid = new byte[(int) __instance.width, (int) __instance.height];
+            }
 
             return;
         }
@@ -133,6 +110,43 @@ public static class WorldGenerationPatch
         if (!Plugin.StartGameUseMap) return;
         Warning("no_valid_directories");
         SetDefaultSceneType(WorldGeneration);
+    }
+
+    private static void ApplyWorldSettingsToRunSettings()
+    {
+        var map = CurrentMap;
+        if (map?.CurrentLayer?.WorldSettingsData == null) return;
+        
+        var settings = map.CurrentLayer.WorldSettingsData;
+        var appliedCount = 0;
+        
+        // Apply WorldSettingsData properties to runSettings
+        var properties = typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var prop in properties)
+        {
+            var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
+            var jsonName = jsonAttr?.PropertyName ?? prop.Name;
+            
+            if (!WorldSettingsData.RunSettingsKeyMap.ContainsKey(jsonName)) continue;
+            
+            var runSettingsKey = WorldSettingsData.GetRunSettingsKey(jsonName);
+            var value = prop.GetValue(settings);
+            if (value == null) continue;
+            WorldGeneration.runSettings[runSettingsKey] = value;
+            appliedCount++;
+        }
+        
+        if (settings.SettingsOverrides != null)
+        {
+            foreach (var kvp in settings.SettingsOverrides)
+            {
+                WorldGeneration.runSettings[kvp.Key] = kvp.Value;
+                appliedCount++;
+            }
+        }
+        
+        // Log summary only
+        Info("settings_overridden", appliedCount, WorldGeneration.runSettings.Count);
     }
 
     private static void StartMapLoading(Map map)
@@ -244,6 +258,8 @@ public static class WorldGenerationPatch
     {
         if (CurrentMap != null)
         {
+            // Apply custom run settings here, after game has fully initialized runSettings
+            ApplyWorldSettingsToRunSettings();
             __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
             return false;
         }
@@ -261,19 +277,15 @@ public static class WorldGenerationPatch
         CreateLoadingCover();
         instance.loadingObject.SetActive(false);
         _loading = true;
-        
+
         var hasCustomStructures = map.CurrentLayer.Structures is { Count: > 0 };
         var hasBuildModeSave = !string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave);
-        var hasItems = map.CurrentLayer.Items is { Count: > 0 };
 
         WorldGeneration.world.generatingWorld = false;
 
         if (hasCustomStructures) CustomStructuresLoader.SpawnCustomStructures(map);
 
         if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
-
-        if (!hasCustomStructures && !hasBuildModeSave && !hasItems)
-            Warning("no_content_type", MapLocale.GetName(map));
 
         GlobalDark.main.Darken();
         yield return new WaitUntil(() => !GlobalDark.main.IsDarkening());

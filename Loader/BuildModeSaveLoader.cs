@@ -20,12 +20,6 @@ public static class BuildModeSaveLoader
                 map.DirectoryPath,
                 $"{map.CurrentLayer.BuildModeSave}.alexx_BMsave");
 
-            if (!File.Exists(saveFilePath))
-            {
-                Error("not_found_buildmode_save");
-                return;
-            }
-
             MapLoader.ApplyBuildModeSave(saveFilePath);
         }
         catch (Exception e)

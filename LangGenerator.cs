@@ -41,15 +41,15 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Map Format
         Other("format.author",
-            "by {0}",
+            "by '{0}'",
             "作者: '{0}'",
             "作者: '{0}'",
-            "автор: {0}");
+            "автор: '{0}'");
         Other("format.features",
-            "Features: {0}",
+            "Features: '{0}'",
             "特性: '{0}'",
             "特性: '{0}'",
-            "Особенности: {0}");
+            "Особенности: '{0}'");
 
         // Feature
         Other("feature.full_bright",
@@ -495,10 +495,10 @@ internal class LangGenerator : ModLangGenMultiBase
             "正在傳送到路徑點'{0}'，位置 {1}...",
             "Телепортация к путевой точке '{0}' на позицию {1}...");
         Command("custommap.waypoint.not_found",
-            "Waypoint not found: {0}",
+            "Waypoint not found: '{0}'",
             "未找到路径点: '{0}'",
             "未找到路徑點: '{0}'",
-            "Путевая точка не найдена: {0}");
+            "Путевая точка не найдена: '{0}'");
         Command("custommap.waypoint.invalid_index",
             "Invalid index {0}, please enter a number between 1 and {1}",
             "无效的索引 '{0}'，请输入 1 到 {1} 之间的数字",
@@ -510,17 +510,17 @@ internal class LangGenerator : ModLangGenMultiBase
             "請指定路徑點 ID 或索引來傳送",
             "Укажите ID или индекс путевой точки для телепортации");
         Command("custommap.waypoint.unknown_subcommand",
-            "Unknown waypoint subcommand: {0}",
+            "Unknown waypoint subcommand: '{0}'",
             "未知的路径点子命令: '{0}'",
             "未知的路徑點子命令: '{0}'",
-            "Неизвестная подкоманда путевой точки: {0}");
+            "Неизвестная подкоманда путевой точки: '{0}'");
 
         // Command - Map - List
         Command("custommap.list.header",
-            "Loaded {0} Map(s):",
-            "已加载 {0} 个地图:",
-            "已載入 {0} 個地圖:",
-            "Загружено карт: {0}");
+            "Loaded '{0}' Map(s):",
+            "已加载 '{0}' 个地图:",
+            "已載入 '{0}' 個地圖:",
+            "Загружено карт: '{0}'");
         Command("custommap.list.item",
             "{0}[{1}] {2} (ID: {3}, Version: {4}, Authors: {5})",
             "{0}[{1}] {2} (ID: {3}, 版本: {4}, 作者: {5})",
@@ -539,15 +539,15 @@ internal class LangGenerator : ModLangGenMultiBase
             "請提供要選擇的地圖ID 或名稱",
             "Укажите ID или имя карты для выбора");
         Command("custommap.select.not_found",
-            "Map not found: {0}",
+            "Map not found: '{0}'",
             "未找到地图: '{0}'",
             "未找到地圖: '{0}'",
-            "Карта не найдена: {0}");
+            "Карта не найдена: '{0}'");
         Command("custommap.select.success",
-            "Selected {0} (ID: {1})",
+            "Selected '{0}' (ID: {1})",
             "已选择 '{0}' (ID: {1})",
             "已選擇 '{0}' (ID: {1})",
-            "Выбрана {0} (ID: {1})");
+            "Выбрана '{0}' (ID: {1})");
         Command("custommap.select.without_world",
             "Selected {0}, but world is not loaded. Map will be loaded when you start a game.",
             "已选择 '{0}'，但世界未加载。地图将在开始游戏时加载。",
@@ -566,20 +566,20 @@ internal class LangGenerator : ModLangGenMultiBase
             "當前層級: {0}/{1}",
             "Текущий слой: {0}/{1}");
         Command("custommap.layer.switched",
-            "Switched to layer {0}",
+            "Switched to layer '{0}'",
             "已切换到层级 '{0}'",
             "已切換到層級 '{0}'",
-            "Переключено на слой {0}");
+            "Переключено на слой '{0}'");
         Command("custommap.layer.already",
-            "Already on layer {0}",
+            "Already on layer '{0}'",
             "已在层级 '{0}'",
             "已在層級 '{0}'",
-            "Уже на слое {0}");
+            "Уже на слое '{0}'");
         Command("custommap.layer.invalid",
-            "Invalid layer, please enter a number between 1 and {0}",
-            "无效的层级，请输入 1 到 {0} 之间的数字",
-            "無效的層級，請輸入 1 到 {0} 之間的數字",
-            "Неверный слой, введите число от 1 до {0}");
+            "Invalid layer, please enter a number between 1 and '{0}'",
+            "无效的层级，请输入 1 到 '{0}' 之间的数字",
+            "無效的層級，請輸入 1 到 '{0}' 之間的數字",
+            "Неверный слой, введите число от 1 до '{0}'");
         Command("custommap.layer.no_layers",
             "No layers available for this map",
             "此地图没有可用的层级",
@@ -608,15 +608,15 @@ internal class LangGenerator : ModLangGenMultiBase
             "設置配置 '{0}' 失敗: '{1}'",
             "Не удалось установить конфигурацию '{0}': {1}");
         Command("custommap.config.not_found",
-            "Configuration not found: {0}",
+            "Configuration not found: '{0}'",
             "未找到配置: '{0}'",
             "未找到配置: '{0}'",
-            "Конфигурация не найдена: {0}");
+            "Конфигурация не найдена: '{0}'");
         Command("custommap.config.invalid_value",
-            "The value of {0} is invalid: {1}",
+            "The value of '{0}' is invalid: {1}",
             "'{0}' 的值无效: '{1}'",
             "'{0}' 的值無效: '{1}'",
-            "Значение {0} неверно: {1}");
+            "Значение '{0}' неверно: {1}");
 
         // Command - Map - Exit
         Command("custommap.exiting",
@@ -664,10 +664,10 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Command - Map - Feature
         Command("custommap.feature.unknown_subcommand",
-            "Unknown feature subcommand: {0}",
+            "Unknown feature subcommand: '{0}'",
             "未知的特性子命令: '{0}'",
             "未知的特性子命令: '{0}'",
-            "Неизвестная подкоманда особенности: {0}");
+            "Неизвестная подкоманда особенности: '{0}'");
         Command("custommap.feature.set_missing_params",
             "Please specify feature name and value to set",
             "请指定特性名称和值来设置",
@@ -689,15 +689,15 @@ internal class LangGenerator : ModLangGenMultiBase
             "特性 '{0}' 已設置為 '{1}'",
             "Особенность '{0}' установлена на {1}");
         Command("custommap.feature.not_found",
-            "Feature not found: {0}",
+            "Feature not found: '{0}'",
             "未找到特性: '{0}'",
             "未找到特性: '{0}'",
-            "Особенность не найдена: {0}");
+            "Особенность не найдена: '{0}'");
         Command("custommap.feature.invalid_value",
-            "Invalid value for {0}: {1}",
+            "Invalid value for '{0}': '{1}'",
             "'{0}' 的值无效: '{1}'",
             "'{0}' 的值無效: '{1}'",
-            "Неверное значение для {0}: {1}");
+            "Неверное значение для '{0}': '{1}'");
 
         // Log - Map Check
         Log("map_check.id_format_warning",
@@ -706,10 +706,10 @@ internal class LangGenerator : ModLangGenMultiBase
             "ID格式不正確，將自動修正",
             "Формат ID неверен, будет автоматически исправлен");
         Log("map_check.author_not_string",
-            "Author element {0} is not a string, removed",
+            "Author element '{0}' is not a string, removed",
             "作者元素 '{0}' 不是字符串，已移除",
             "作者元素 '{0}' 不是字串，已移除",
-            "Элемент автора {0} не является строкой, удален");
+            "Элемент автора '{0}' не является строкой, удален");
         Log("map_check.author_empty",
             "Author array is empty, set default value",
             "作者数组为空，已设置默认值",
@@ -733,110 +733,105 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Log - World Generation
         Log("world_generation.type_set",
-            "Set scene type to: {0}",
+            "Set scene type to: '{0}'",
             "设置场景类型为: '{0}'",
             "設置場景類型為: '{0}'",
-            "Установлен тип сцены: {0}");
+            "Установлен тип сцены: '{0}'");
         Log("world_generation.no_features_enabled",
             "No features enabled",
             "未启用任何特性",
             "未啟用任何特性",
             "Особенности не включены");
         Log("world_generation.feature_enabled",
-            "{0} enabled",
+            "'{0}' enabled",
             "已启用 '{0}'",
             "已啟用 '{0}'",
-            "{0} включено");
+            "'{0}' включено");
         Log("world_generation.feature_enabled_with_value",
-            "{0} enabled: {1}",
+            "'{0}' enabled: {1}",
             "已启用 '{0}': '{1}'",
             "已啟用 '{0}': '{1}'",
-            "{0} включено: {1}");
+            "'{0}' включено: {1}");
         Log("world_generation.unknown_feature",
-            "Unknown feature: {0}",
+            "Unknown feature: '{0}'",
             "未知特性: '{0}'",
             "未知特性: '{0}'",
-            "Неизвестная особенность: {0}");
+            "Неизвестная особенность: '{0}'");
         Log("world_generation.skip_generation",
-            "Skipped {0} generation",
-            "已跳过 {0} 生成",
-            "已跳過 {0} 生成",
-            "Пропущена генерация {0}");
+            "Skipped '{0}' generation",
+            "已跳过 '{0}' 生成",
+            "已跳過 '{0}' 生成",
+            "Пропущена генерация '{0}'");
         Log("world_generation.phase.preparing",
-            "Preparing Map: {0}...",
+            "Preparing Map: '{0}'...",
             "准备地图: '{0}'...",
             "準備地圖: '{0}'...",
-            "Подготовка карты: {0}...");
+            "Подготовка карты: '{0}'...");
         Log("world_generation.phase.generating",
-            "{0} - Generating world...",
+            "'{0}' - Generating world...",
             "'{0}' - 正在生成世界...",
             "'{0}' - 正在生成世界...",
-            "{0} - Генерация мира...");
+            "'{0}' - Генерация мира...");
         Log("world_generation.phase.skipping",
-            "{0} - Skipped {1}",
+            "'{0}' - Skipped {1}",
             "'{0}' - 已跳过 '{1}'",
             "'{0}' - 已跳過 '{1}'",
-            "{0} - Пропущено {1}");
+            "'{0}' - Пропущено {1}");
         Log("world_generation.phase.placing_blocks",
-            "{0} - Placing blocks: {1} success, {2} failed / {3} total ({4}%)",
+            "'{0}' - Placing blocks: {1} success, {2} failed / {3} total ({4}%)",
             "'{0}' - 放置方块: {1} 成功, {2} 失败 / {3} 共 ({4}%)",
             "'{0}' - 放置方塊: {1} 成功, {2} 失敗 / {3} 共 ({4}%)",
-            "{0} - Размещение блоков: {1} успешно, {2} неудачно / {3} всего ({4}%)");
+            "'{0}' - Размещение блоков: {1} успешно, {2} неудачно / {3} всего ({4}%)");
         Log("world_generation.phase.spawning_map",
-            "{0} - Spawning map...",
+            "'{0}' - Spawning map...",
             "'{0}' - 正在生成地图...",
             "'{0}' - 正在生成地圖...",
-            "{0} - Генерация карты...");
+            "'{0}' - Генерация карты...");
         Log("world_generation.phase.spawning_custom_structures",
-            "{0} - Spawning custom structures...",
+            "'{0}' - Spawning custom structures...",
             "'{0}' - 正在生成自定义结构...",
             "'{0}' - 正在生成自訂結構...",
-            "{0} - Генерация пользовательских структур...");
+            "'{0}' - Генерация пользовательских структур...");
         Log("world_generation.phase.spawning_build_mode_save",
-            "{0} - Spawning build mode save...",
+            "'{0}' - Spawning build mode save...",
             "'{0}' - 正在生成建筑模式存档...",
             "'{0}' - 正在生成建築模式存檔...",
-            "{0} - Генерация сохранения строительного режима...");
+            "'{0}' - Генерация сохранения строительного режима...");
         Log("world_generation.phase.applying_settings",
-            "{0} - Applying settings...",
+            "'{0}' - Applying settings...",
             "'{0}' - 正在应用设置...",
             "'{0}' - 正在應用設定...",
-            "{0} - Применение настроек...");
+            "'{0}' - Применение настроек...");
         Log("world_generation.loading_start",
-            "Started loading Map: {0}",
+            "Started loading Map: '{0}'",
             "开始加载地图: '{0}'",
             "開始載入地圖: '{0}'",
-            "Начата загрузка карты: {0}");
-        Log("world_generation.no_content_type",
-            "Map '{0}' has no content type defined (Structures, BuildModeSave, or Items)",
-            "地图 '{0}' 没有定义内容类型 (Structures, BuildModeSave, 或 Items)",
-            "地圖 '{0}' 沒有定義內容類型 (Structures, BuildModeSave, 或 Items)",
-            "Карта '{0}' не имеет определенного типа содержимого (Structures, BuildModeSave, или Items)");
+            "Начата загрузка карты: '{0}'");
         Log("world_generation.no_commands",
-            "No {0} enabled",
+            "No '{0}' enabled",
             "未启用任何 '{0}'",
             "未啟用任何 '{0}'",
-            "{0} не включено");
+            "'{0}' не включено");
         Log("world_generation.exited_map",
             "Exited Map",
             "已退出地图",
             "已退出地圖",
             "Вышли с карты");
         Log("world_generation.executing_command",
-            "Executing {0}: {1}",
+            "Executing '{0}': '{1}'",
             "执行 '{0}': '{1}'",
             "執行 '{0}': '{1}'",
-            "Выполнение {0}: {1}");
+            "Выполнение '{0}': '{1}'");
         Log("world_generation.executing_loop_command",
-            "Executing loop {0}: {1}",
+            "Executing loop '{0}': '{1}'",
             "执行循环 '{0}': '{1}'",
             "執行迴圈 '{0}': '{1}'",
-            "Выполнение цикла {0}: {1}");
+            "Выполнение цикла '{0}': '{1}'");
         Log("world_generation.start_game_map",
-            "Starting game with configured Map: {0} (ID: {1})",
+            "Starting game with configured Map: '{0}' (ID: {1})",
             "开始游戏时自动使用配置的地图: '{0}' (ID: {1})",
             "開始遊戲時自動使用配置的地圖: '{0}' (ID: {1})",
-            "Начало игры с настроенной картой: {0} (ID: {1})");
+            "Начало игры с настроенной картой: '{0}' (ID: {1})");
         Log("world_generation.start_game_map_not_found",
             "Configured Map (ID: {0}) not found, using default",
             "未找到配置的地图 (ID: '{0}')，将使用默认",
@@ -863,32 +858,20 @@ internal class LangGenerator : ModLangGenMultiBase
             "正在應用設定覆蓋, 數量={0}",
             "Применение переопределений настроек, количество={0}");
         Log("world_generation.settings_override_not_found",
-            "Settings override not found: {0}",
+            "Settings override not found: '{0}'",
             "未找到设置覆盖: '{0}'",
             "未找到設定覆蓋: '{0}'",
-            "Переопределение настроек не найдено: {0}");
+            "Переопределение настроек не найдено: '{0}'");
         Log("world_generation.settings_override_applied",
-            "Applied settings override: {0} = {1}",
+            "Applied settings override: '{0}' = {1}",
             "已应用设置覆盖: '{0}' = '{1}'",
             "已應用設定覆蓋: '{0}' = '{1}'",
-            "Применено переопределение настроек: {0} = {1}");
+            "Применено переопределение настроек: '{0}' = {1}");
         Log("world_generation.settings_override_failed",
-            "Failed to apply settings override: {0}",
+            "Failed to apply settings override: '{0}'",
             "应用设置覆盖失败: '{0}'",
             "應用設定覆蓋失敗: '{0}'",
-            "Не удалось применить переопределение настроек: {0}");
-
-        // Log - Validation
-        Log("validation.multiple_content_types",
-            "Cannot use multiple content types (Structures, BuildModeSave) at the same time, only one is allowed",
-            "不能同时使用多种内容类型 (Structures, BuildModeSave)，只允许一种",
-            "不能同時使用多種內容類型 (Structures, BuildModeSave)，只有一種被允許",
-            "Нельзя использовать несколько типов содержимого (Structures, BuildModeSave) одновременно, только один разрешен");
-        Log("validation.missing_content_type",
-            "Missing content type (Structures, or BuildModeSave)",
-            "缺少内容类型 (Structures 或 BuildModeSave)",
-            "缺少內容類型 (Structures 或 BuildModeSave)",
-            "Отсутствует тип содержимого (Structures или BuildModeSave)");
+            "Не удалось применить переопределение настроек: '{0}'");
 
         // Log - Map Loader
         Log("map_loader.load_error",
@@ -917,10 +900,10 @@ internal class LangGenerator : ModLangGenMultiBase
             "成功載入地圖: 起始位置({0}, {1})，大小({2}x{3})",
             "Карта успешно загружена: начальная позиция({0}, {1}), размер({2}x{3})");
         Log("map_loader.load_failed",
-            "Failed to load map: {0}",
+            "Failed to load map: '{0}'",
             "加载地图失败: '{0}'",
             "載入地圖失敗: '{0}'",
-            "Не удалось загрузить карту: {0}");
+            "Не удалось загрузить карту: '{0}'");
         Log("map_loader.place_failed",
             "Failed to place {2} {3} at ({0}, {1}): {4}",
             "在 ({0}, {1}) 放置 {2} {3} 失败: {4}",
@@ -947,107 +930,107 @@ internal class LangGenerator : ModLangGenMultiBase
             "非預期的權杖類型: '{0}'，位置 ({1}, {2})",
             "Неожиданный тип токена: {0}, позиция ({1}, {2})");
         Log("map_loader.reload_success",
-            "Successfully reloaded map: {0}",
+            "Successfully reloaded map: '{0}'",
             "成功重新加载地图: '{0}'",
             "成功重新載入地圖: '{0}'",
-            "Карта успешно перезагружена: {0}");
+            "Карта успешно перезагружена: '{0}'");
         Log("map_loader.reload_failed",
-            "Failed to reload map: {0}",
+            "Failed to reload map: '{0}'",
             "重新加载地图失败: '{0}'",
             "重新載入地圖失敗: '{0}'",
-            "Не удалось перезагрузить карту: {0}");
+            "Не удалось перезагрузить карту: '{0}'");
         Log("map_loader.restarting_scene",
             "Restarting scene...",
             "正在重启场景...",
             "正在重啟場景...",
             "Перезапуск сцены...");
         Log("map_loader.scene_reloading",
-            "Reloading scene: {0}",
+            "Reloading scene: '{0}'",
             "正在重新加载场景: '{0}'",
             "正在重新載入場景: '{0}'",
-            "Перезагрузка сцены: {0}");
+            "Перезагрузка сцены: '{0}'");
         Log("map_loader.scene_reloaded",
             "Scene reloaded",
             "场景已重新加载",
             "場景已重新載入",
             "Сцена перезагружена");
         Log("map_loader.scene_reload_failed",
-            "Failed to reload scene: {0}",
+            "Failed to reload scene: '{0}'",
             "重新加载场景失败: '{0}'",
             "重新載入場景失敗: '{0}'",
-            "Не удалось перезагрузить сцену: {0}");
+            "Не удалось перезагрузить сцену: '{0}'");
         Log("map_loader.no_current_map",
             "No current Map configuration loaded",
             "当前没有加载的地图配置",
             "當前沒有載入的地圖配置",
             "Текущая конфигурация карты не загружена");
         Log("map_loader.custom_structures_not_supported",
-            "Custom structures are not supported for map loading: {0}",
+            "Custom structures are not supported for map loading: '{0}'",
             "地图加载不支持自定义结构: '{0}'",
             "地圖載入不支援自訂結構: '{0}'",
-            "Пользовательские структуры не поддерживаются для загрузки карты: {0}");
+            "Пользовательские структуры не поддерживаются для загрузки карты: '{0}'");
         Log("map_loader.no_features_enabled",
             "No features enabled",
             "未启用任何特性",
             "未啟用任何特性",
             "Особенности не включены");
         Log("map_loader.feature_enabled",
-            "{0} enabled",
+            "'{0}' enabled",
             "已启用 '{0}'",
             "已啟用 '{0}'",
-            "{0} включено");
+            "'{0}' включено");
         Log("map_loader.feature_enabled_with_value",
-            "{0} enabled: {1}",
+            "'{0}' enabled: {1}",
             "已启用 '{0}': '{1}'",
             "已啟用 '{0}': '{1}'",
-            "{0} включено: {1}");
+            "'{0}' включено: {1}");
         Log("map_loader.skip_generation",
-            "Skipped {0} generation",
+            "Skipped '{0}' generation",
             "已跳过 '{0}' 生成",
             "已跳過 '{0}' 生成",
-            "Пропущена генерация {0}");
+            "Пропущена генерация '{0}'");
         Log("map_loader.no_directory_path",
             "Map directory path is null or empty",
             "地图目录路径为空",
             "地圖目錄路徑為空",
             "Путь к каталогу карты пуст");
         Log("map_loader.map_json_not_found",
-            "map.json not found in: {0}",
-            "在 {0} 中找不到 map.json",
-            "在 {0} 中找不到 map.json",
-            "map.json не найден в: {0}");
+            "map.json not found in: '{0}'",
+            "在 '{0}' 中找不到 map.json",
+            "在 '{0}' 中找不到 map.json",
+            "map.json не найден в: '{0}'");
         Log("map_loader.map_deserialize_failed",
             "Failed to deserialize Map from disk",
             "反序列化地图失败",
             "反序列化地圖失敗",
             "Не удалось десериализовать карту с диска");
         Log("map_loader.map_reloaded_from_disk",
-            "Reloaded Map from disk: {0}",
+            "Reloaded Map from disk: '{0}'",
             "已从磁盘重新加载地图: '{0}'",
             "已從磁碟重新載入地圖: '{0}'",
-            "Карта перезагружена с диска: {0}");
+            "Карта перезагружена с диска: '{0}'");
         Log("map_loader.map_reload_failed",
-            "Failed to reload Map from disk: {0}",
+            "Failed to reload Map from disk: '{0}'",
             "重新加载地图失败: '{0}'",
             "重新載入地圖失敗: '{0}'",
-            "Не удалось перезагрузить карту с диска: {0}");
+            "Не удалось перезагрузить карту с диска: '{0}'");
         Log("map_loader.validation.no_data",
-            "No {1} data in {0}",
-            "{0} 中没有 {1} 数据",
-            "{0} 中沒有 {1} 資料",
-            "Нет данных {1} в {0}");
+            "No '{1}' data in '{0}'",
+            "'{0}' 中没有 '{1}' 数据",
+            "'{0}' 中沒有 '{1}' 資料",
+            "Нет данных '{1}' в '{0}'");
         Log("map_loader.validation.row_data_empty",
-            "{0} row data is empty",
-            "{0} 行数据为空",
-            "{0} 行資料為空",
-            "Данные строки {0} пусты");
+            "'{0}' row data is empty",
+            "'{0}' 行数据为空",
+            "'{0}' 行資料為空",
+            "Данные строки '{0}' пусты");
 
         // Log - Error
         Log("error.no_map_file",
-            "Cannot find map.json file: {0}",
+            "Cannot find map.json file: '{0}'",
             "找不到 map.json 文件: '{0}'",
             "找不到 map.json 檔案: '{0}'",
-            "Не удается найти файл map.json: {0}");
+            "Не удается найти файл map.json: '{0}'");
         Log("error.no_valid_directories",
             "No valid Map directories, please check the Maps folder",
             "没有有效的地图目录，请检查 Maps 文件夹",
@@ -1172,10 +1155,10 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Log - Custom Structures Loader
         Log("custom_structures_loader.loading",
-            "Loading custom structure: {0}",
+            "Loading custom structure: '{0}'",
             "正在加载自定义结构: '{0}'",
             "正在載入自訂結構: '{0}'",
-            "Загрузка пользовательской структуры: {0}");
+            "Загрузка пользовательской структуры: '{0}'");
         Log("custom_structures_loader.failed",
             "Failed to load custom structure ({0}): {1}",
             "加载自定义结构失败 ({0}): {1}",
@@ -1199,10 +1182,10 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Log - Build Mode Save Loader
         Log("build_mode_save_loader.loading",
-            "Loading Build Mode save: {0} (blocks: {1}, liquids: {2}, backgrounds: {3})",
+            "Loading Build Mode save: '{0}' (blocks: {1}, liquids: {2}, backgrounds: {3})",
             "正在加载建筑模式存档: '{0}' (方块: {1}, 液体: {2}, 背景: {3})",
             "正在載入建築模式存檔: '{0}' (方塊: {1}, 液體: {2}, 背景: {3})",
-            "Загрузка сохранения строительного режима: {0} (блоки: {1}, жидкости: {2}, фоны: {3})");
+            "Загрузка сохранения строительного режима: '{0}' (блоки: {1}, жидкости: {2}, фоны: {3})");
         Log("build_mode_save_loader.failed",
             "Failed to load Build Mode save ({0}): {1}",
             "加载建筑模式存档失败 ({0}): {1}",
@@ -1214,17 +1197,17 @@ internal class LangGenerator : ModLangGenMultiBase
             "未找到建築模式存檔檔案",
             "Файл сохранения строительного режима не найден");
         Log("build_mode_save_loader.bg_sprite_missing",
-            "Background sprite not found: {0}",
+            "Background sprite not found: '{0}'",
             "未找到背景精灵: '{0}'",
             "未找到背景精靈: '{0}'",
-            "Фоновый спрайт не найден: {0}");
+            "Фоновый спрайт не найден: '{0}'");
 
         // Log - Map Loader (Build Mode)
         Log("map_loader.build_mode_save_applied",
-            "Build Mode save applied: {0} blocks, {1} liquids, {2} backgrounds, {3} failed",
-            "建筑模式存档已应用: {0} 方块, {1} 液体, {2} 背景, {3} 失败",
-            "建築模式存檔已應用: {0} 方塊, {1} 液體, {2} 背景, {3} 失敗",
-            "Сохранение строительного режима применено: {0} блоков, {1} жидкостей, {2} фонов, {3} неудачно");
+            "Build Mode save applied: '{0}' blocks, {1} liquids, {2} backgrounds, {3} failed",
+            "建筑模式存档已应用: '{0}' 方块, {1} 液体, {2} 背景, {3} 失败",
+            "建築模式存檔已應用: '{0}' 方塊, {1} 液體, {2} 背景, {3} 失敗",
+            "Сохранение строительного режима применено: '{0}' блоков, {1} жидкостей, {2} фонов, {3} неудачно");
         Log("map_loader.not_found_buildmode_save",
             "Build Mode save file not found",
             "未找到建筑模式存档文件",
@@ -1238,50 +1221,50 @@ internal class LangGenerator : ModLangGenMultiBase
 
         // Log - Map Directory Loader
         Log("loader.directory_not_found",
-            "Directory not found: {0}",
+            "Directory not found: '{0}'",
             "目录未找到: '{0}'",
             "目錄未找到: '{0}'",
-            "Каталог не найден: {0}");
+            "Каталог не найден: '{0}'");
         Log("loader.map_json_not_found",
-            "map.json not found in: {0}",
+            "map.json not found in: '{0}'",
             "在 '{0}' 中找不到 map.json",
             "在 '{0}' 中找不到 map.json",
-            "map.json не найден в: {0}");
+            "map.json не найден в: '{0}'");
         Log("loader.map_json_failed",
-            "Failed to deserialize map.json: {0}",
+            "Failed to deserialize map.json: '{0}'",
             "反序列化 map.json 失败: '{0}'",
             "反序列化 map.json 失敗: '{0}'",
-            "Не удалось десериализовать map.json: {0}");
+            "Не удалось десериализовать map.json: '{0}'");
         Log("loader.success",
-            "Successfully loaded Map: {0} (ID: {1}, Version: {2})",
+            "Successfully loaded Map: '{0}' (ID: {1}, Version: {2})",
             "成功加载地图: '{0}' (ID: {1}, 版本: {2})",
             "成功載入地圖: '{0}' (ID: {1}, 版本: {2})",
-            "Карта успешно загружена: {0} (ID: {1}, Версия: {2})");
+            "Карта успешно загружена: '{0}' (ID: {1}, Версия: {2})");
         Log("loader.failed",
-            "Failed to load Map from {0}: {1}",
-            "从 {0} 加载地图失败: {1}",
-            "從 {0} 載入地圖失敗: {1}",
-            "Не удалось загрузить карту из {0}: {1}");
+            "Failed to load Map from '{0}': '{1}'",
+            "从 '{0}' 加载地图失败: {1}",
+            "從 '{0}' 載入地圖失敗: {1}",
+            "Не удалось загрузить карту из '{0}': '{1}'");
         Log("loader.level_dir_not_found",
-            "Level directory not found: {0}",
+            "Level directory not found: '{0}'",
             "关卡目录未找到: '{0}'",
             "關卡目錄未找到: '{0}'",
-            "Каталог уровня не найден: {0}");
+            "Каталог уровня не найден: '{0}'");
         Log("loader.no_level_files",
-            "No level files found in: {0}",
+            "No level files found in: '{0}'",
             "在 '{0}' 中找不到关卡文件",
             "在 '{0}' 中找不到關卡檔案",
-            "Файлы уровней не найдены в: {0}");
+            "Файлы уровней не найдены в: '{0}'");
         Log("loader.loaded_level",
-            "Loaded level: {0}",
+            "Loaded level: '{0}'",
             "已加载关卡: '{0}'",
             "已載入關卡: '{0}'",
-            "Уровень загружен: {0}");
+            "Уровень загружен: '{0}'");
         Log("loader.failed_to_load_level",
-            "Failed to load level file {0}: {1}",
-            "加载关卡文件 {0} 失败: {1}",
-            "載入關卡檔案 {0} 失敗: {1}",
-            "Не удалось загрузить файл уровня {0}: {1}");
+            "Failed to load level file '{0}': '{1}'",
+            "加载关卡文件 '{0}' 失败: {1}",
+            "載入關卡檔案 '{0}' 失敗: {1}",
+            "Не удалось загрузить файл уровня '{0}': '{1}'");
         Log("loader.no_world_settings",
             "No world settings found, using defaults",
             "未找到世界设置，使用默认值",
@@ -1289,18 +1272,18 @@ internal class LangGenerator : ModLangGenMultiBase
             "Настройки мира не найдены, используются значения по умолчанию");
         Log("loader.missing_type",
             "Missing 'type' property in {0}, expected '{1}'",
-            "{0} 中缺少 'type' 属性，期望 '{1}'",
-            "{0} 中缺少 'type' 屬性，期望 '{1}'",
+            "'{0}' 中缺少 'type' 属性，期望 '{1}'",
+            "'{0}' 中缺少 'type' 屬性，期望 '{1}'",
             "Отсутствует свойство 'type' в {0}, ожидалось '{1}'");
         Log("loader.type_mismatch",
             "Type mismatch in {0}: expected '{1}', got '{2}'",
-            "{0} 中类型不匹配: 期望 '{1}'，实际 '{2}'",
-            "{0} 中類型不匹配: 期望 '{1}'，實際 '{2}'",
+            "'{0}' 中类型不匹配: 期望 '{1}'，实际 '{2}'",
+            "'{0}' 中類型不匹配: 期望 '{1}'，實際 '{2}'",
             "Несоответствие типа в {0}: ожидалось '{1}', получено '{2}'");
         Log("loader.failed_to_load_file",
-            "Failed to load {0}: {1}",
-            "加载 {0} 失败: {1}",
-            "載入 {0} 失敗: {1}",
-            "Не удалось загрузить {0}: {1}");
+            "Failed to load '{0}': '{1}'",
+            "加载 '{0}' 失败: {1}",
+            "載入 '{0}' 失敗: {1}",
+            "Не удалось загрузить '{0}': '{1}'");
     }
 }
