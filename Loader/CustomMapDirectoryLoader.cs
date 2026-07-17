@@ -13,16 +13,16 @@ namespace CustomMap.Loader;
 
 public static class CustomMapDirectoryLoader
 {
-    private static readonly (string PropName, string SubDir, string FileName, string TypeCheck)[] FeatureDescriptors =
+    private static readonly (string PropName, string SubDir, string FileName)[] FeatureDescriptors =
     [
-        (nameof(Map.CurrentLayer.MineData), "world", "mine.json", "feature.world.mine"),
-        (nameof(Map.CurrentLayer.JumpPadData), "world", "jump_pad.json", "feature.world.jump_pad"),
-        (nameof(Map.CurrentLayer.TurretData), "world", "turret.json", "feature.world.turret"),
-        (nameof(Map.CurrentLayer.SoundCannonData), "world", "sound_cannon.json", "feature.world.sound_cannon"),
-        (nameof(Map.CurrentLayer.SpikeStabberData), "world", "spike_stabber.json", "feature.world.spike_stabber"),
-        (nameof(Map.CurrentLayer.GeyserData), "world", "geyser.json", "feature.world.geyser"),
-        (nameof(Map.CurrentLayer.BearTrapData), "world", "beartrap.json", "feature.world.beartrap"),
-        (nameof(Map.XpData), "player", "xp.json", "feature.player.xp")
+        (nameof(Map.CurrentLayer.MineData), "world", "mine.json"),
+        (nameof(Map.CurrentLayer.JumpPadData), "world", "jump_pad.json"),
+        (nameof(Map.CurrentLayer.TurretData), "world", "turret.json"),
+        (nameof(Map.CurrentLayer.SoundCannonData), "world", "sound_cannon.json"),
+        (nameof(Map.CurrentLayer.SpikeStabberData), "world", "spike_stabber.json"),
+        (nameof(Map.CurrentLayer.GeyserData), "world", "geyser.json"),
+        (nameof(Map.CurrentLayer.BearTrapData), "world", "beartrap.json"),
+        (nameof(Map.XpData), "player", "xp.json")
     ];
 
     public static Map LoadFromDirectory(string directoryPath)
@@ -36,7 +36,7 @@ public static class CustomMapDirectoryLoader
 
         try
         {
-            var map = LoadJsonWithTypeCheck<Map>(MapJsonPath, "map");
+            var map = LoadJson<Map>(MapJsonPath);
             if (map == null)
                 return null;
 
@@ -44,13 +44,16 @@ public static class CustomMapDirectoryLoader
 
             map.Layers = LoadLayers(directoryPath);
 
+            if (map.Layers.Count == 0)
+                map.Layers.Add(new Layer());
+
             map.CurrentLayer.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
-            foreach (var (propName, subDir, fileName, typeCheck) in FeatureDescriptors)
+            foreach (var (propName, subDir, fileName) in FeatureDescriptors)
             {
                 var prop = typeof(Map).GetProperty(propName);
                 if (prop == null) continue;
-                var value = LoadFeatureFileByType(prop.PropertyType, directoryPath, subDir, fileName, typeCheck);
+                var value = LoadFeatureFileByType(prop.PropertyType, directoryPath, subDir, fileName);
                 if (value != null)
                     prop.SetValue(map, value);
             }
@@ -94,7 +97,7 @@ public static class CustomMapDirectoryLoader
         foreach (var layerFile in layerFiles)
             try
             {
-                var layerData = LoadJsonWithTypeCheck<Layer>(layerFile, "layer");
+                var layerData = LoadJson<Layer>(layerFile);
                 if (layerData != null)
                     layers.Add(layerData);
             }
@@ -111,24 +114,23 @@ public static class CustomMapDirectoryLoader
         var settingsPath = Path.Combine(directoryPath, "feature", "world", "settings.json");
         return !File.Exists(settingsPath)
             ? null
-            : LoadJsonWithTypeCheck<WorldSettingsData>(settingsPath, "feature.world.settings");
+            : LoadJson<WorldSettingsData>(settingsPath);
     }
 
-    private static object LoadFeatureFileByType(Type dataType, string directoryPath, string subDir, string fileName,
-        string expectedType)
+    private static object LoadFeatureFileByType(Type dataType, string directoryPath, string subDir, string fileName)
     {
         var method = typeof(CustomMapDirectoryLoader).GetMethod(nameof(LoadFeatureFile),
             BindingFlags.NonPublic | BindingFlags.Static);
-        return method?.MakeGenericMethod(dataType).Invoke(null, [directoryPath, subDir, fileName, expectedType]);
+        return method?.MakeGenericMethod(dataType).Invoke(null, [directoryPath, subDir, fileName]);
     }
 
-    private static T LoadFeatureFile<T>(string directoryPath, string subDir, string fileName, string expectedType)
+    private static T LoadFeatureFile<T>(string directoryPath, string subDir, string fileName)
         where T : class
     {
         var filePath = Path.Combine(directoryPath, "feature", subDir, fileName);
         return !File.Exists(filePath)
             ? null
-            : LoadJsonWithTypeCheck<T>(filePath, expectedType);
+            : LoadJson<T>(filePath);
     }
 
     private static CommandData LoadCommandData(string directoryPath)
@@ -136,23 +138,17 @@ public static class CustomMapDirectoryLoader
         var commandPath = Path.Combine(directoryPath, "command.json");
         return !File.Exists(commandPath)
             ? null
-            : LoadJsonWithTypeCheck<CommandData>(commandPath, "command");
+            : LoadJson<CommandData>(commandPath);
     }
 
-    private static T LoadJsonWithTypeCheck<T>(string filePath, string expectedType) where T : class
+    private static T LoadJson<T>(string filePath) where T : class
     {
         try
         {
             var json = File.ReadAllText(filePath);
             var jObject = JObject.Parse(json);
 
-            var actualType = jObject["type"]?.ToString();
-            if (string.IsNullOrEmpty(actualType))
-                return null;
-
-            return !string.Equals(actualType, expectedType, StringComparison.OrdinalIgnoreCase)
-                ? null
-                : jObject.ToObject<T>();
+            return jObject.ToObject<T>();
         }
         catch
         {

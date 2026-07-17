@@ -972,7 +972,7 @@ internal class LangGenerator : ModLangGenMultiBase
             "'{0}' 行数据为空",
             "'{0}' 行資料為空",
             "Данные строки '{0}' пусты");
-        
+
         // Log - Map Load
         Log("map_load.empty_target_path",
             "Target path cannot be null or empty",

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Bark.BetterCCL;
+using Bark.Tool;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -9,8 +10,6 @@ namespace CustomMap;
 
 public static class MapLocale
 {
-    private const string MapType = "map";
-
     public static string GetName(Map map)
     {
         if (map == null) return string.Empty;
@@ -27,22 +26,41 @@ public static class MapLocale
     {
         if (map == null) return string.Empty;
         var currentLang = PlayerPrefs.GetString("locale", "EN");
+
+        // 先尝试当前语言
         var name = ReadFromMapLangForLang(map, "name", currentLang);
         if (!string.IsNullOrEmpty(name)) return name;
-        if (currentLang != "EN")
-        {
-            name = ReadFromMapLangForLang(map, "name", "EN");
-            if (!string.IsNullOrEmpty(name)) return name;
-        }
 
+        // 回退到 EN
+        if (currentLang == "EN") return map.Id ?? string.Empty;
+        name = ReadFromMapLangForLang(map, "name", "EN");
+        if (!string.IsNullOrEmpty(name)) return name;
+
+        // 最后回退到 ID
         return map.Id ?? string.Empty;
     }
 
-    public static string GetDescription(Map map)
+    public static string GetDescriptionForLang(Map map, string lang)
     {
-        return map == null
-            ? string.Empty
-            : ReadFromMapLang(map, "description") ?? string.Empty;
+        if (map == null) return string.Empty;
+        return ReadFromMapLangForLang(map, "description", lang) ?? string.Empty;
+    }
+
+    public static string GetDisplayDescription(Map map)
+    {
+        if (map == null) return string.Empty;
+        var currentLang = PlayerPrefs.GetString("locale", "EN");
+
+        // 先尝试当前语言
+        var desc = ReadFromMapLangForLang(map, "description", currentLang);
+        if (!string.IsNullOrEmpty(desc)) return desc;
+
+        // 回退到 EN
+        if (currentLang == "EN") return string.Empty;
+        desc = ReadFromMapLangForLang(map, "description", "EN");
+        if (!string.IsNullOrEmpty(desc)) return desc;
+
+        return string.Empty;
     }
 
     public static string GetAuthor(Map map)
@@ -88,26 +106,26 @@ public static class MapLocale
         var saveDir = directoryPath ?? map?.DirectoryPath;
         if (map == null || string.IsNullOrEmpty(saveDir))
         {
-            Plugin.Logger?.LogInfo(
+            LogUtil.Info(
                 $"[MapLocale.Debug] SaveToCurrentLang skipped: map={(map == null
                     ? "null"
-                    : $"DirectoryPath={map.DirectoryPath}")}, directoryPath={directoryPath}");
+                    : $"DirectoryPath={map.DirectoryPath}")}, directoryPath={directoryPath}", Plugin.Logger);
             return;
         }
 
-        var name = GetName(map);
-        var desc = GetDescription(map);
-        Plugin.Logger?.LogInfo(
-            $"[MapLocale.Debug] SaveToCurrentLang start: saveDir={saveDir}, Name={name}, Desc={desc}");
+        var name = GetDisplayName(map);
+        var desc = GetDisplayDescription(map);
+        LogUtil.Info(
+            $"[MapLocale.Debug] SaveToCurrentLang start: saveDir={saveDir}, Name={name}, Desc={desc}", Plugin.Logger);
 
         try
         {
             var currentLang = PlayerPrefs.GetString("locale", "EN");
             var langDir = Path.Combine(saveDir, "lang");
-            Plugin.Logger?.LogInfo($"[MapLocale.Debug] Creating lang dir: {langDir}");
+            LogUtil.Info($"[MapLocale.Debug] Creating lang dir: {langDir}", Plugin.Logger);
             Directory.CreateDirectory(langDir);
             var langFile = Path.Combine(langDir, $"{currentLang}.json");
-            Plugin.Logger?.LogInfo($"[MapLocale.Debug] Lang file path: {langFile}");
+            LogUtil.Info($"[MapLocale.Debug] Lang file path: {langFile}", Plugin.Logger);
 
             JObject langJson;
             if (File.Exists(langFile))
@@ -122,43 +140,26 @@ public static class MapLocale
                 langJson = new JObject();
             }
 
-            JObject mapObj;
-            if (langJson[MapType] is JObject existing)
-            {
-                mapObj = existing;
-            }
-            else
-            {
-                mapObj = new JObject();
-                langJson[MapType] = mapObj;
-            }
-
-            mapObj["name"] ??= name;
-            mapObj["description"] ??= desc;
+            // 修复：将 name 和 description 合并到 langJson
+            langJson["name"] ??= name;
+            langJson["description"] ??= desc;
 
             var jsonContent = JsonConvert.SerializeObject(langJson, Formatting.Indented);
             File.WriteAllText(langFile, jsonContent + Environment.NewLine);
         }
         catch (Exception ex)
         {
-            Plugin.Logger?.LogWarning($"[MapLocale] Failed to save locale: {ex.Message}");
+            LogUtil.Warning($"[MapLocale] Failed to save locale: {ex.Message}", Plugin.Logger);
         }
     }
 
     private static string ReadFromMapLang(Map map, string key)
     {
-        try
-        {
-            if (string.IsNullOrEmpty(map.DirectoryPath))
-                return null;
-
-            var currentLang = PlayerPrefs.GetString("locale", "EN");
-            return ReadFromMapLangForLang(map, key, currentLang);
-        }
-        catch
-        {
+        if (map == null || string.IsNullOrEmpty(map.DirectoryPath))
             return null;
-        }
+
+        var currentLang = PlayerPrefs.GetString("locale", "EN");
+        return ReadFromMapLangForLang(map, key, currentLang);
     }
 
     private static string ReadFromMapLangForLang(Map map, string key, string lang)
@@ -174,11 +175,20 @@ public static class MapLocale
                 return null;
 
             var json = JObject.Parse(File.ReadAllText(langFile));
-            var mapObj = json[MapType] as JObject;
-            return mapObj?[key]?.ToString();
+            return json[key]?.ToString();
         }
-        catch
+        catch (FileNotFoundException)
         {
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            LogUtil.Warning($"[MapLocale] Failed to parse lang file for {lang}: {ex.Message}", Plugin.Logger);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            LogUtil.Warning($"[MapLocale] Unexpected error reading lang file for {lang}: {ex.Message}", Plugin.Logger);
             return null;
         }
     }

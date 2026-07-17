@@ -80,14 +80,9 @@ public static class MapCheck
 
         var hasBuildModeSave = !string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave);
 
-        if (hasBuildModeSave && !Plugin.BuildModeLoaded)
-        {
-            map.MissingMods.Add("Build Mode Mod");
-        }
+        if (hasBuildModeSave && !Plugin.BuildModeLoaded) map.MissingMods.Add("Build Mode Mod");
 
         foreach (var mod in map.MissingMods)
-        {
             LogUtil.Warning($"{MapLocale.GetName(map)} need '{mod}' mod", Plugin.Logger);
-        }
     }
 }

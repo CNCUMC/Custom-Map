@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Bark.BetterCCL;
 using Bark.Tool;
 using CustomMap.Patch;
@@ -12,7 +11,7 @@ namespace CustomMap.Loader;
 public static class MapLoader
 {
     private const string LocaleKeyPre = "map_loader";
-    
+
     public static void ReloadMapFromDisk(Map map)
     {
         if (map == null)
@@ -107,11 +106,11 @@ public static class MapLoader
         }
 
         LogUtil.Divider();
-        InfoCommand("info.name", MapLocale.GetName(map));
+        InfoCommand("info.name", MapLocale.GetDisplayName(map));
         InfoCommand("info.id", map.Id);
         InfoCommand("info.version", map.Version);
         InfoCommand("info.authors", MapLocale.GetAuthor(map));
-        InfoCommand("info.description", MapLocale.GetDescription(map));
+        InfoCommand("info.description", MapLocale.GetDisplayDescription(map));
         InfoCommand("info.features", map.CurrentLayer.ActiveFeatures);
         InfoCommand("info.spawn", map.CurrentLayer.SpawnPosition);
         LogUtil.Divider();
@@ -137,14 +136,15 @@ public static class MapLoader
             var map = maps[i];
             var isCurrent = map.Id == MapUtils.CurrentMap?.Id;
             var marker = isCurrent
-                ? "->" 
+                ? "->"
                 : "  ";
 
             var displayName = MapLocale.GetName(map);
 
             if (map.MissingMods.Count > 0)
             {
-                var missingInfo = BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.requires_mod", string.Join(", ", map.MissingMods));
+                var missingInfo = BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.requires_mod",
+                    string.Join(", ", map.MissingMods));
                 displayName = $"<color=grey>{displayName} {missingInfo}";
             }
 

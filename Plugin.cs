@@ -32,6 +32,7 @@ public class Plugin : BaseUnityPlugin
     public static bool MoreLogs;
 
     public static bool StartGameUseMap;
+
     // public static float ProgressUpdateInterval;
     public static string FirstUseMap;
 
@@ -190,7 +191,8 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(BetterLocale.GetLog($"{NameSpace}.world_generation.scan_maps_failed", mapsDir, ex.Message));
+            Logger.LogWarning(
+                BetterLocale.GetLog($"{NameSpace}.world_generation.scan_maps_failed", mapsDir, ex.Message));
         }
 
         var arr = choices.ToArray();

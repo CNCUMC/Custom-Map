@@ -57,7 +57,9 @@ public static class WorldGenerationPatch
             CurrentMap = map;
         }
         else
+        {
             Warning("start_game_map_not_found", targetId);
+        }
     }
 
     [HarmonyPatch("Awake")]
@@ -117,10 +119,7 @@ public static class WorldGenerationPatch
         }
 
         if (settings.SettingsOverrides == null) return;
-        foreach (var kvp in settings.SettingsOverrides)
-        {
-            WorldGeneration.runSettings[kvp.Key] = kvp.Value;
-        }
+        foreach (var kvp in settings.SettingsOverrides) WorldGeneration.runSettings[kvp.Key] = kvp.Value;
     }
 
     private static void StartMapLoading(Map map)
@@ -338,9 +337,7 @@ public static class WorldGenerationPatch
         if (commands?.OnceCommands == null
             || commands.OnceCommands.Count == 0
            )
-        {
             return;
-        }
 
         if (commands.OnceCommands != null)
             foreach (var command in commands.OnceCommands)
