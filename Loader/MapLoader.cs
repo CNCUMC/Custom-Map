@@ -11,67 +11,8 @@ namespace CustomMap.Loader;
 
 public static class MapLoader
 {
-    private const string LocaleKeyPre = "map_loader.";
-
-    public static void ApplyBuildModeSave(string saveFilePath)
-    {
-        if (!Plugin.BuildModeLoaded)
-        {
-            Warning("build_mode_mod_not_loaded");
-            return;
-        }
-
-        if (!File.Exists(saveFilePath))
-        {
-            Error("not_found_buildmode_save");
-            return;
-        }
-
-        try
-        {
-            var loadModeType = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(a => a.GetType("LoadMode"))
-                .FirstOrDefault(t => t != null);
-
-            if (loadModeType == null)
-            {
-                Error("not_found", "Build Mode mod");
-                return;
-            }
-
-            var assembly = loadModeType.Assembly;
-            var buildModeModType = assembly.GetType("BuildModeMod");
-            if (buildModeModType == null)
-            {
-                Error("not_found", "BuildModeMod");
-                return;
-            }
-
-            loadModeType.GetMethod("LoadFileAndStartPlacement",
-                    BindingFlags.Public | BindingFlags.Static)
-                ?.Invoke(null, [saveFilePath]);
-
-            var applyLoadMethod = loadModeType.GetMethod("ApplyLoad",
-                BindingFlags.NonPublic | BindingFlags.Static);
-            if (applyLoadMethod == null)
-            {
-                Error("not_found", "LoadMode.ApplyLoad");
-                return;
-            }
-
-            applyLoadMethod.Invoke(null, null);
-
-            buildModeModType.GetField("_loadBuffer", BindingFlags.Public | BindingFlags.Static)
-                ?.SetValue(null, null);
-            buildModeModType.GetField("_isLoading", BindingFlags.Public | BindingFlags.Static)
-                ?.SetValue(null, false);
-        }
-        catch (Exception ex)
-        {
-            Error("build_mode_save_load_failed", ex.Message);
-        }
-    }
-
+    private const string LocaleKeyPre = "map_loader";
+    
     public static void ReloadMapFromDisk(Map map)
     {
         if (map == null)
@@ -129,7 +70,6 @@ public static class MapLoader
         LogUtil.Divider();
         try
         {
-            MoreLogs("restarting_scene");
             RestartScene();
         }
         catch (Exception ex)
@@ -196,13 +136,15 @@ public static class MapLoader
         {
             var map = maps[i];
             var isCurrent = map.Id == MapCheck.CurrentMap?.Id;
-            var marker = isCurrent ? "->" : "  ";
+            var marker = isCurrent
+                ? "->" 
+                : "  ";
 
             var displayName = MapLocale.GetName(map);
 
             if (map.MissingMods.Count > 0)
             {
-                var missingInfo = BetterLocale.GetLog("map_check.requires_mod", string.Join(", ", map.MissingMods));
+                var missingInfo = BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.requires_mod", string.Join(", ", map.MissingMods));
                 displayName = $"<color=grey>{displayName} {missingInfo}";
             }
 
@@ -227,7 +169,7 @@ public static class MapLoader
 
     private static void InfoCommand(string key, params object[] args)
     {
-        LogUtil.Info(BetterLocale.GetCommand($"custommap.{key}", args), Plugin.Logger);
+        LogUtil.Info(BetterLocale.GetCommand($"{Plugin.NameSpace}.cm.{key}", args), Plugin.Logger);
     }
 
     private static void Error(string key, params object[] args)
@@ -247,6 +189,6 @@ public static class MapLoader
 
     private static string LocaleLog(string key, params object[] args)
     {
-        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.{key}", args);
     }
 }

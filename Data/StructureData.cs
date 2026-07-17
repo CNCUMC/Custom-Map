@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace CustomMap.Data;
 
-public class StructurePlacement
+public class StructureData
 {
     [JsonProperty("structure")] public string Structure { get; set; }
 

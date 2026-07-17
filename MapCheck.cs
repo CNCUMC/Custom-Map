@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Bark.BetterCCL;
+using Bark.Tool;
 using CustomMap.Loader;
 using CustomMap.Patch;
 
@@ -38,7 +39,7 @@ public static class MapCheck
 
         var directories = Directory.GetDirectories(MapsPath);
 
-        Plugin.Logger.LogInfo($"Read {directories.Length} Map folders");
+        LogUtil.Info($"Read {directories.Length} Map folders", Plugin.Logger);
 
         ValidDirectories.Clear();
         CheckFailDirectories.Clear();
@@ -55,7 +56,7 @@ public static class MapCheck
         Maps.Add(Plugin.TemplateMap);
 
         if (ValidDirectories.Count == 0) return;
-        Plugin.Logger.LogInfo($"Valid directories: {ValidDirectories.Count}, loading...");
+        LogUtil.Warning($"Valid directories: {ValidDirectories.Count}, loading...", Plugin.Logger);
 
         var directoriesToValidate = ValidDirectories.ToList();
         foreach (var directory in directoriesToValidate)
@@ -69,16 +70,16 @@ public static class MapCheck
             }
             else
             {
-                UninitializedWarning($"{Path.GetFileName(directory)} Loading failed!");
+                LogUtil.Warning($"{Path.GetFileName(directory)} Loading failed!", Plugin.Logger);
                 CheckFailDirectories.Add(directory);
             }
         }
 
         if (CheckFailDirectories.Count == 0) return;
-        Plugin.Logger.LogInfo($"Directory validation failed: {CheckFailDirectories.Count}:");
+        LogUtil.Warning($"Directory validation failed: {CheckFailDirectories.Count}:", Plugin.Logger);
         foreach (var failDirectory in CheckFailDirectories)
         {
-            Plugin.Logger.LogInfo($"- {Path.GetFileName(failDirectory)}");
+            LogUtil.Warning($"- {Path.GetFileName(failDirectory)}", Plugin.Logger);
             ValidDirectories.Remove(failDirectory);
         }
     }
@@ -87,12 +88,17 @@ public static class MapCheck
     {
         if (map == null) return;
 
-        var missingMods = map.MissingMods;
         var hasBuildModeSave = !string.IsNullOrEmpty(map.CurrentLayer.BuildModeSave);
 
-        if (!hasBuildModeSave || Plugin.BuildModeLoaded) return;
-        missingMods.Add("Build Mode");
-        Plugin.Logger.LogWarning(BetterLocale.GetLog("map_check.missing_build_mode_mod", MapLocale.GetName(map)));
+        if (hasBuildModeSave && !Plugin.BuildModeLoaded)
+        {
+            map.MissingMods.Add("Build Mode Mod");
+        }
+
+        foreach (var mod in map.MissingMods)
+        {
+            LogUtil.Warning($"{MapLocale.GetName(map)} need '{mod}' mod", Plugin.Logger);
+        }
     }
 
     public static string GetMapPath(Map map = null)
@@ -101,10 +107,5 @@ public static class MapCheck
         return string.IsNullOrEmpty(target?.DirectoryPath)
             ? null
             : target.DirectoryPath;
-    }
-
-    private static void UninitializedWarning(string key)
-    {
-        Plugin.Logger.LogWarning($"{key}");
     }
 }

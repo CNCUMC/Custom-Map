@@ -18,7 +18,7 @@ namespace CustomMap.Patch;
 [HarmonyPatch(typeof(WorldGeneration))]
 public static class WorldGenerationPatch
 {
-    private const string LocaleKeyPre = "world_generation.";
+    private const string LocaleKeyPre = "world_generation_patch";
     public static WorldGeneration WorldGeneration;
     internal static Map CurrentMap;
     private static float _sLoopTimer;
@@ -44,35 +44,20 @@ public static class WorldGenerationPatch
         if (!Plugin.StartGameUseMap)
             return;
 
-        Map map = null;
-
-        if (!string.IsNullOrEmpty(Plugin.FirstUseMap))
-        {
-            var targetId = Plugin.FirstUseMap;
-            map = MapCheck.Maps.FirstOrDefault(f =>
-                f != null &&
-                (f.Id?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true ||
-                 MapLocale.GetName(f)?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
-
-            if (map != null)
-                Info("start_game_map", MapLocale.GetName(map), map.Id);
-            else
-                Warning("start_game_map_not_found", targetId);
-        }
-
-        map ??= MapCheck.Maps.FirstOrDefault();
+        if (string.IsNullOrEmpty(Plugin.FirstUseMap)) return;
+        var targetId = Plugin.FirstUseMap;
+        var map = MapCheck.Maps.FirstOrDefault(f =>
+            f != null
+            && (f.Id?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true ||
+                MapLocale.GetName(f)?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
 
         if (map != null)
         {
+            Info("start_game_map", MapLocale.GetName(map), map.Id);
             CurrentMap = map;
-            Plugin.Logger.LogInfo(
-                $"[CustomMap.Debug] AwakePrefix: Set CurrentMap to '{MapLocale.GetName(map)}' (ID: {map.Id}), ExitTargetScene={ExitTargetScene}");
         }
         else
-        {
-            Plugin.Logger.LogWarning(
-                $"[CustomMap.Debug] AwakePrefix: No map found! FirstUseMap='{Plugin.FirstUseMap}', Maps.Count={MapCheck.Maps.Count}");
-        }
+            Warning("start_game_map_not_found", targetId);
     }
 
     [HarmonyPatch("Awake")]
@@ -88,14 +73,12 @@ public static class WorldGenerationPatch
             SetDefaultSceneType(WorldGeneration, map);
 
             // Initialize fluid array early to prevent NullReferenceException in FluidManager
-            if (FluidManager.main != null)
-            {
-                var chunkWidth = 16u;
-                var chunkHeight = 16u;
-                __instance.width = chunkWidth * (uint) WorldGeneration.CHUNKSIZE;
-                __instance.height = chunkHeight * (uint) WorldGeneration.CHUNKSIZE;
-                FluidManager.main.fluid = new byte[(int) __instance.width, (int) __instance.height];
-            }
+            if (FluidManager.main == null) return;
+            const uint chunkWidth = 16u;
+            const uint chunkHeight = 16u;
+            __instance.width = chunkWidth * (uint)WorldGeneration.CHUNKSIZE;
+            __instance.height = chunkHeight * (uint)WorldGeneration.CHUNKSIZE;
+            FluidManager.main.fluid = new byte[(int)__instance.width, (int)__instance.height];
 
             return;
         }
@@ -116,37 +99,31 @@ public static class WorldGenerationPatch
     {
         var map = CurrentMap;
         if (map?.CurrentLayer?.WorldSettingsData == null) return;
-        
+
         var settings = map.CurrentLayer.WorldSettingsData;
         var appliedCount = 0;
-        
-        // Apply WorldSettingsData properties to runSettings
+
         var properties = typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         foreach (var prop in properties)
         {
             var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
             var jsonName = jsonAttr?.PropertyName ?? prop.Name;
-            
+
             if (!WorldSettingsData.RunSettingsKeyMap.ContainsKey(jsonName)) continue;
-            
+
             var runSettingsKey = WorldSettingsData.GetRunSettingsKey(jsonName);
             var value = prop.GetValue(settings);
             if (value == null) continue;
             WorldGeneration.runSettings[runSettingsKey] = value;
             appliedCount++;
         }
-        
+
         if (settings.SettingsOverrides != null)
-        {
             foreach (var kvp in settings.SettingsOverrides)
             {
                 WorldGeneration.runSettings[kvp.Key] = kvp.Value;
                 appliedCount++;
             }
-        }
-        
-        // Log summary only
-        Info("settings_overridden", appliedCount, WorldGeneration.runSettings.Count);
     }
 
     private static void StartMapLoading(Map map)
@@ -211,7 +188,7 @@ public static class WorldGenerationPatch
     public static bool SkipWorldCreateBackground()
     {
         if (CurrentMap is not { CurrentLayer.SkipBackground: true }) return true;
-        MoreLogs("skip_generation", BetterLocale.GetOther("common.background"));
+        MoreLogs("skip_generation", LocaleLog("background"));
         return false;
     }
 
@@ -220,7 +197,16 @@ public static class WorldGenerationPatch
     public static bool SkipWorldGenerateStructures()
     {
         if (CurrentMap is not { CurrentLayer.SkipStructures: true }) return true;
-        MoreLogs("skip_generation", BetterLocale.GetOther("common.structure"));
+        MoreLogs("skip_generation", LocaleLog("structure"));
+        return false;
+    }
+
+    [HarmonyPatch("WorldGenerateTerrain")]
+    [HarmonyPrefix]
+    public static bool SkipWorldGenerateTerrain()
+    {
+        if (CurrentMap is not { CurrentLayer.SkipTerrain: true }) return true;
+        MoreLogs("skip_generation", LocaleLog("terrain"));
         return false;
     }
 
@@ -229,15 +215,6 @@ public static class WorldGenerationPatch
     public static bool SetLoadingTextPrefix(string localetext)
     {
         return !_loading || CurrentMap == null;
-    }
-
-    [HarmonyPatch("WorldGenerateTerrain")]
-    [HarmonyPrefix]
-    public static bool SkipWorldGenerateTerrain()
-    {
-        if (CurrentMap is not { CurrentLayer.SkipTerrain: true }) return true;
-        MoreLogs("skip_generation", BetterLocale.GetOther("common.terrain"));
-        return false;
     }
 
     [HarmonyPatch("WorldPlacePlayer")]
@@ -258,7 +235,6 @@ public static class WorldGenerationPatch
     {
         if (CurrentMap != null)
         {
-            // Apply custom run settings here, after game has fully initialized runSettings
             ApplyWorldSettingsToRunSettings();
             __instance.StartCoroutine(ContentLoadingCoroutine(__instance));
             return false;
@@ -285,7 +261,9 @@ public static class WorldGenerationPatch
 
         if (hasCustomStructures) CustomStructuresLoader.SpawnCustomStructures(map);
 
-        if (hasBuildModeSave) BuildModeSaveLoader.SpawnBuildModeSave(map);
+        if (hasBuildModeSave)
+            LogUtil.Warning("Coming soon :)", Plugin.Logger);
+        // BuildModeSaveLoader.SpawnBuildModeSave(map);
 
         GlobalDark.main.Darken();
         yield return new WaitUntil(() => !GlobalDark.main.IsDarkening());
@@ -360,17 +338,17 @@ public static class WorldGenerationPatch
     private static void ExecuteCommands(Map map)
     {
         var commands = map.CurrentLayer.CommandData;
-        if (commands == null || ((commands.OnceCommands == null || commands.OnceCommands.Count == 0) &&
-                                 (commands.LoopCommands == null || commands.LoopCommands.Count == 0)))
+        if (commands?.OnceCommands == null
+            || commands.OnceCommands.Count == 0
+           )
         {
-            MoreLogs("no_commands", BetterLocale.GetLog("common.startup_command"));
             return;
         }
 
         if (commands.OnceCommands != null)
             foreach (var command in commands.OnceCommands)
             {
-                MoreLogs("executing_command", BetterLocale.GetLog("common.startup_command"), command);
+                MoreLogs("executing_command", LocaleLog("startup_command"), command);
                 CUCoreUtils.ConsoleRunCommand(ConsoleScript.instance, command);
             }
 
@@ -393,7 +371,7 @@ public static class WorldGenerationPatch
 
         foreach (var command in loopCommands)
         {
-            MoreLogs("executing_loop_command", BetterLocale.GetLog("common.loop_command"), command);
+            MoreLogs("executing_command", LocaleLog("loop_command"), command);
             CUCoreUtils.ConsoleRunCommand(ConsoleScript.instance, command);
         }
     }
@@ -416,6 +394,6 @@ public static class WorldGenerationPatch
 
     private static string LocaleLog(string key, params object[] args)
     {
-        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.{key}", args);
     }
 }

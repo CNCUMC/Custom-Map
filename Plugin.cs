@@ -16,8 +16,8 @@ using HarmonyLib;
 
 namespace CustomMap;
 
-[BepInDependency("net.cucorelib", "1.0.2")]
-[BepInDependency("org.cncumc.bark", "1.1.0")]
+[BepInDependency("net.cucorelib", "1.0.3")]
+[BepInDependency("org.cncumc.bark", "1.1.1")]
 [BepInDependency("com.Jimmyking.morestructures", "1.2.1")]
 [BepInDependency("com.alexx_.buildmode", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(Guid, Name, Version)]
@@ -26,12 +26,13 @@ public class Plugin : BaseUnityPlugin
     public const string Guid = "org.cncumc.custommap";
     public const string Name = "Custom Map";
     public const string Version = "1.0.0";
-    internal const string NameSpace = "custommap";
+    internal const string NameSpace = "custom_map";
     internal new static ManualLogSource Logger;
 
     public static bool MoreLogs;
+
     public static bool StartGameUseMap;
-    public static float ProgressUpdateInterval;
+    // public static float ProgressUpdateInterval;
     public static string FirstUseMap;
 
     public static readonly Map TemplateMap = new()
@@ -46,18 +47,13 @@ public class Plugin : BaseUnityPlugin
                 Type = WorldGeneration.OverrideSceneType.Debug,
                 X = -68,
                 Y = 62,
-                SkipBackground = false,
+                SkipTerrain = false,
                 Items =
                 [
                     new ItemData
                     {
                         Id = Items.Rifle,
                         Slot = Slots.MainHand
-                    },
-                    new ItemData
-                    {
-                        Id = Items.MindWipe,
-                        Slot = Slots.Mouth
                     },
                     new ItemData
                     {
@@ -135,10 +131,10 @@ public class Plugin : BaseUnityPlugin
 
         new LangGenerator().Initialize(Logger);
 
-        BetterOptions.Bool(NameSpace, "more_logs", NameSpace, false, v => MoreLogs = v);
-        BetterOptions.Bool(NameSpace, "start_game_use_map", NameSpace, false, v => StartGameUseMap = v);
-        BetterOptions.Float(NameSpace, "progress_update_interval", NameSpace, 333, 10, 1000,
-            v => ProgressUpdateInterval = v);
+        BetterOptions.Bool(NameSpace, "more_logs", Name, false, v => MoreLogs = v);
+        BetterOptions.Bool(NameSpace, "start_game_use_map", Name, false, v => StartGameUseMap = v);
+        // BetterOptions.Float(NameSpace, "progress_update_interval", Name, 333, 10, 1000,
+        //     v => ProgressUpdateInterval = v);
         RegisterMapOption();
 
         BetterLocale.Flush();
@@ -155,7 +151,7 @@ public class Plugin : BaseUnityPlugin
         var mapsDir = MapCheck.MapsPath;
 
         // Add TemplateMap - register English default and use localized name
-        var templateKey = $"custommap.first_use_map{TemplateMap.Id}";
+        var templateKey = $"{NameSpace}.first_use_map{TemplateMap.Id}";
         BetterLocale.SetDefault("EN", NameSpace, "option", templateKey, $"{Name} Template");
         BetterLocale.Flush();
         var templateDisplayName = BetterLocale.GetOther(templateKey);
@@ -174,13 +170,13 @@ public class Plugin : BaseUnityPlugin
                         var map = CustomMapDirectoryLoader.LoadFromDirectory(dir);
                         if (map == null) continue;
 
-                        // Skip if this map has the same Id as TemplateMap to avoid duplicates
+                        // Skip if this map has the same ID as TemplateMap to avoid duplicates
                         if (map.Id == TemplateMap.Id) continue;
 
                         MapCheck.DetectMissingMods(map);
 
                         // Register English default and use localized name
-                        var key = $"custommap.custommap.first_use_map{map.Id}";
+                        var key = $"{NameSpace}.first_use_map{map.Id}";
                         BetterLocale.SetDefault("EN", NameSpace, "option", key, MapLocale.GetDisplayName(map));
                         BetterLocale.Flush();
                         var displayName = BetterLocale.GetOther(key);
@@ -194,11 +190,11 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(BetterLocale.GetLog("world_generation.scan_maps_failed", mapsDir, ex.Message));
+            Logger.LogWarning(BetterLocale.GetLog($"{NameSpace}.world_generation.scan_maps_failed", mapsDir, ex.Message));
         }
 
         var arr = choices.ToArray();
-        BetterOptions.Dropdown(NameSpace, "first_use_map", NameSpace,
+        BetterOptions.Dropdown(NameSpace, "first_use_map", Name,
             0, arr,
             i => FirstUseMap = i >= 0 && i < arr.Length
                 ? arr[i].Key

@@ -76,7 +76,10 @@ public class WorldSettingsData
     [JsonProperty("infection_speed")] public float InfectionSpeed { get; set; } = 1.0f;
     [JsonProperty("infection_chance")] public float InfectionChance { get; set; } = 1.0f;
     [JsonProperty("fibrillation_rate")] public float FibrillationRate { get; set; } = 1.0f;
-    [JsonProperty("mood_normalization_rate")] public float MoodNormalizationRate { get; set; } = 1.0f;
+
+    [JsonProperty("mood_normalization_rate")]
+    public float MoodNormalizationRate { get; set; } = 1.0f;
+
     [JsonProperty("bonus_limb_armor")] public float BonusLimbArmor { get; set; }
     [JsonProperty("stamina_regen")] public float StaminaRegen { get; set; } = 1.0f;
     [JsonProperty("attack_damage")] public float AttackDamage { get; set; } = 1.0f;
@@ -89,15 +92,23 @@ public class WorldSettingsData
     [JsonProperty("low_mood_events")] public bool LowMoodEvents { get; set; } = true;
     [JsonProperty("liquid_pushing")] public bool LiquidPushing { get; set; } = true;
     [JsonProperty("disfigurement")] public bool Disfigurement { get; set; } = true;
-    [JsonProperty("no_sleep_restrictions")] public bool NoSleepRestrictions { get; set; }
+
+    [JsonProperty("no_sleep_restrictions")]
+    public bool NoSleepRestrictions { get; set; }
+
     [JsonProperty("infinite_last_stand")] public bool InfiniteLastStand { get; set; }
     [JsonProperty("trader_chance")] public float TraderChance { get; set; } = 33.0f;
     [JsonProperty("trader_item_amount")] public float TraderItemAmount { get; set; } = 1.0f;
     [JsonProperty("trader_rep_offset")] public float TraderRepOffset { get; set; }
     [JsonProperty("item_decay_rate")] public float ItemDecayRate { get; set; } = 1.0f;
     [JsonProperty("lock_pick_precision")] public float LockPickPrecision { get; set; } = 1.0f;
-    [JsonProperty("layer_modifier_chance")] public float LayerModifierChance { get; set; } = 40.0f;
-    [JsonProperty("time_between_earthquakes")] public float TimeBetweenEarthquakes { get; set; } = 1.0f;
+
+    [JsonProperty("layer_modifier_chance")]
+    public float LayerModifierChance { get; set; } = 40.0f;
+
+    [JsonProperty("time_between_earthquakes")]
+    public float TimeBetweenEarthquakes { get; set; } = 1.0f;
+
     [JsonProperty("temperature_offset")] public float TemperatureOffset { get; set; }
     [JsonProperty("ore_amount")] public float OreAmount { get; set; } = 1.0f;
 
@@ -115,22 +126,19 @@ public class WorldSettingsData
     {
         var result = new Dictionary<string, object>();
         var properties = typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        
+
         foreach (var prop in properties)
         {
             var jsonAttr = prop.GetCustomAttribute<JsonPropertyAttribute>();
             var jsonName = jsonAttr?.PropertyName ?? prop.Name;
-            
+
             if (!RunSettingsKeyMap.ContainsKey(jsonName)) continue;
-            
+
             var runSettingsKey = GetRunSettingsKey(jsonName);
             var value = prop.GetValue(this);
-            if (value != null)
-            {
-                result[runSettingsKey] = value;
-            }
+            if (value != null) result[runSettingsKey] = value;
         }
-        
+
         return result;
     }
 }

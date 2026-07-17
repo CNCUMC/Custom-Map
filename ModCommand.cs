@@ -20,7 +20,7 @@ namespace CustomMap;
 [HarmonyPatch(typeof(ConsoleScript))]
 public class ModCommand
 {
-    private const string LocaleKeyPre = "mod_command.";
+    private const string LocaleKeyPre = "mod_command";
     private static bool _autofillRegistered;
 
     [HarmonyPatch("RegisterAllCommands")]
@@ -57,14 +57,6 @@ public class ModCommand
                 ("string", LocaleCommand("parameter")),
                 ("string", LocaleCommand("parameter"))
             };
-
-            ConsoleCommandRegistry.Register(
-                "custommap",
-                LocaleCommand("description"),
-                ExecuteMapCommand,
-                argAutofill,
-                paramDescriptions
-            );
 
             ConsoleCommandRegistry.Register(
                 "cm",
@@ -576,12 +568,6 @@ public class ModCommand
 
     private static void HandleFeature(string[] args)
     {
-        if (CUCoreUtils.IsInWorld())
-        {
-            BetterLocale.GetLog("mod_command.world_not_loaded");
-            return;
-        }
-
         var map = MapCheck.CurrentMap;
         if (map == null)
         {
@@ -592,7 +578,6 @@ public class ModCommand
         switch (args.Length)
         {
             case < 3:
-                InfoCommand("help");
                 ListFeatures(map);
                 return;
             case >= 4:
@@ -611,7 +596,7 @@ public class ModCommand
         var settings = map.CurrentLayer.WorldSettingsData;
         if (settings != null)
         {
-            var wsDisplay = LocaleOther("feature.world_settings_data");
+            var wsDisplay = LocaleOther("feature.world_settings");
             var wsItems =
                 (from prop in typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     where prop.Name != "Type"
@@ -626,6 +611,13 @@ public class ModCommand
 
         var featureDataTypes = new Dictionary<string, object>
         {
+            ["full_bright"] = map.CurrentLayer.WorldSettingsData.FullBright,
+            ["forgiving_level"] = map.CurrentLayer.WorldSettingsData.ForgivingLevel,
+            ["gravity"] = map.CurrentLayer.WorldSettingsData.Gravity,
+            ["jump_limit"] = map.CurrentLayer.WorldSettingsData.JumpLimit,
+            ["climb_limit"] = map.CurrentLayer.WorldSettingsData.ClimbLimit,
+            ["skip_terrain"] = map.CurrentLayer.SkipTerrain,
+            ["skip_background"] = map.CurrentLayer.SkipBackground,
             ["mine"] = map.CurrentLayer.MineData,
             ["jump_pad"] = map.CurrentLayer.JumpPadData,
             ["turret"] = map.CurrentLayer.TurretData,
@@ -639,7 +631,7 @@ public class ModCommand
         foreach (var kvp in featureDataTypes)
         {
             var value = kvp.Value;
-            var displayName = LocaleOther($"feature.{kvp.Key}_data");
+            var displayName = LocaleOther($"feature.{kvp.Key}");
             if (value == null)
             {
                 groups.Add(($"{displayName}({kvp.Key})", ["null"]));
@@ -751,6 +743,13 @@ public class ModCommand
     {
         var propName = name switch
         {
+            "full_bright" => "FullBright",
+            "forgiving_level" => "ForgivingLevel",
+            "gravity" => "Gravity",
+            "jump_limit" => "JumpLimit",
+            "climb_limit" => "ClimbLimit",
+            "skip_terrain" => "SkipTerrain",
+            "skip_background" => "SkipBackground",
             "mine" => "MineData",
             "jump_pad" => "JumpPadData",
             "turret" => "TurretData",
@@ -758,7 +757,6 @@ public class ModCommand
             "spike_stabber" => "SpikeStabberData",
             "geyser" => "GeyserData",
             "beartrap" => "BearTrapData",
-            "world_settings" => "WorldSettings",
             "xp" => "XpData",
             _ => null
         };
@@ -785,7 +783,9 @@ public class ModCommand
 
     private static string GetFeatureDisplayName(string fieldName)
     {
-        return string.IsNullOrEmpty(fieldName) ? fieldName : fieldName.ToLowerInvariant();
+        return string.IsNullOrEmpty(fieldName)
+            ? fieldName
+            : fieldName.ToLowerInvariant();
     }
 
     private static bool EnsureWorldLoaded()
@@ -899,17 +899,17 @@ public class ModCommand
 
     private static string LocaleLog(string key, params object[] args)
     {
-        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.{key}", args);
     }
 
     private static string LocaleOther(string key, params object[] args)
     {
-        return BetterLocale.GetOther(key, args);
+        return BetterLocale.GetOther($"{Plugin.NameSpace}.{key}", args);
     }
 
     private static string LocaleCommand(string key, params object[] args)
     {
-        return BetterLocale.GetCommand($"custommap.{key}", args);
+        return BetterLocale.GetCommand($"{Plugin.NameSpace}.cm.{key}", args);
     }
 
     private static void Error(string key, params object[] args)

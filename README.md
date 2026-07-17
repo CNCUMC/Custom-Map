@@ -69,7 +69,7 @@ start a new game.
 
 ## Commands
 
-All commands use the `cm` prefix (or `custommap`).
+All commands use the `cm` prefix.
 
 | Command                 | Description                                     |
 |-------------------------|-------------------------------------------------|

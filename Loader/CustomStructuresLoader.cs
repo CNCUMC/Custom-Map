@@ -9,7 +9,7 @@ namespace CustomMap.Loader;
 
 public static class CustomStructuresLoader
 {
-    private const string LocaleKeyPre = "custom_structures_loader.";
+    private const string LocaleKeyPre = "custom_structures_loader";
 
     private static readonly string[] StructureExtensions = [".ms2.json", ".m2", ".txt"];
     private static readonly string[] StructureSubdirectories = ["", "layers"];
@@ -110,6 +110,6 @@ public static class CustomStructuresLoader
 
     private static string LocaleLog(string key, params object[] args)
     {
-        return BetterLocale.GetLog($"{LocaleKeyPre}{key}", args);
+        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}{key}", args);
     }
 }

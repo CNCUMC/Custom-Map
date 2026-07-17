@@ -10,7 +10,7 @@ namespace CustomMap;
 public class Layer
 {
     [JsonProperty("structures", NullValueHandling = NullValueHandling.Ignore)]
-    public List<StructurePlacement> Structures { get; set; } = [];
+    public List<StructureData> Structures { get; set; } = [];
 
     [JsonProperty("build_mode_save", NullValueHandling = NullValueHandling.Ignore)]
     public string BuildModeSave { get; set; }
