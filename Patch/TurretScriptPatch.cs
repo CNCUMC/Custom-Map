@@ -19,7 +19,7 @@ public class TurretScriptPatch
     private static readonly FieldInfo DidCountSoundField = typeof(TurretScript).GetField(
         "didcountsound", BindingFlags.NonPublic | BindingFlags.Instance);
 
-    private static TurretData TurretData => MapCheck.CurrentMap?.CurrentLayer.TurretData;
+    private static TurretData TurretData => MapUtils.CurrentMap?.CurrentLayer.TurretData;
 
     private static float GetCooldown()
     {

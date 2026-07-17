@@ -17,7 +17,7 @@ public class JumpPadScriptPatch
         "light",
         BindingFlags.NonPublic | BindingFlags.Instance);
 
-    private static JumpPadData JumpPadData => MapCheck.CurrentMap?.CurrentLayer.JumpPadData;
+    private static JumpPadData JumpPadData => MapUtils.CurrentMap?.CurrentLayer.JumpPadData;
 
     [HarmonyPatch("OnCollisionEnter2D")]
     [HarmonyPrefix]

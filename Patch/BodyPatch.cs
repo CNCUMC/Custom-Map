@@ -19,7 +19,7 @@ public static class BodyPatch
 
     private static int _jumpCount;
     private static int _climbCount;
-    private static WorldSettingsData WorldSettings => MapCheck.CurrentMap?.CurrentLayer.WorldSettingsData;
+    private static WorldSettingsData WorldSettings => MapUtils.CurrentMap?.CurrentLayer.WorldSettingsData;
 
     private static bool IsPatchActive =>
         WorldSettings != null
@@ -38,8 +38,6 @@ public static class BodyPatch
         HandleMultiJump(__instance);
         HandleMultiClimb(__instance);
 
-        // û���
-        // ��ʼ��
         if (!__instance.grounded) return;
         _jumpCount = 0;
         _climbCount = 0;
@@ -47,15 +45,12 @@ public static class BodyPatch
 
     private static void HandleMultiJump(Body __instance)
     {
-        // ���
         if (__instance.grounded)
             return;
 
-        // û���� ��ͷ��
         if (!JumpKey || _jumpCount >= WorldSettings.JumpLimit)
             return;
 
-        // �ָ�
         JumpCooldownField.SetValue(__instance, 0f);
         __instance.grounded = true;
         __instance.Jump();
@@ -64,14 +59,11 @@ public static class BodyPatch
 
     private static void HandleMultiClimb(Body __instance)
     {
-        // // ���
         if (__instance.grounded) return;
 
-        // û���� ��ͷ��
         if (!JumpKey || _climbCount >= WorldSettings.ClimbLimit)
             return;
 
-        // �ָ�
         FirstWallJumpField.SetValue(__instance, true);
         __instance.grounded = true;
         _climbCount++;

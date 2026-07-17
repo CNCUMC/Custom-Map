@@ -19,7 +19,7 @@ public class BearTrapScriptPatch
         "origPos", BindingFlags.NonPublic | BindingFlags.Instance);
 
     private static readonly Dictionary<BearTrap, float> LastTriggerTime = new();
-    private static BearTrapData BearTrapData => MapCheck.CurrentMap?.CurrentLayer.BearTrapData;
+    private static BearTrapData BearTrapData => MapUtils.CurrentMap?.CurrentLayer.BearTrapData;
 
     [HarmonyPatch("OnTriggerEnter2D")]
     [HarmonyPrefix]

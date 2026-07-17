@@ -44,9 +44,9 @@ public static class MapLoader
                 return;
             }
 
-            var index = MapCheck.Maps.FindIndex(f => f.Id == map.Id);
+            var index = MapUtils.Maps.FindIndex(f => f.Id == map.Id);
             if (index >= 0)
-                MapCheck.Maps[index] = reloadedMap;
+                MapUtils.Maps[index] = reloadedMap;
 
             WorldGenerationPatch.CurrentMap = reloadedMap;
 
@@ -99,7 +99,7 @@ public static class MapLoader
 
     public static void LogMapInfo()
     {
-        var map = MapCheck.CurrentMap ?? MapCheck.Maps.FirstOrDefault();
+        var map = MapUtils.CurrentMap ?? MapUtils.Maps.FirstOrDefault();
         if (map == null)
         {
             Error("no_current_map");
@@ -120,7 +120,7 @@ public static class MapLoader
 
     public static void LogMapList()
     {
-        var maps = MapCheck.Maps;
+        var maps = MapUtils.Maps;
 
         if (maps == null
             || maps.Count == 0)
@@ -135,7 +135,7 @@ public static class MapLoader
         for (var i = 0; i < maps.Count; i++)
         {
             var map = maps[i];
-            var isCurrent = map.Id == MapCheck.CurrentMap?.Id;
+            var isCurrent = map.Id == MapUtils.CurrentMap?.Id;
             var marker = isCurrent
                 ? "->" 
                 : "  ";

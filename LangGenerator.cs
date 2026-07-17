@@ -1011,16 +1011,6 @@ internal class LangGenerator : ModLangGenMultiBase
             "Не удалось определить допустимое имя папки из пути '{0}'");
 
         // Log - Mod Command
-        Log("mod_command.empty_type",
-            "Unknown command type",
-            "未知的命令类型",
-            "未知的命令類型",
-            "Неизвестный тип команды");
-        Log("mod_command.world_not_loaded",
-            "World not loaded",
-            "未加载世界",
-            "未載入世界",
-            "Мир не загружен");
         Log("mod_command.no_waypoints",
             "No waypoints defined in current Map",
             "当前地图未定义路径点",

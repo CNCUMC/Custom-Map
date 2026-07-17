@@ -18,7 +18,7 @@ public class MineScriptPatch
         BindingFlags.NonPublic | BindingFlags.Instance);
 
     private static readonly Lazy<ExplosionParams> DefaultExplosionParams = new(() => new ExplosionParams());
-    private static MineData MineData => MapCheck.CurrentMap?.CurrentLayer.MineData;
+    private static MineData MineData => MapUtils.CurrentMap?.CurrentLayer.MineData;
 
     private static ExplosionParams CreateMineExplosionParams(Vector3 pos)
     {

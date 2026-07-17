@@ -35,9 +35,9 @@ public static class WorldGenerationPatch
     {
         WorldGeneration = __instance;
 
-        if (MapCheck.HasRunningMap && !ExitTargetScene.HasValue)
+        if (MapUtils.HasMap && !ExitTargetScene.HasValue)
         {
-            CurrentMap = MapCheck.CurrentMap;
+            CurrentMap = MapUtils.CurrentMap;
             return;
         }
 
@@ -46,7 +46,7 @@ public static class WorldGenerationPatch
 
         if (string.IsNullOrEmpty(Plugin.FirstUseMap)) return;
         var targetId = Plugin.FirstUseMap;
-        var map = MapCheck.Maps.FirstOrDefault(f =>
+        var map = MapUtils.Maps.FirstOrDefault(f =>
             f != null
             && (f.Id?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true ||
                 MapLocale.GetName(f)?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true));
@@ -101,7 +101,6 @@ public static class WorldGenerationPatch
         if (map?.CurrentLayer?.WorldSettingsData == null) return;
 
         var settings = map.CurrentLayer.WorldSettingsData;
-        var appliedCount = 0;
 
         var properties = typeof(WorldSettingsData).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         foreach (var prop in properties)
@@ -115,15 +114,13 @@ public static class WorldGenerationPatch
             var value = prop.GetValue(settings);
             if (value == null) continue;
             WorldGeneration.runSettings[runSettingsKey] = value;
-            appliedCount++;
         }
 
-        if (settings.SettingsOverrides != null)
-            foreach (var kvp in settings.SettingsOverrides)
-            {
-                WorldGeneration.runSettings[kvp.Key] = kvp.Value;
-                appliedCount++;
-            }
+        if (settings.SettingsOverrides == null) return;
+        foreach (var kvp in settings.SettingsOverrides)
+        {
+            WorldGeneration.runSettings[kvp.Key] = kvp.Value;
+        }
     }
 
     private static void StartMapLoading(Map map)

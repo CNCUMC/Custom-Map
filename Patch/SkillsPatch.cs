@@ -14,7 +14,7 @@ public class SkillsPatch
     [HarmonyPrefix]
     private static bool SetupPrefix(Skills __instance, int chr)
     {
-        var currentMap = MapCheck.CurrentMap;
+        var currentMap = MapUtils.CurrentMap;
         if (currentMap?.XpData == null)
             return true;
 

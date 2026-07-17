@@ -119,10 +119,10 @@ public class ModCommand
                 case "reload":
                     CheckArg(args, 1);
                     MapCheck.Reload();
-                    if (HasWorldLoaded() && MapCheck.CurrentMap != null)
+                    if (MapUtils.IsInMapWorld)
                     {
-                        MapLoader.ReloadMapFromDisk(MapCheck.CurrentMap);
-                        MapLoader.ReloadMap(MapCheck.CurrentMap);
+                        MapLoader.ReloadMapFromDisk(MapUtils.CurrentMap);
+                        MapLoader.ReloadMap(MapUtils.CurrentMap);
                     }
 
                     InfoCommand("reload.success");
@@ -136,12 +136,12 @@ public class ModCommand
                     HandleSaveReload();
                     break;
                 case "info":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.HasMap) return;
                     CheckArg(args, 1);
                     MapLoader.LogMapInfo();
                     break;
                 case "spawn":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.IsInMapWorld) return;
                     CheckArg(args, 1);
                     Spawn();
                     break;
@@ -157,19 +157,19 @@ public class ModCommand
                         MapLoader.LogMapList();
                     break;
                 case "feature":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.HasMap) return;
                     HandleFeature(args);
                     break;
                 case "waypoint":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.HasMap) return;
                     HandleWaypoint(args);
                     break;
                 case "save":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.IsInMapWorld) return;
                     HandleSave(args);
                     break;
                 case "layer":
-                    if (!EnsureWorldLoaded()) return;
+                    if (!MapUtils.IsInMapWorld) return;
                     HandleLayer(args);
                     break;
                 case "exit":
@@ -180,14 +180,9 @@ public class ModCommand
 
     private static void HandleSaveReload()
     {
-        if (!EnsureWorldLoaded()) return;
+        if (!MapUtils.IsInMapWorld) return;
 
-        var map = MapCheck.CurrentMap;
-        if (map == null)
-        {
-            Error("no_map");
-            return;
-        }
+        var map = MapUtils.CurrentMap;
 
         var directoryPath = map.DirectoryPath;
         if (string.IsNullOrEmpty(directoryPath))
@@ -207,9 +202,9 @@ public class ModCommand
 
     private static void HandleWaypoint(string[] args)
     {
-        if (!EnsureWorldLoaded()) return;
+        if (!MapUtils.IsInMapWorld) return;
 
-        var map = MapCheck.CurrentMap;
+        var map = MapUtils.CurrentMap;
         if (map == null)
         {
             Error("no_waypoints");
@@ -251,7 +246,7 @@ public class ModCommand
 
     private static void HandleSave(string[] args)
     {
-        var map = MapCheck.CurrentMap;
+        var map = MapUtils.CurrentMap;
 
         string targetPath = null;
 
@@ -318,13 +313,13 @@ public class ModCommand
     private static string ResolveTargetPath(string targetName)
     {
         foreach (var dir in
-                 from dir in MapCheck.ValidDirectories
+                 from dir in MapUtils.ValidDirectories
                  let folderName = Path.GetFileName(dir)
                  where string.Equals(folderName, targetName, StringComparison.OrdinalIgnoreCase)
                  select dir)
             return dir;
 
-        var directPath = Path.Combine(MapCheck.MapsPath, targetName);
+        var directPath = Path.Combine(MapUtils.MapsPath, targetName);
         if (!Directory.Exists(directPath))
             Directory.CreateDirectory(directPath);
 
@@ -412,7 +407,7 @@ public class ModCommand
 
     private static void HandleLayer(string[] args)
     {
-        var map = MapCheck.CurrentMap;
+        var map = MapUtils.CurrentMap;
         if (map == null)
         {
             Error("no_current_map");
@@ -448,7 +443,7 @@ public class ModCommand
 
         map.CurrentLayerIndex = newIndex;
 
-        if (HasWorldLoaded())
+        if (MapUtils.IsInMapWorld)
         {
             MapLoader.ReloadMap(map);
             MapLoader.LogMapInfo();
@@ -459,8 +454,6 @@ public class ModCommand
 
     private static void HandleExit(string[] args)
     {
-        if (!EnsureWorldLoaded()) return;
-
         if (args.Length < 3)
         {
             Error("exit_no_target");
@@ -568,7 +561,7 @@ public class ModCommand
 
     private static void HandleFeature(string[] args)
     {
-        var map = MapCheck.CurrentMap;
+        var map = MapUtils.CurrentMap;
         if (map == null)
         {
             Error("no_map");
@@ -788,25 +781,6 @@ public class ModCommand
             : fieldName.ToLowerInvariant();
     }
 
-    private static bool EnsureWorldLoaded()
-    {
-        if (HasWorldLoaded()) return true;
-        Error("world_not_loaded");
-        return false;
-    }
-
-    private static bool HasWorldLoaded()
-    {
-        try
-        {
-            return WorldGeneration.world && !WorldGeneration.world.generatingWorld;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     private static void Select(string key)
     {
         if (string.IsNullOrWhiteSpace(key))
@@ -815,7 +789,7 @@ public class ModCommand
             return;
         }
 
-        if (MapCheck.Maps == null || MapCheck.Maps.Count == 0)
+        if (MapUtils.Maps == null || MapUtils.Maps.Count == 0)
         {
             InfoCommand("list.empty");
             return;
@@ -825,17 +799,17 @@ public class ModCommand
 
         if (int.TryParse(key, out var index))
         {
-            if (index < 1 || index > MapCheck.Maps.Count)
+            if (index < 1 || index > MapUtils.Maps.Count)
             {
-                InfoCommand("select.invalid_index", index, MapCheck.Maps.Count);
+                InfoCommand("select.invalid_index", index, MapUtils.Maps.Count);
                 return;
             }
 
-            map = MapCheck.Maps[index - 1];
+            map = MapUtils.Maps[index - 1];
         }
         else
         {
-            map = MapCheck.Maps.Find(f =>
+            map = MapUtils.Maps.Find(f =>
                 f != null &&
                 (f.Id?.Equals(key, StringComparison.OrdinalIgnoreCase) == true ||
                  MapLocale.GetName(f)?.Equals(key, StringComparison.OrdinalIgnoreCase) == true));
@@ -851,7 +825,7 @@ public class ModCommand
 
         InfoCommand("select.success", MapLocale.GetName(map), map.Id);
 
-        if (HasWorldLoaded())
+        if (MapUtils.IsInMapWorld)
         {
             MapLoader.ReloadMap(map);
             MapLoader.LogMapInfo();
@@ -892,7 +866,7 @@ public class ModCommand
 
     private static void Spawn()
     {
-        var map = MapCheck.CurrentMap;
+        var map = MapUtils.CurrentMap;
         InfoCommand("spawn", map.CurrentLayer.SpawnPosition);
         PlayerUtil.Tp(map.CurrentLayer.SpawnPosition);
     }

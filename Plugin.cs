@@ -148,7 +148,7 @@ public class Plugin : BaseUnityPlugin
     private static void RegisterMapOption()
     {
         var choices = new List<ModDropdownChoice>();
-        var mapsDir = MapCheck.MapsPath;
+        var mapsDir = MapUtils.MapsPath;
 
         // Add TemplateMap - register English default and use localized name
         var templateKey = $"{NameSpace}.first_use_map{TemplateMap.Id}";
