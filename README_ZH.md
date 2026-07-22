@@ -104,13 +104,11 @@ Maps/
     ├── map.json                      # 地图元数据
     ├── layers/
     │   ├── layer1/                   # 层级 1 文件夹
-    │   │   ├── layer.json            # 层级属性
-    │   │   ├── command.json          # 层级指令（可选）
-    │   │   └── *.m2.json             # 结构文件（可选）
+    │   │   ├── layer.json            # 层级属性 + 结构
+    │   │   └── command.json          # 层级指令（可选）
     │   └── layer2/                   # 层级 2 文件夹（可选）
     │       ├── layer.json
-    │       ├── command.json
-    │       └── *.m2.json
+    │       └── command.json
     ├── command.json                  # 全局指令 — 作为所有层级的回退（可选）
     ├── feature/
     │   ├── world/
@@ -185,15 +183,16 @@ Maps/
 | `waypoints`       | `array`    | `[]`    | 坐标点列表（用于 `cm waypoint`）                                                   |
 | `items`           | `array`    | `[]`    | 出生时给予的物品                                                                  |
 
-### 结构文件 (*.m2.json)
+### 结构
 
-层级文件夹中的每个 `.m2.json` 文件定义一个结构放置：
+结构直接定义在 `layer.json` 的 `structures` 数组中：
 
 ```json
 {
-  "structure": "StructureName",
-  "x": 10,
-  "y": 20
+  "structures": [
+    { "structure": "StructureName", "x": 10, "y": 20 }
+  ],
+  "skip_terrain": false
 }
 ```
 

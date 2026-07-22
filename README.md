@@ -107,13 +107,11 @@ Maps/
     ├── map.json                      # Map metadata
     ├── layers/
     │   ├── layer1/                   # Layer 1 folder
-    │   │   ├── layer.json            # Layer properties
-    │   │   ├── command.json          # Layer commands (optional)
-    │   │   └── *.m2.json             # Structure files (optional)
+    │   │   ├── layer.json            # Layer properties + structures
+    │   │   └── command.json          # Layer commands (optional)
     │   └── layer2/                   # Layer 2 folder (optional)
     │       ├── layer.json
-    │       ├── command.json
-    │       └── *.m2.json
+    │       └── command.json
     ├── command.json                  # Global commands — applied to all layers as fallback (optional)
     ├── feature/
     │   ├── world/
@@ -188,15 +186,16 @@ Each layer is a folder under `layers/` (e.g. `layers/layer1/`).
 | `waypoints`       | `array`    | `[]`    | Waypoint list (for `cm waypoint`)                                                     |
 | `items`           | `array`    | `[]`    | Items to give on spawn                                                                |
 
-### Structure Files (*.m2.json)
+### Structures
 
-Each `.m2.json` file in a layer folder defines a single structure placement:
+Structures are defined inline in `layer.json` via the `structures` array:
 
 ```json
 {
-  "structure": "StructureName",
-  "x": 10,
-  "y": 20
+  "structures": [
+    { "structure": "StructureName", "x": 10, "y": 20 }
+  ],
+  "skip_terrain": false
 }
 ```
 

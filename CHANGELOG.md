@@ -7,7 +7,7 @@
 - **Layer-based map structure** — Maps now use a folder-based layer system (`layers/layer1/`) instead of flat JSON files
 - **Per-layer commands** — Each layer can have its own `command.json` with startup and loop commands
 - **Global command fallback** — Map-root `command.json` applies to all layers as a fallback
-- **Structure files** — Individual `.m2.json` files per layer for structure placement
+- **Inline structures** — Structures defined directly in `layer.json` via the `structures` array
 - **Multi-language UI** — Full localization support for English, Simplified Chinese, Traditional Chinese, and Russian
 - **Custom loading screen** — Real-time progress display during map generation
 - **Waypoint system** — Define and teleport to waypoints within layers
@@ -38,9 +38,8 @@ Maps/your-map-name/
 ├── map.json              # Map metadata (id, version, author)
 ├── layers/
 │   ├── layer1/
-│   │   ├── layer.json    # Layer properties (type, spawn, skip flags)
-│   │   ├── command.json  # Layer commands (optional)
-│   │   └── *.m2.json     # Structure files (optional)
+│   │   ├── layer.json    # Layer properties + structures
+│   │   └── command.json  # Layer commands (optional)
 │   └── layer2/
 │       └── ...
 ├── command.json          # Global commands - applied to all layers (optional)

@@ -117,9 +117,6 @@ public static class CustomMapDirectoryLoader
                 if (File.Exists(commandPath))
                     layerData.CommandData = LoadJson<CommandData>(commandPath);
 
-                // 加载 *.m2.json 结构文件
-                layerData.Structures = LoadStructures(layerDir);
-
                 layers.Add(layerData);
             }
             catch
@@ -128,26 +125,6 @@ public static class CustomMapDirectoryLoader
             }
 
         return layers;
-    }
-
-    private static List<StructureData> LoadStructures(string layerDir)
-    {
-        var structures = new List<StructureData>();
-        var m2Files = Directory.GetFiles(layerDir, "*.m2.json");
-
-        foreach (var m2File in m2Files)
-            try
-            {
-                var structure = LoadJson<StructureData>(m2File);
-                if (structure != null)
-                    structures.Add(structure);
-            }
-            catch
-            {
-                // ignore
-            }
-
-        return structures;
     }
 
     private static WorldSettingsData LoadWorldSettings(string directoryPath)
@@ -258,13 +235,6 @@ public static class CustomMapDirectoryLoader
                     SaveJsonWithTypeCheck(commandPath, map.Layers[i].CommandData, "command");
                 }
 
-                // 保存 *.m2.json 结构文件
-                if (map.Layers[i].Structures is { Count: > 0 })
-                    for (var s = 0; s < map.Layers[i].Structures.Count; s++)
-                    {
-                        var structurePath = Path.Combine(layerDir, $"structure_{s + 1}.m2.json");
-                        SaveJsonWithTypeCheck(structurePath, map.Layers[i].Structures[s], "structure");
-                    }
             }
         }
 
