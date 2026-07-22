@@ -41,6 +41,10 @@ public static class WorldGenerationPatch
             return;
         }
 
+        // 如果设置了退出目标，不加载任何地图
+        if (ExitTargetScene.HasValue)
+            return;
+
         if (!Plugin.StartGameUseMap)
             return;
 

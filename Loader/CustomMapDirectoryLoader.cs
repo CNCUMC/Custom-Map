@@ -42,10 +42,18 @@ public static class CustomMapDirectoryLoader
 
             map.DirectoryPath = directoryPath;
 
+            // 先加载地图根目录的 command.json 作为全局回退
+            var mapCommandData = LoadCommandData(directoryPath);
+
             map.Layers = LoadLayers(directoryPath);
 
             if (map.Layers.Count == 0)
                 map.Layers.Add(new Layer());
+
+            // 为所有没有独立 command.json 的层级应用地图级命令
+            if (mapCommandData != null)
+                foreach (var layer in map.Layers)
+                    layer.CommandData ??= mapCommandData;
 
             map.CurrentLayer.WorldSettingsData = LoadWorldSettings(directoryPath) ?? new WorldSettingsData();
 
@@ -59,8 +67,6 @@ public static class CustomMapDirectoryLoader
             }
 
             map.XpData ??= new XpData();
-
-            map.CurrentLayer.CommandData = LoadCommandData(directoryPath);
 
             return map;
         }
@@ -76,30 +82,45 @@ public static class CustomMapDirectoryLoader
         if (!Directory.Exists(layersDir))
             return [];
 
-        var layerFiles = Directory.GetFiles(layersDir, "layer*.json")
-            .Select(f =>
+        // 扫描 layers/ 下的子目录（layer1/, layer2/, ...）
+        var layerDirs = Directory.GetDirectories(layersDir, "layer*")
+            .Select(d =>
             {
-                var name = Path.GetFileNameWithoutExtension(f);
+                var name = Path.GetFileName(d);
                 var numStr = name.Substring("layer".Length);
                 var num = int.TryParse(numStr, out var n)
                     ? n
                     : int.MaxValue;
-                return (Path: f, Num: num);
+                return (Path: d, Num: num);
             })
             .OrderBy(x => x.Num)
             .Select(x => x.Path)
             .ToList();
 
-        if (layerFiles.Count == 0)
+        if (layerDirs.Count == 0)
             return [];
 
         var layers = new List<Layer>();
-        foreach (var layerFile in layerFiles)
+        foreach (var layerDir in layerDirs)
             try
             {
-                var layerData = LoadJson<Layer>(layerFile);
-                if (layerData != null)
-                    layers.Add(layerData);
+                var layerJsonPath = Path.Combine(layerDir, "layer.json");
+                if (!File.Exists(layerJsonPath))
+                    continue;
+
+                var layerData = LoadJson<Layer>(layerJsonPath);
+                if (layerData == null)
+                    continue;
+
+                // 加载 command.json（从层级目录）
+                var commandPath = Path.Combine(layerDir, "command.json");
+                if (File.Exists(commandPath))
+                    layerData.CommandData = LoadJson<CommandData>(commandPath);
+
+                // 加载 *.m2.json 结构文件
+                layerData.Structures = LoadStructures(layerDir);
+
+                layers.Add(layerData);
             }
             catch
             {
@@ -107,6 +128,26 @@ public static class CustomMapDirectoryLoader
             }
 
         return layers;
+    }
+
+    private static List<StructureData> LoadStructures(string layerDir)
+    {
+        var structures = new List<StructureData>();
+        var m2Files = Directory.GetFiles(layerDir, "*.m2.json");
+
+        foreach (var m2File in m2Files)
+            try
+            {
+                var structure = LoadJson<StructureData>(m2File);
+                if (structure != null)
+                    structures.Add(structure);
+            }
+            catch
+            {
+                // ignore
+            }
+
+        return structures;
     }
 
     private static WorldSettingsData LoadWorldSettings(string directoryPath)
@@ -180,6 +221,17 @@ public static class CustomMapDirectoryLoader
             var layersDir = Path.Combine(directoryPath, "layers");
             Directory.CreateDirectory(layersDir);
 
+            // 清理旧的层级文件和目录
+            foreach (var oldDir in Directory.GetDirectories(layersDir, "layer*"))
+                try
+                {
+                    Directory.Delete(oldDir, true);
+                }
+                catch
+                {
+                    /* ignore */
+                }
+
             foreach (var oldFile in Directory.GetFiles(layersDir, "*.json"))
                 try
                 {
@@ -192,8 +244,27 @@ public static class CustomMapDirectoryLoader
 
             for (var i = 0; i < map.Layers.Count; i++)
             {
-                var layerPath = Path.Combine(layersDir, $"layer{i + 1}.json");
-                SaveJsonWithTypeCheck(layerPath, map.Layers[i], "layer");
+                var layerDir = Path.Combine(layersDir, $"layer{i + 1}");
+                Directory.CreateDirectory(layerDir);
+
+                // 保存 layer.json
+                var layerJsonPath = Path.Combine(layerDir, "layer.json");
+                SaveJsonWithTypeCheck(layerJsonPath, map.Layers[i], "layer");
+
+                // 保存 command.json（如果有）
+                if (map.Layers[i].CommandData != null)
+                {
+                    var commandPath = Path.Combine(layerDir, "command.json");
+                    SaveJsonWithTypeCheck(commandPath, map.Layers[i].CommandData, "command");
+                }
+
+                // 保存 *.m2.json 结构文件
+                if (map.Layers[i].Structures is { Count: > 0 })
+                    for (var s = 0; s < map.Layers[i].Structures.Count; s++)
+                    {
+                        var structurePath = Path.Combine(layerDir, $"structure_{s + 1}.m2.json");
+                        SaveJsonWithTypeCheck(structurePath, map.Layers[i].Structures[s], "structure");
+                    }
             }
         }
 
@@ -226,10 +297,6 @@ public static class CustomMapDirectoryLoader
 
         Plugin.Logger?.LogInfo(
             $"[MapDirectoryLoader.Debug] SaveToDirectory after SaveToCurrentLang, CommandData is null? {map.CurrentLayer.CommandData == null}");
-
-        if (map.CurrentLayer.CommandData == null) return;
-        var commandPath = Path.Combine(directoryPath, "command.json");
-        SaveJsonWithTypeCheck(commandPath, map.CurrentLayer.CommandData, "command");
     }
 
     private static void SaveJsonWithTypeCheck<T>(string filePath, T obj, string expectedType) where T : class

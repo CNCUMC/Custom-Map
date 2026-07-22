@@ -110,6 +110,6 @@ public static class CustomStructuresLoader
 
     private static string LocaleLog(string key, params object[] args)
     {
-        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}{key}", args);
+        return BetterLocale.GetLog($"{Plugin.NameSpace}.{LocaleKeyPre}.{key}", args);
     }
 }

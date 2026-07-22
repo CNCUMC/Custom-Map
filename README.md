@@ -18,35 +18,35 @@ of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jim
 - [Quick Start](#quick-start)
 - [Commands](#commands)
 - [Map Structure](#map-structure)
+- [Layer](#layer)
+- [Command System](#command-system)
 - [Features](#features)
 - [Settings](#settings)
+- [Compatibility](#compatibility)
 - [License](#license)
 
 ---
 
 ## Overview
 
-**Custom Map** allows you to load custom-designed maps in Casualties Unknown. Maps are defined using a string-based
-format with a key-value mapping system, enabling precise control over every block and entity placement.
+**Custom Map** allows you to load custom-designed maps in Casualties Unknown.
 
-- **String map format** — Each character in the map grid maps to a block ID or entity ID via a JSON key dictionary
+- **Layer-based maps** — Multi-layer support with independent settings, structures, and commands per layer
 - **Feature system** — Per-map configuration for mines, turrets, jump pads, spike stabbers, geysers, bear traps, and
   more
 - **Custom loading screen** — Shows real-time progress during map generation
 - **Command interface** — Full `cm` command set for managing maps in-game
-- **Multi-language support** — English, 简体中文, 繁體中文
+- **Multi-language support** — English, 简体中文, 繁體中文, Русский
 - **Mod compatibility** — Soft integration with [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)
-  and [Build Mode](https://www.nexusmods.com/scavprototype/mods/24) — load `.txt` / `.ms.json` / `.ms2.json`  structures
-  and `.alexx_BMsave` saves alongside your map
 
 ---
 
 ## Installation
 
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx) for Casualties Unknown.
-2. Install [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) ≥ 1.0.2 — place `CUCoreLib.dll` in
+2. Install [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) — place `CUCoreLib.dll` in
    `BepInEx/plugins/`.
-3. Install [Bark](https://github.com/CNCUMC/Bark) ≥ 1.0.2 — place `Bark.dll` in `BepInEx/plugins/Bark/`.
+3. Install [Bark](https://github.com/CNCUMC/Bark) — place `Bark.dll` in `BepInEx/plugins/Bark/`.
 4. Install Custom Map, place in `BepInEx/plugins/Custom Map`.
 5. Place map folders in `Maps/` (next to the game executable).
 
@@ -71,23 +71,21 @@ start a new game.
 
 All commands use the `cm` prefix.
 
-| Command                 | Description                                     |
-|-------------------------|-------------------------------------------------|
-| `cm help`               | Show help                                       |
-| `cm list`               | List all available maps                         |
-| `cm list <id>`          | Select and load a map by ID or index            |
-| `cm select <id>`        | Select a map (reloads world if loaded)          |
-| `cm reload`             | Reload current map from disk                    |
-| `cm load`               | Reload all maps from Maps folder                |
-| `cm info`               | Show current map details                        |
-| `cm spawn`              | Teleport to map spawn point                     |
-| `cm feature`            | List or modify map features                     |
-| `cm waypoint`           | List or teleport to waypoints                   |
-| `cm save <start> <end>` | Save an area to current map                     |
-| `cm save as [name]`     | Save an area as a new map (click two positions) |
-| `cm level`              | Show current level number                       |
-| `cm level <n>`          | Switch to level n (reloads world if loaded)     |
-| `cm exit`               | Exit custom map and return to vanilla           |
+| Command                   | Description                               |
+|---------------------------|-------------------------------------------|
+| `cm help`                 | Show help                                 |
+| `cm reload`               | Reload current map from disk              |
+| `cm load`                 | Reload all maps from Maps folder          |
+| `cm savereload`           | Save and reload current map               |
+| `cm info`                 | Show current map details                  |
+| `cm spawn`                | Teleport to map spawn point               |
+| `cm select <id>`          | Select a map by ID, name, or index        |
+| `cm list`                 | List all available maps                   |
+| `cm feature [name] [val]` | List or set map features                  |
+| `cm waypoint [list\|get]` | Manage waypoints                          |
+| `cm save`                 | Save current map to disk                  |
+| `cm layer [n]`            | Show or switch layer                      |
+| `cm exit <target>`        | Exit map — `none` (vanilla) or `tutorial` |
 
 ---
 
@@ -98,49 +96,180 @@ A map is a folder under `Maps/` with the following structure:
 ```
 Maps/
 └── your-map-name/
-    ├── map.json                      # Map metadata (name, ID, version, author, description)
-    ├── level/
-    │   ├── level_1.json              # Level data (map grid, key table, spawn, items, waypoints)
-    │   └── level_2.json              # (optional) Additional levels
+    ├── map.json                      # Map metadata
+    ├── layers/
+    │   ├── layer1/                   # Layer 1 folder
+    │   │   ├── layer.json            # Layer properties
+    │   │   ├── command.json          # Layer commands (optional)
+    │   │   └── *.m2.json             # Structure files (optional)
+    │   └── layer2/                   # Layer 2 folder (optional)
+    │       ├── layer.json
+    │       ├── command.json
+    │       └── *.m2.json
+    ├── command.json                  # Global commands — applied to all layers as fallback (optional)
     ├── feature/
     │   ├── world/
     │   │   ├── settings.json         # World settings (gravity, full bright, skip flags)
-    │   │   ├── mine.json             # Mine configuration
-    │   │   ├── jump_pad.json         # Jump pad configuration
-    │   │   ├── turret.json           # Turret configuration
-    │   │   ├── sound_cannon.json     # Sound cannon configuration
-    │   │   ├── spike_stabber.json    # Spike stabber configuration
-    │   │   ├── geyser.json           # Geyser configuration
-    │   │   └── beartrap.json         # Bear trap configuration
+    │   │   ├── mine.json             # Mine configuration (optional)
+    │   │   ├── jump_pad.json         # Jump pad configuration (optional)
+    │   │   ├── turret.json           # Turret configuration (optional)
+    │   │   ├── sound_cannon.json     # Sound cannon configuration (optional)
+    │   │   ├── spike_stabber.json    # Spike stabber configuration (optional)
+    │   │   ├── geyser.json           # Geyser configuration (optional)
+    │   │   └── beartrap.json         # Bear trap configuration (optional)
     │   └── player/
-    │       └── xp.json               # XP configuration
-    └── command.json                  # Commands (startup/loop)
+    │       └── xp.json               # XP configuration (optional)
+    └── lang/
+        ├── EN.json                   # English localization
+        ├── zh-CN.json                # Simplified Chinese localization
+        └── zh-TW.json                # Traditional Chinese localization
 ```
+
+### map.json
+
+```json
+{
+  "id": "mymap",
+  "version": "1.0.0",
+  "author": [
+    "AuthorName"
+  ]
+}
+```
+
+| Field     | Type       | Description                |
+|-----------|------------|----------------------------|
+| `id`      | `string`   | Unique map identifier      |
+| `version` | `string`   | Map version (e.g. `1.0.0`) |
+| `author`  | `string[]` | List of author names       |
+
+---
+
+## Layer
+
+Each layer is a folder under `layers/` (e.g. `layers/layer1/`).
+
+### layer.json
+
+```json
+{
+  "type": "Debug",
+  "spawn": [
+    0,
+    0
+  ],
+  "x": -68,
+  "y": 62,
+  "skip_terrain": true,
+  "skip_structures": true,
+  "skip_background": true,
+  "waypoints": [],
+  "items": []
+}
+```
+
+| Field             | Type       | Default | Description                                                                           |
+|-------------------|------------|---------|---------------------------------------------------------------------------------------|
+| `type`            | `string`   | `Debug` | Scene type: `Debug`, `Wasteland`, `TemperateForest`, `RockDesert`, `Tutorial`, `None` |
+| `spawn`           | `number[]` | `[0,0]` | Spawn position `[x, y]`                                                               |
+| `x`               | `int`      | `0`     | World X offset of the layer                                                           |
+| `y`               | `int`      | `0`     | World Y offset of the layer                                                           |
+| `skip_terrain`    | `bool`     | `true`  | Skip vanilla terrain generation                                                       |
+| `skip_structures` | `bool`     | `true`  | Skip vanilla structure generation                                                     |
+| `skip_background` | `bool`     | `true`  | Skip vanilla background generation                                                    |
+| `waypoints`       | `array`    | `[]`    | Waypoint list (for `cm waypoint`)                                                     |
+| `items`           | `array`    | `[]`    | Items to give on spawn                                                                |
+
+### Structure Files (*.m2.json)
+
+Each `.m2.json` file in a layer folder defines a single structure placement:
+
+```json
+{
+  "structure": "StructureName",
+  "x": 10,
+  "y": 20
+}
+```
+
+| Field       | Type     | Description                                           |
+|-------------|----------|-------------------------------------------------------|
+| `structure` | `string` | Structure name (registered via Custom Structures mod) |
+| `x`         | `int`    | World X coordinate                                    |
+| `y`         | `int`    | World Y coordinate                                    |
+
+---
+
+## Command System
+
+### Global Commands (`command.json` in map root)
+
+Applied to **all layers** as a fallback. If a layer has its own `command.json`, the layer-level one takes priority.
+
+```json
+{
+  "once_commands": [
+    "command1",
+    "command2"
+  ],
+  "loop_commands": [
+    "loop_command1"
+  ],
+  "loop_interval": 10.0
+}
+```
+
+### Layer Commands (`command.json` in layer folder)
+
+Override global commands for a specific layer. Same format as above.
+
+| Field           | Type       | Description                               |
+|-----------------|------------|-------------------------------------------|
+| `once_commands` | `string[]` | Commands executed once on map load        |
+| `loop_commands` | `string[]` | Commands executed repeatedly              |
+| `loop_interval` | `float`    | Interval in seconds between loop commands |
 
 ---
 
 ## Features
 
-Each feature is configured per-map via JSON files in `feature/world/`. Common properties include:
+Each feature file in `feature/world/` or `feature/player/` configures the corresponding game entity.
 
-- **Cooldown** — Time between activations
-- **Undestroy** — Whether the entity is indestructible
-- **NoLight** — Disables the entity's light emission
-- **Damage/Speed multipliers** — Adjusts damage output or movement speed
+| Feature              | Description                                                                              |
+|----------------------|------------------------------------------------------------------------------------------|
+| `settings.json`      | World settings: `full_bright`, `gravity`, `jump_limit`, `climb_limit`, `forgiving_level` |
+| `mine.json`          | Mine: cooldown, undestroy                                                                |
+| `jump_pad.json`      | Jump pad: cooldown, force, no_light                                                      |
+| `turret.json`        | Turret: cooldown, shot power, range, undestroy, no_light                                 |
+| `sound_cannon.json`  | Sound cannon: cooldown, range, charge time, undestroy                                    |
+| `spike_stabber.json` | Spike stabber: damage, cooldown, undestroy, no_light, sound                              |
+| `geyser.json`        | Geyser: cooldown, duration, range, rumble time, no_liquid                                |
+| `beartrap.json`      | Bear trap: damage, cooldown, undestroy                                                   |
+| `xp.json`            | XP: strength/resilience/intelligence levels and EXP ranges                               |
 
 ---
 
 ## Settings
 
-| Setting                    | Description                                  |
-|----------------------------|----------------------------------------------|
-| `more_logs`                | Enable verbose logging                       |
-| `start_game_use_map`       | Automatically use selected map when starting |
-| `first_use_map`            | Map ID to use when starting a new game       |
-| `progress_update_interval` | Blocks between progress text updates         |
+| Setting                    | Description                                    | Default    |
+|----------------------------|------------------------------------------------|------------|
+| `More Logs`                | Enable verbose logging                         | `false`    |
+| `Start Game Use Map`       | Automatically use selected map when starting   | `false`    |
+| `First Use Map`            | Map ID to use when starting a new game         | `template` |
+| `Progress Update Interval` | Number of blocks between progress text updates | `333`      |
+
+---
+
+## Compatibility
+
+Custom Map supports soft integration with:
+
+| Mod                                                                 | Required | Description                                                           |
+|---------------------------------------------------------------------|----------|-----------------------------------------------------------------------|
+| [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) | No       | Place `.txt` / `.ms.json` / `.ms2.json` files for structure placement |
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+[LGPL-3.0](LICENSE.md)
