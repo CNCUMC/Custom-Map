@@ -1,14 +1,19 @@
 ![Logo](Logo.png)
 
-[English Guide](README.md)
+[English Guide](README.md) | [Руководство на русском](README_RU.md)
 
 # Custom Map
 
 [GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
 _一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/)
-打造的自定义地图加载器，基于 [Bark](https://github.com/CNCUMC/Bark)
+打造的自定义地图加载器，基于 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)、[Bark](https://github.com/CNCUMC/Bark)
 和 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)。_
+
+**_本模组支持俄语 (感谢 @Crescia1949 和 [Mimo](https://mimo.mi.com/)大模型!)_**
+
+_@Crescia1949 不是俄语母语者，AI翻译也不一定准确，有任何建议在 [NexusMods post](https://www.nexusmods.com/scavprototype/mods/436)
+或 [GitHub Issues](https://github.com/CNCUMC/Custom-Map/issues) 及时报告。_
 
 ---
 
@@ -37,7 +42,8 @@ _一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/)
 - **自定义加载界面** — 地图生成时显示实时进度
 - **指令接口** — 完整的 `cm` 指令集用于管理地图
 - **多语言支持** — English、简体中文、繁體中文、Русский
-- **模组兼容** — 软集成 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)
+- **基于 Custom Structures** — 扩展 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)，
+  提供多层级支持、特性系统和游戏内指令
 
 ---
 
@@ -46,8 +52,9 @@ _一个为 [Casualties Unknown](https://store.steampowered.com/app/4576490/)
 1. 为 Casualties Unknown 安装 [BepInEx 5.x](https://github.com/BepInEx/BepInEx)。
 2. 安装 [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) — 将 `CUCoreLib.dll` 放入 `BepInEx/plugins/`。
 3. 安装 [Bark](https://github.com/CNCUMC/Bark) — 将 `Bark.dll` 放入 `BepInEx/plugins/Bark/`。
-4. 安装 Custom Map，放入 `BepInEx/plugins/Custom Map`。
-5. 将地图文件夹放入 `Maps/`（游戏可执行文件同级目录）。
+4. 安装 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) — 放入 `BepInEx/plugins/`。
+5. 安装 Custom Map，放入 `BepInEx/plugins/Custom Map`。
+6. 将地图文件夹放入 `Maps/`（游戏可执行文件同级目录）。
 
 ---
 

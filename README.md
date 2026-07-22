@@ -1,13 +1,19 @@
 ![Logo](Logo.png)
 
-[中文指南](README_ZH.md)
+[中文指南](README_ZH.md) | [Руководство на русском](README_RU.md)
 
 # Custom Map
 
 [GitHub](https://github.com/CNCUMC/Custom-Map) | [NexusMods](https://www.nexusmods.com/scavprototype/mods/436) | [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)
 
 _A custom map loader for [Casualties Unknown](https://store.steampowered.com/app/4576490/), built on top
-of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
+of [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9), [Bark](https://github.com/CNCUMC/Bark)
+and [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
+
+**_This mod supports Russian (thanks to @Crescia1949 and [Mimo](https://mimo.mi.com/) AI!)_**
+
+_@Crescia1949 is not a native Russian speaker, and AI translation may not be perfectly accurate. Please report any issues
+on [NexusMods post](https://www.nexusmods.com/scavprototype/mods/436) or [GitHub Issues](https://github.com/CNCUMC/Custom-Map/issues)._
 
 ---
 
@@ -37,7 +43,8 @@ of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jim
 - **Custom loading screen** — Shows real-time progress during map generation
 - **Command interface** — Full `cm` command set for managing maps in-game
 - **Multi-language support** — English, 简体中文, 繁體中文, Русский
-- **Mod compatibility** — Soft integration with [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9)
+- **Built on Custom Structures** — Extends [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) with
+  multi-layer support, feature system, and in-game commands
 
 ---
 
@@ -47,8 +54,9 @@ of [Bark](https://github.com/CNCUMC/Bark) and [CUCoreLib](https://github.com/jim
 2. Install [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) — place `CUCoreLib.dll` in
    `BepInEx/plugins/`.
 3. Install [Bark](https://github.com/CNCUMC/Bark) — place `Bark.dll` in `BepInEx/plugins/Bark/`.
-4. Install Custom Map, place in `BepInEx/plugins/Custom Map`.
-5. Place map folders in `Maps/` (next to the game executable).
+4. Install [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9) — place in `BepInEx/plugins/`.
+5. Install Custom Map, place in `BepInEx/plugins/Custom Map`.
+6. Place map folders in `Maps/` (next to the game executable).
 
 ---
 
