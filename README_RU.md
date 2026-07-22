@@ -11,7 +11,7 @@ _Загрузчик пользовательских карт для [Casualties
 [Custom Structures](https://www.nexusmods.com/scavprototype/mods/9), [Bark](https://github.com/CNCUMC/Bark)
 и [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib)._
 
-**_Этот мод поддерживает русский язык (спасибо @Crescia1949 и [Mimo](https://mimo.mi.com/) AI!)_**
+**_Этой мод поддерживает русский язык (спасибо @Crescia1949 и [Mimo](https://mimo.mi.com/) AI!)_**
 
 _@Crescia1949 не является носителем русского языка, и перевод с помощью ИИ может быть неточным.
 Пожалуйста, сообщайте о любых проблемах на [NexusMods](https://www.nexusmods.com/scavprototype/mods/436)
